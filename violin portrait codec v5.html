@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Violin Portrait — rendered through the codec</title>
+<style>
+  :root{
+    --cream:#FAF4E6; --paper:#F3EAD3; --ink:#34232E; --faint:#e4d9bf;
+    --plum:#6D2C56; --gold:#B07D22; --green:#3C6B4E; --good:#3C6B4E; --muted:rgba(52,35,46,0.55);
+    --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif; --sans:"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 12px 40px;}
+  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--plum);font-weight:600;text-transform:uppercase;}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4.2vw,31px);line-height:1.12;margin:5px 0 10px;}
+  h1 em{font-style:italic;color:var(--plum);}
+  .sub{font-size:13px;color:var(--muted);line-height:1.5;margin:2px 2px 12px;max-width:700px;} .sub b{color:var(--ink);} .sub em{color:var(--plum);font-style:italic;}
+  .card{background:var(--paper);border:1px solid var(--faint);border-radius:5px;box-shadow:0 6px 22px rgba(52,35,46,.08);padding:10px 12px 8px;margin-bottom:12px;}
+  canvas{width:100%;height:auto;display:block;border-radius:4px;background:#a8a8a8;touch-action:none;cursor:grab;}
+  canvas.grabbing{cursor:grabbing;}
+  .math{font-family:var(--serif);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 4px 4px;} .tag{font-size:11px;color:var(--muted);letter-spacing:.08em;}
+  button{font-family:inherit;font-size:12px;color:var(--ink);background:var(--cream);border:1px solid var(--muted);border-radius:20px;padding:6px 11px;cursor:pointer;}
+  button:hover{background:var(--paper);} button.on{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+  .ctl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin:6px 4px 2px;}
+  .ctl label{font-size:11.5px;color:var(--muted);} .ctl .val{font-family:var(--serif);font-size:12px;min-width:64px;text-align:right;}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;outline:none;background:linear-gradient(90deg,var(--plum),var(--faint));}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--cream);border:2.5px solid var(--ink);cursor:pointer;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 12px;margin:6px 2px 6px;}
+  .cell{background:var(--paper);border:1px solid var(--faint);border-radius:6px;padding:8px 10px;}
+  .cell .k{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;} .cell .v{font-family:var(--serif);font-size:15px;margin-top:2px;}
+  .wide{grid-column:1 / -1;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .badge{font-size:11.5px;font-weight:700;color:#fff;background:var(--good);border-radius:20px;padding:3px 10px;}
+  .foot{font-size:12px;color:var(--muted);line-height:1.55;margin:2px 4px 0;} .foot b{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Tetra Engine · The Codec · Portrait Mode</div>
+  <h1>Violin portrait — <em>rendered through the codec</em></h1>
+  
+
+  <div class="card">
+    <canvas id="cv" width="720" height="720" aria-label="A dense decoded splat portrait of a violin, lit and depth-sorted, reconstructed from the flat codec payload. Drag to rotate in yaw and pitch; a slider controls roll."></canvas>
+    <div class="row">
+      <button id="bSpin" class="on">spinning — drag to steer</button>
+      <button id="bLimit">film-limit frame</button>
+    </div>
+    <div class="ctl">
+      <label>roll (third axis)</label>
+      <input id="sR" type="range" min="-3.1416" max="3.1416" value="0" step="0.02">
+      <span class="val" id="vR">0.00</span>
+      <label>AR noise σ (0 = clean)</label>
+      <input id="sN" type="range" min="0" max="0.003" value="0" step="0.0005">
+      <span class="val" id="vN">0.0000</span>
+    </div>
+  </div>
+
+  <p class="sub">The violin as a <b>surfaced body</b> — arched spruce top, maple back and
+  ribs, ebony fittings, purfling, f-holes cut through — in <b>flat material color only</b>, no texture, on a bare
+  gray field. <b>Photographic lighting is baked into each anchor's color at encode time</b>; the payload is only
+  <b>(u, v, aspect, color)</b>. The body turns on <b>three axes under your hand</b> — drag for yaw and pitch, slide for roll, or let it spin — and every frame is its own photograph:
+  encoded through the slits, thinned, and <em>decoded</em> — positions from aspect ratios, occlusion from
+  painter-sorting by <b>decoded</b> depth. No z ever crosses the wire. The default view samples about a tenth of the film's packing bound; <b>film-limit frame</b> re-samples the surface <b>anisotropically</b> (fine along y, coarse along x — matched to the film's own aspect squeeze) and fills it.</p>
+
+  <div class="grid">
+    <div class="cell"><div class="k">anchors sampled</div><div class="v math" id="oN">—</div></div>
+    <div class="cell"><div class="k">transmitted (fine film, R₀=0.12)</div><div class="v math" id="oK">—</div></div>
+    <div class="cell"><div class="k">position RMS (decode)</div><div class="v math" id="oRMS">—</div></div>
+    <div class="cell"><div class="k">depth-sort inversions</div><div class="v math" id="oInv">—</div></div>
+    <div class="cell"><div class="k">AR band</div><div class="v math" id="oAR">—</div></div>
+    <div class="cell"><div class="k">film capacity used (est.)</div><div class="v math" id="oCap">—</div></div>
+    <div class="cell"><div class="k">payload per anchor</div><div class="v math">u, v, AR, rgb</div></div>
+    <div class="cell wide"><div><div class="k">the reading</div><div class="v math" id="oMsg" style="font-size:14px;">—</div></div><span class="badge" id="oBadge">—</span></div>
+  </div>
+
+  <p class="foot">
+    Everything geometric — position, proportion, which surface hides which — comes out of the <b>decode</b>:
+    Möbius inversion of each anchor's aspect ratio, then painter's ordering by the decoded z. The color is the
+    photograph's job, carried per anchor. <b>Nothing else is drawn</b>: a flat gray field, no shadow, no vignette.
+    Thinning is <b>nearest-first</b>, so merged anchors are the <em>occluded</em> skin — the film records what a
+    camera would see. Raise σ and depth-sort speckle appears — the honest failure mode of a codec portrait. Verified in <code>check violin portrait.js</code>: the check script
+    extracts and runs <em>this page's own sampler and codec</em>.
+  </p>
+</div>
+
+<script id="sampler">
+// ================= SAMPLER + CODEC (pure; verified verbatim by the check script) =================
+var PORTRAIT = (function(){
+  var Zv=150, Zh=250, SCALE=1.25;
+
+  // ---------- outline ----------
+  function arc(cx,cy,r,a0,a1,n){ var p=[]; for(var i=0;i<=n;i++){ var t=(a0+(a1-a0)*i/n)*Math.PI/180;
+    p.push([cx+r*Math.cos(t), cy+r*Math.sin(t)]); } return p; }
+  var half=[]; half=half.concat(arc(0,-32,24,-90,38,30)); half.push([19.6,-14.6]);
+  half=half.concat(arc(29,-3,15,217,143,22)); half.push([17.8,8.8]);
+  half=half.concat(arc(0,24,18,-26,90,26));
+  var outline = half.concat(half.slice(1,-1).reverse().map(function(p){return[-p[0],p[1]];}));
+  function inside(px,py){ var c=false;
+    for(var i=0,j=outline.length-1;i<outline.length;j=i++){
+      var xi=outline[i][0],yi=outline[i][1],xj=outline[j][0],yj=outline[j][1];
+      if(((yi>py)!==(yj>py)) && (px < (xj-xi)*(py-yi)/(yj-yi)+xi)) c=!c; } return c; }
+  function halfWidth(y){ var w=0;
+    for(var i=0,j=outline.length-1;i<outline.length;j=i++){
+      var yi=outline[i][1],yj=outline[j][1];
+      if((yi>y)!==(yj>y)){ var x=outline[j][0]+(outline[i][0]-outline[j][0])*(y-yj)/(yi-yj); if(Math.abs(x)>w)w=Math.abs(x); } }
+    return w; }
+
+  // ---------- arching (top and back plates) ----------
+  var ARCH_T=4.4, ARCH_B=3.6;
+  function lon(y){ var t=(y+7)/56; var v=1-t*t; return v>0?Math.pow(v,0.55):0; }   // longitudinal profile
+  function archZ(x,y,h){ var w=halfWidth(y); if(w<1) return 0;
+    var q=1-(x*x)/(w*w); return q>0? h*Math.sqrt(q)*lon(y) : 0; }
+  function topZ(x,y){ return 6+archZ(x,y,ARCH_T); }
+  function backZ(x,y){ return -6-archZ(x,y,ARCH_B); }
+  function normOf(f,x,y,sgn){ var e=0.6;
+    var dx=(f(x+e,y)-f(x-e,y))/(2*e), dy=(f(x,y+e)-f(x,y-e))/(2*e);
+    var n=[-dx,-dy,sgn], L=Math.hypot(n[0],n[1],n[2]); return [n[0]/L,n[1]/L,n[2]/L]; }
+
+  // ---------- f-holes (punched through the top) ----------
+  function inFhole(x,y){ var s=x>0?1:-1, cx=s*10.6;
+    var u=(x-cx)*s, v=y+5;                                   // local, mirrored
+    var t=(v+11)/22; if(t<0||t>1) return false;
+    var stem=u-2.0*Math.sin(2*Math.PI*t);                     // S-shaped stem
+    if(Math.abs(stem)<0.9 && v>-9.2 && v<9.2) return true;
+    if(Math.hypot(u-2.0*Math.sin(2*Math.PI*0.06), v+9.2)<1.9) return true;   // lower eye
+    if(Math.hypot(u-2.0*Math.sin(2*Math.PI*0.94), v-9.2)<1.9) return true;   // upper eye
+    return false; }
+
+  // ---------- materials ----------
+  function grainNoise(a,b){ var x=Math.sin(a*12.9898+b*78.233)*43758.5453; return x-Math.floor(x); }
+  function matSpruce(x,y){ return {c:[199,140,62], ks:0.34, kp:26, tag:'spruce'}; }   // flat color — no grain
+  function matMaple(x,y){ return {c:[176,98,50],  ks:0.42, kp:30, tag:'maple'}; }    // flat color — no flame
+  var matEbony ={c:[27,22,19],  ks:0.5, kp:44, tag:'ebony'};
+  var matBridge={c:[224,198,150],ks:0.2, kp:16, tag:'bridge'};
+  var matString={c:[214,214,220],ks:0.9, kp:60, tag:'string'};
+  var matDark  ={c:[38,26,18],  ks:0.15,kp:10, tag:'dark'};
+
+  // ---------- build the sampled body ----------
+  function build(px,py,jit){
+    var P=[], PX=px||1.15, PY=py||1.15, J=(jit===0)?0:0.4;
+    function pt(x,y,z,n,m){ P.push({x:x,y:y,z:z,nx:n[0],ny:n[1],nz:n[2],
+      r:m.c[0],g:m.c[1],b:m.c[2],ks:m.ks,kp:m.kp,tag:m.tag}); }
+    // plates (jittered grid), f-holes punched from the top
+    for(var y=-55.4;y<=41.4;y+=PY) for(var x=-23.4;x<=23.4;x+=PX){
+      var jx=x+(grainNoise(x,y)-0.5)*J*PX, jy=y+(grainNoise(y,x)-0.5)*J*PY;
+      if(!inside(jx,jy)) continue;
+      if(!inFhole(jx,jy)) pt(jx,jy,topZ(jx,jy), normOf(topZ,jx,jy,1), matSpruce(jx,jy));
+      var bx=jx+PX/2, by=jy+PY/2;
+      if(inside(bx,by)) pt(bx,by,backZ(bx,by), normOf(backZ,bx,by,-1), matMaple(bx,by));
+    }
+    // purfling (dark inlay line inset from the edge, on the top)
+    for(var i=0;i<outline.length;i++){ var o=outline[i], w=halfWidth(o[1])||1;
+      var k=(w-1.7)/w, px2=o[0]*k, py2=o[1];
+      if(inside(px2,py2)&&!inFhole(px2,py2)) pt(px2,py2,topZ(px2,py2)+0.05,[0,0,1],matDark); }
+    // f-hole rims (dark)
+    for(var s=-1;s<=1;s+=2) for(var t=0;t<=1.001;t+=0.045){
+      var v=-11+22*t, u=2.0*Math.sin(2*Math.PI*t);
+      [[0.95,0],[-0.95,0]].forEach(function(off){
+        var x2=s*(10.6+u+off[0]), y2=v-5;
+        if(inside(x2,y2)) pt(x2,y2,topZ(x2,y2)+0.05,[0,0,1],matDark); });
+    }
+    // ribs (side band with outward normals)
+    for(var i=0;i<outline.length;i++){
+      var a=outline[i], b2=outline[(i+1)%outline.length];
+      var tx=b2[0]-a[0], ty=b2[1]-a[1], L=Math.hypot(tx,ty)||1;
+      var nx=ty/L, ny=-tx/L; if(nx*a[0]+ny*a[1]<0){nx=-nx;ny=-ny;}
+      for(var z=-5.4;z<=5.4;z+=1.35) pt(a[0],a[1],z,[nx,ny,0],matMaple(a[0]*0.4,z*3));
+    }
+    // neck (maple) + fingerboard (ebony, cambered)
+    for(var y=41;y<=71;y+=1.2){ for(var x=-3;x<=3;x+=1.2){
+        pt(x,y,-2,[0,0,-1],matMaple(x,y)); }
+      [-3,3].forEach(function(x2){ for(var z=-2;z<=2.6;z+=1.15) pt(x2,y,z,[x2>0?1:-1,0,0],matMaple(y,z)); });
+    }
+    for(var y=31;y<=70;y+=1.1) for(var x=-4.1;x<=4.1;x+=1.1){
+      var q=1-(x*x)/(4.4*4.4), zc=5.4+(q>0?0.9*Math.sqrt(q):0);
+      pt(x,y,zc, normOf(function(a,b){var qq=1-(a*a)/(4.4*4.4);return 5.4+(qq>0?0.9*Math.sqrt(qq):0);},x,y,1), matEbony);
+    }
+    // pegbox + pegs + scroll (a sampled tube along the spiral)
+    for(var y=72;y<=86;y+=1.3) [-3.5,3.5].forEach(function(x2){ for(var z=-2;z<=2.6;z+=1.3) pt(x2,y,z,[x2>0?1:-1,0,0],matMaple(y,z)); });
+    [75,78,81,84].forEach(function(y){ for(var x=-7;x<=7;x+=1.4) pt(x,y,0.5,[0,0,1],matEbony); });
+    for(var i2=0;i2<=17;i2++){ var tt=i2/17, th=tt*1.75*2*Math.PI, r2=7-5.8*tt;
+      var cy2=90+r2*Math.sin(th), cz2=0.5+r2*Math.cos(th);
+      for(var a2=0;a2<Math.PI*2;a2+=Math.PI/4){
+        var ny2=Math.sin(th)*Math.cos(a2), nz2=Math.cos(th)*Math.cos(a2), nx2=Math.sin(a2);
+        pt(nx2*2.1, cy2+ny2*2.1, cz2+nz2*2.1, [nx2,ny2,nz2], matMaple(cy2,cz2)); } }
+    // bridge + tailpiece + strings
+    for(var x=-7.6;x<=7.6;x+=1.2) for(var z=6.2;z<=8.4-Math.abs(x)*0.16;z+=1.0)
+      pt(x,-8,z,[0,-1,0],matBridge);
+    for(var y=-51;y<=-37;y+=0.95) for(var x=-3.9*(1-(y+51)/16);x<=3.9*(1-(y+51)/16);x+=0.95)
+      pt(x,y,7.1,[0,0.14980536,0.98871540],matEbony);
+    [-3,-1,1,3].forEach(function(x0){
+      for(var t2=0;t2<=1.001;t2+=0.016){ var y2=-40+t2*(-6+40), x2=x0*0.9+(x0*0.8-x0*0.9)*t2;
+        pt(x2,y2,7.6+t2*1.2,[0,0,1],matString); }
+      for(var t3=0;t3<=1.001;t3+=0.016){ var y3=-6+t3*77, x3=x0*0.8+(x0*0.45-x0*0.8)*t3;
+        pt(x3,y3,8.8-t3*3.0,[0,0,1],matString); } });
+    return {pts:P, px:PX, py:PY};
+  }
+
+  // ---------- pose + baked lighting + codec ----------
+  var LIGHT=[0.42,0.5,-0.76];(function(){var L=Math.hypot(LIGHT[0],LIGHT[1],LIGHT[2]);LIGHT=LIGHT.map(function(c){return c/L;});})();
+  function poseAndBake(pts, yaw, pitch, Z0, roll){
+    var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+    var cr=Math.cos(roll||0), sr=Math.sin(roll||0);
+    return pts.map(function(p){
+      var x1=p.x*SCALE, y1=(p.y-20)*SCALE, z=p.z*SCALE;
+      var x=x1*cr - y1*sr, y=x1*sr + y1*cr;                     // roll about the body's z-axis
+      var rx=x*cy-z*sy, rz=x*sy+z*cy, ry=y*cp-rz*sp, rz2=y*sp+rz*cp;
+      var nX=p.nx*cr - p.ny*sr, nY=p.nx*sr + p.ny*cr;
+      var nx=nX*cy-p.nz*sy, nz0=nX*sy+p.nz*cy, ny=nY*cp-nz0*sp, nz=nY*sp+nz0*cp;
+      var nd=Math.max(0, nx*LIGHT[0]+ny*LIGHT[1]+nz*LIGHT[2]);
+      var hx=LIGHT[0], hy=LIGHT[1], hz=LIGHT[2]-1;
+      var hL=Math.hypot(hx,hy,hz); hx/=hL;hy/=hL;hz/=hL;
+      var spec=p.ks*Math.pow(Math.max(0,nx*hx+ny*hy+nz*hz), p.kp)*255;
+      var sh=0.30+0.74*nd;
+      var col=[Math.min(255,p.r*sh+spec), Math.min(255,p.g*sh+spec), Math.min(255,p.b*sh+spec)];
+      return {X:rx, Y:ry, Z:Z0+rz2, r:col[0]|0, g:col[1]|0, b:col[2]|0, nd:nd};
+    });
+  }
+  function encode(w){ var dv=w.Z-Zv, dh=w.Z-Zh;
+    return {u:w.X*(-Zv)/dv, v:w.Y*(-Zh)/dh, ar:(Zv/Math.abs(dv))/(Zh/Math.abs(dh)), r:w.r, g:w.g, b:w.b}; }
+  function decode(a){ var Z=Zv*Zh*(a.ar-1)/(a.ar*Zh-Zv);
+    return {X:a.u*(Z-Zv)/(-Zv), Y:a.v*(Z-Zh)/(-Zh), Z:Z, r:a.r, g:a.g, b:a.b}; }
+  function thin(payload, R0){                                  // grid-hash separation, NEAREST FIRST:
+    var zOf=function(ar){ return Zv*Zh*(ar-1)/(ar*Zh-Zv); };    // the film records the visible skin,
+    var semi=function(ar){ var Z=zOf(ar); return R0*Math.max(Zv/Math.abs(Z-Zv),Zh/Math.abs(Z-Zh)); };
+    var order=payload.map(function(_,i){return i;}).sort(function(a,b){ return zOf(payload[a].ar)-zOf(payload[b].ar); });
+    var cell=2*R0*1.6, H={}, kept=[], merged=0;
+    function key(i,j){return i+"_"+j;}
+    for(var q0=0;q0<order.length;q0++){ var n=order[q0]; var p=payload[n], si=semi(p.ar);
+      var ci=Math.floor(p.u/cell), cj=Math.floor(p.v/cell), ok=true;
+      for(var di=-1;di<=1&&ok;di++) for(var dj=-1;dj<=1&&ok;dj++){
+        var lst=H[key(ci+di,cj+dj)]; if(!lst) continue;
+        for(var q=0;q<lst.length;q++){ var K=payload[lst[q]];
+          if(Math.hypot(p.u-K.u,p.v-K.v) < si+semi(K.ar)){ ok=false; break; } } }
+      if(ok){ kept.push(n); (H[key(ci,cj)]=H[key(ci,cj)]||[]).push(n); } else merged++;
+    }
+    kept.sort(function(a,b){return a-b;});
+    return {kept:kept, merged:merged};
+  }
+  return {build:build, poseAndBake:poseAndBake, encode:encode, decode:decode, thin:thin,
+          inFhole:inFhole, inside:inside, topZ:topZ, Zv:Zv, Zh:Zh, SCALE:SCALE};
+})();
+</script>
+
+<script>
+(function(){
+  var cv=document.getElementById('cv'), ctx=cv.getContext && cv.getContext('2d');
+  var STD=PORTRAIT.build(), dense=null, model=STD;
+  var Z0=450, GRAY='#a8a8a8';
+  var st={yaw:0.5, pitch:0.12, roll:0, spin:true, dirty:true};
+  function minus(x){return x.replace(/^-/,"−");}
+  function mul(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function gauss(r){ var u=1-r(), v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+  // fixed framing: bounding radius of the body, valid for EVERY orientation
+  var R=(function(){ var m=0; for(var i=0;i<model.pts.length;i++){ var p=model.pts[i];
+    var dx=p.x, dy=p.y-20, dz=p.z, r=Math.sqrt(dx*dx+dy*dy+dz*dz); if(r>m)m=r; }
+    return m*PORTRAIT.SCALE; })();
+
+  // ---- inputs ----
+  var sN=document.getElementById('sN'), sR=document.getElementById('sR'), bSpin=document.getElementById('bSpin');
+  sN.addEventListener('input',function(){ document.getElementById('vN').textContent=minus((+sN.value).toFixed(4)); st.dirty=true; });
+  sR.addEventListener('input',function(){ st.roll=+sR.value; document.getElementById('vR').textContent=minus((+sR.value).toFixed(2)); st.dirty=true; });
+  var bLimit=document.getElementById('bLimit');
+  function setSpin(on){ st.spin=on; bSpin.classList.toggle('on',on);
+    bSpin.textContent = on? 'spinning — drag to steer' : 'paused — tap to spin';
+    if(on){ model=STD; bLimit.classList.remove('on'); bLimit.textContent='film-limit frame'; }
+    st.dirty=true; }
+  bLimit.addEventListener('click',function(){
+    setSpin(false);
+    if(dense){ model=dense; bLimit.classList.add('on'); bLimit.textContent='film-limit frame ✓'; st.dirty=true; if(!ctx) renderFrame(); return; }
+    bLimit.textContent='sampling at the film limit…';
+    setTimeout(function(){ dense=PORTRAIT.build(0.55,0.22,0); model=dense;
+      bLimit.classList.add('on'); bLimit.textContent='film-limit frame ✓'; st.dirty=true; if(!ctx) renderFrame(); },30);
+  });
+  bSpin.addEventListener('click',function(){ setSpin(!st.spin); });
+  var drag=false,x0=0,y0=0,yw=0,pt=0;
+  cv.addEventListener('pointerdown',function(e){ drag=true; x0=e.clientX; y0=e.clientY; yw=st.yaw; pt=st.pitch;
+    cv.classList.add('grabbing'); if(cv.setPointerCapture){ try{cv.setPointerCapture(e.pointerId);}catch(_){} }
+    if(st.spin) setSpin(false); });
+  cv.addEventListener('pointermove',function(e){ if(!drag) return;
+    st.yaw = yw + (e.clientX-x0)*0.010;
+    st.pitch = Math.max(-1.55, Math.min(1.55, pt + (e.clientY-y0)*0.010));
+    st.dirty=true; });
+  function endDrag(){ drag=false; cv.classList.remove('grabbing'); }
+  cv.addEventListener('pointerup',endDrag); cv.addEventListener('pointercancel',endDrag);
+
+  // ---- per-frame photograph: pose -> bake -> encode -> thin -> decode -> paint ----
+  var frame=0;
+  function renderFrame(){
+    var sig=+sN.value;
+    var world=PORTRAIT.poseAndBake(model.pts, st.yaw, st.pitch, Z0, st.roll);
+    var payload=world.map(PORTRAIT.encode);
+    var th=PORTRAIT.thin(payload, 0.12);
+    var rng=mul(7 + ((sig*1e5)|0));
+    var dec=[], rms=0;
+    for(var q=0;q<th.kept.length;q++){ var i=th.kept[q], a=payload[i];
+      var ar=a.ar + (sig>0? sig*gauss(rng):0);
+      var d=PORTRAIT.decode({u:a.u,v:a.v,ar:ar,r:a.r,g:a.g,b:a.b});
+      d.trueZ=world[i].Z;
+      var t=world[i]; rms+=(d.X-t.X)*(d.X-t.X)+(d.Y-t.Y)*(d.Y-t.Y)+(d.Z-t.Z)*(d.Z-t.Z);
+      dec.push(d);
+    }
+    rms=Math.sqrt(rms/Math.max(dec.length,1));
+    dec.sort(function(a,b){ return b.Z-a.Z; });
+    var inv=0; for(var i2=1;i2<dec.length;i2++) if(dec[i2].trueZ>dec[i2-1].trueZ+1e-9) inv++;
+
+    if(ctx){
+      var W=cv.width,H=cv.height;
+      ctx.fillStyle=GRAY; ctx.fillRect(0,0,W,H);                 // bare field — nothing else
+      var sc=Math.min((W-70)/(2*R), (H-70)/(2*R));
+      var ox=W/2, oy=H/2;
+      var rx=Math.max(0.8, model.px*PORTRAIT.SCALE*sc*0.66), ry=Math.max(0.8, model.py*PORTRAIT.SCALE*sc*0.66);
+      for(var q2=0;q2<dec.length;q2++){ var d2=dec[q2];
+        ctx.fillStyle='rgb('+d2.r+','+d2.g+','+d2.b+')';
+        ctx.beginPath(); ctx.ellipse(ox+d2.X*sc, oy-d2.Y*sc, rx, ry, 0, 0, Math.PI*2); ctx.fill();
+      }
+    }
+
+    if(frame%6===0 || !st.spin){
+      var lo=1e9, hi=-1e9, ulo=1e9,uhi=-1e9,vlo=1e9,vhi=-1e9;
+      for(var q3=0;q3<th.kept.length;q3++){ var pk=payload[th.kept[q3]], v3=pk.ar;
+        if(v3<lo)lo=v3; if(v3>hi)hi=v3;
+        if(pk.u<ulo)ulo=pk.u; if(pk.u>uhi)uhi=pk.u; if(pk.v<vlo)vlo=pk.v; if(pk.v>vhi)vhi=pk.v; }
+      var T=2*0.12*1.25, packArea=Math.sqrt(3)/2*T*T;
+      var util=th.kept.length*packArea/Math.max((uhi-ulo)*(vhi-vlo),1e-6)*100;
+      document.getElementById('oCap').textContent=util.toFixed(0)+'%';
+      document.getElementById('oN').textContent=model.pts.length;
+      document.getElementById('oK').textContent=th.kept.length+'  ('+th.merged+' merged)';
+      document.getElementById('oRMS').textContent= sig>0? rms.toFixed(2) : (rms<1e-8?'0 (exact)':rms.toFixed(6));
+      document.getElementById('oInv').textContent=inv;
+      document.getElementById('oAR').textContent=lo.toFixed(3)+' .. '+hi.toFixed(3);
+      document.getElementById('oMsg').textContent = sig===0
+        ? 'three-axis pose, one photograph per frame: encoded, thinned, decoded — occlusion from decoded z, exact'
+        : 'σ > 0: positions scatter and '+inv+' painter inversions appear — the codec portrait degrading honestly';
+      var bd=document.getElementById('oBadge'); bd.style.background=(sig===0)?'var(--good)':'#b06a2f';
+      bd.textContent= sig===0? 'decoded ✓' : 'noisy';
+    }
+    frame++;
+  }
+
+  renderFrame();
+  if(ctx && typeof requestAnimationFrame==='function'){
+    (function tick(){
+      if(st.spin){ st.yaw+=0.0075; if(st.yaw>Math.PI*2) st.yaw-=Math.PI*2; st.dirty=true; }
+      if(st.dirty){ st.dirty=false; renderFrame(); }
+      requestAnimationFrame(tick);
+    })();
+  }
+})();
+</script>
+</body>
+</html>
