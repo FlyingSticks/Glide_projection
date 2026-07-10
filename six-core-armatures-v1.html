@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>39 · The Six Core Armatures — one gauge, six patterns of recession</title>
+<style>
+  :root{
+    /* palette lifted from the Banksy plate: warm grey ground, ink black, one vivid green (+ its own deep value) */
+    --cream:#B4B2A6;      /* base ground: page + resting buttons */
+    --paper:#BEBCB0;      /* lifted panels: cards, readout cells */
+    --sagesurf:#EBE9DA;   /* drawing surface (value lifted ~20% per markup) */
+    --ink:#151310;        /* black — text, depicted geometry, the gauge */
+    --faint:#8E8C80;      /* hairlines, grid, slider tracks */
+    --muted:rgba(21,19,16,0.60);
+    --green:#65D858;      /* vivid green — matched · highlight · interactive chrome */
+    --greendeep:#46973D;  /* deep green — secondary chrome */
+    --red:#ED3121;        /* construction red — the projection armature (from the marked swatch) */
+    --hl:rgba(101,216,88,0.42);        /* marker wash for inline emphasis */
+    /* semantic aliases kept so string-set colors in the script still resolve */
+    --crimson:#ED3121; --violet:#ED3121; --blue:#151310; --plum:#151310;
+    --purple:#46973D; --steel:#151310; --gold:#151310; --good:#65D858;
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif; --serif:var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:860px;margin:0 auto;padding:18px 12px 40px;}
+  .eyebrow{display:inline-block;font-size:11px;letter-spacing:.22em;color:var(--ink);font-weight:700;text-transform:uppercase;background:var(--hl);padding:3px 7px;}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(21px,4vw,29px);line-height:1.12;margin:9px 0 10px;}
+  h1 em{font-style:italic;color:var(--ink);background:var(--hl);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .card{background:var(--paper);border:1px solid var(--faint);border-radius:0;box-shadow:0 5px 18px rgba(21,19,16,.10);padding:9px 11px 7px;margin-bottom:10px;}
+  svg{width:100%;height:auto;display:block;border-radius:0;background:var(--sagesurf);} #view{aspect-ratio:640/440;}
+  .rowbtn{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:8px 2px 2px;} .tag{font-size:11px;color:var(--muted);letter-spacing:.06em;}
+  button{font-family:inherit;font-size:12px;color:var(--ink);background:var(--cream);border:1px solid var(--ink);border-radius:0;padding:6px 11px;cursor:pointer;}
+  button.on{background:var(--ink);color:var(--sagesurf);border-color:var(--ink);}
+  button.pull{background:var(--green);border-color:var(--ink);color:var(--ink);font-weight:700;} button.pull.on{background:var(--ink);color:var(--green);}
+  .ctl{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin:8px 2px 2px;}
+  .ctl label{font-size:11.5px;color:var(--muted);} .ctl .val{font-family:var(--serif);font-size:12.5px;min-width:120px;text-align:right;}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:0;outline:none;border:1px solid var(--ink);}
+  #sK{background:linear-gradient(90deg,var(--faint),var(--green));}
+  #sD{background:linear-gradient(90deg,var(--faint),var(--greendeep) 50%,var(--faint));}
+  #sP{background:linear-gradient(90deg,var(--ink),var(--faint));}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:0;background:var(--sagesurf);border:2.5px solid var(--ink);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.28);}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:0;background:var(--sagesurf);border:2.5px solid var(--ink);cursor:pointer;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 12px;margin:8px 2px 6px;}
+  .cell{background:var(--paper);border:1px solid var(--faint);border-radius:0;padding:8px 10px;}
+  .cell .k{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;} .cell .v{font-family:var(--serif);font-size:15px;margin-top:2px;}
+  .wide{grid-column:1 / -1;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .badge{font-size:11.5px;font-weight:700;color:var(--green);background:var(--ink);border-radius:0;padding:3px 10px;letter-spacing:.02em;}
+  .sub{font-size:12.5px;color:var(--muted);line-height:1.55;margin:8px 2px 10px;} .sub b{color:var(--ink);} .sub em{color:var(--ink);font-style:italic;background:var(--hl);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .foot{font-size:12px;color:var(--muted);line-height:1.55;margin:2px 4px 0;} .foot b{color:var(--ink);}
+
+  /* Sheet 39 additions: per-mode control rows */
+  .ctl{display:block;}
+  .crow{display:none;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:6px;}
+  #sK,#sLam{background:linear-gradient(90deg,var(--faint),var(--green));}
+  #sU0,#sV0,#sSig,#sA,#sB{background:linear-gradient(90deg,var(--faint),var(--greendeep) 50%,var(--faint));}
+  #sP{background:linear-gradient(90deg,var(--ink),var(--faint));}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">Tetra Engine · Drafting Board · Sheet 39</span>
+  <h1>The six core armatures — <em>one gauge, six patterns of recession</em></h1>
+
+  <div class="card">
+    <svg id="view" viewBox="0 0 640 440" role="img" aria-label="A complete presentation drawing of the chosen scene, projected through any of the six core glide armatures from the plate on p. 93 — vanishing point, vanishing plane, vanishing axis, herringbone, keystone, and box — with seats, rates, compression, and staging shear on sliders, and the image of infinity drawn live."><path d="M503.3 125.1L101.5 125.1L101.5 305.9L503.3 305.9L503.3 125.1Z" fill="#C2C0B4" stroke="#151310" stroke-width="0.9"/><path d="M549.5 57.8L147.7 57.8L139.7 69.4L132.9 79.3L127.1 87.8L122.0 95.2L117.6 101.7L113.6 107.4L110.1 112.6L106.9 117.2L104.1 121.3L101.5 125.1L503.3 125.1L505.9 121.3L508.8 117.2L511.9 112.6L515.4 107.4L519.4 101.7L523.8 95.2L528.9 87.8L534.7 79.3L541.5 69.4L549.5 57.8Z" fill="#B8B6AA" stroke="#151310" stroke-width="0.9"/><path d="M549.5 396.9L147.7 396.9L139.7 381.2L132.9 367.8L127.1 356.3L122.0 346.3L117.6 337.5L113.6 329.7L110.1 322.8L106.9 316.6L104.1 311.0L101.5 305.9L503.3 305.9L505.9 311.0L508.8 316.6L511.9 322.8L515.4 329.7L519.4 337.5L523.8 346.3L528.9 356.3L534.7 367.8L541.5 381.2L549.5 396.9Z" fill="#CCCABE" stroke="#151310" stroke-width="0.9"/><path d="M549.5 57.8L549.5 396.9L541.5 381.2L534.7 367.8L528.9 356.3L523.8 346.3L519.4 337.5L515.4 329.7L511.9 322.8L508.8 316.6L505.9 311.0L503.3 305.9L503.3 125.1L505.9 121.3L508.8 117.2L511.9 112.6L515.4 107.4L519.4 101.7L523.8 95.2L528.9 87.8L534.7 79.3L541.5 69.4L549.5 57.8Z" fill="#A6A498" stroke="#151310" stroke-width="0.9"/><path d="M147.7 57.8L147.7 396.9L139.7 381.2L132.9 367.8L127.1 356.3L122.0 346.3L117.6 337.5L113.6 329.7L110.1 322.8L106.9 316.6L104.1 311.0L101.5 305.9L101.5 125.1L104.1 121.3L106.9 117.2L110.1 112.6L113.6 107.4L117.6 101.7L122.0 95.2L127.1 87.8L132.9 79.3L139.7 69.4L147.7 57.8Z" fill="#A6A498" stroke="#151310" stroke-width="0.9"/><path d="M503.5 124.9L503.5 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M463.3 124.9L463.3 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M423.1 124.9L423.1 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M382.9 124.9L382.9 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M342.7 124.9L342.7 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M302.6 124.9L302.6 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M262.4 124.9L262.4 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M222.2 124.9L222.2 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M182.0 124.9L182.0 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M141.8 124.9L141.8 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M101.7 124.9L101.7 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 124.9L101.7 124.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 155.1L101.7 155.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 185.3L101.7 185.3" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 215.5L101.7 215.5" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 245.7L101.7 245.7" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 276.0L101.7 276.0" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.5 306.2L101.7 306.2" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 57.8L541.5 69.4L534.7 79.3L528.9 87.8L523.8 95.2L519.4 101.7L515.4 107.4L511.9 112.6L508.8 117.2L505.9 121.3L503.3 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M507.3 57.8L499.3 69.4L492.6 79.3L486.7 87.8L481.6 95.2L477.2 101.7L473.2 107.4L469.7 112.6L466.6 117.2L463.7 121.3L461.1 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M465.1 57.8L457.1 69.4L450.4 79.3L444.5 87.8L439.5 95.2L435.0 101.7L431.1 107.4L427.5 112.6L424.4 117.2L421.5 121.3L418.9 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M422.9 57.8L414.9 69.4L408.2 79.3L402.3 87.8L397.3 95.2L392.8 101.7L388.9 107.4L385.3 112.6L382.2 117.2L379.3 121.3L376.8 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M380.7 57.8L372.8 69.4L366.0 79.3L360.2 87.8L355.1 95.2L350.6 101.7L346.7 107.4L343.2 112.6L340.0 117.2L337.1 121.3L334.6 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M338.5 57.8L330.6 69.4L323.8 79.3L318.0 87.8L312.9 95.2L308.4 101.7L304.5 107.4L301.0 112.6L297.8 117.2L295.0 121.3L292.4 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M296.3 57.8L288.4 69.4L281.6 79.3L275.8 87.8L270.7 95.2L266.2 101.7L262.3 107.4L258.8 112.6L255.6 117.2L252.8 121.3L250.2 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M254.1 57.8L246.2 69.4L239.4 79.3L233.6 87.8L228.5 95.2L224.0 101.7L220.1 107.4L216.6 112.6L213.4 117.2L210.6 121.3L208.0 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M212.0 57.8L204.0 69.4L197.2 79.3L191.4 87.8L186.3 95.2L181.9 101.7L177.9 107.4L174.4 112.6L171.2 117.2L168.4 121.3L165.8 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M169.8 57.8L161.8 69.4L155.0 79.3L149.2 87.8L144.1 95.2L139.7 101.7L135.7 107.4L132.2 112.6L129.0 117.2L126.2 121.3L123.6 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 57.8L147.7 57.8" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M531.7 83.7L129.9 83.7" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M519.4 101.7L117.6 101.7" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M510.3 114.9L108.5 114.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.3 125.1L101.5 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 396.9L541.5 381.2L534.7 367.8L528.9 356.3L523.8 346.3L519.4 337.5L515.4 329.7L511.9 322.8L508.8 316.6L505.9 311.0L503.3 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M507.3 396.9L499.3 381.2L492.6 367.8L486.7 356.3L481.6 346.3L477.2 337.5L473.2 329.7L469.7 322.8L466.6 316.6L463.7 311.0L461.1 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M465.1 396.9L457.1 381.2L450.4 367.8L444.5 356.3L439.5 346.3L435.0 337.5L431.1 329.7L427.5 322.8L424.4 316.6L421.5 311.0L418.9 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M422.9 396.9L414.9 381.2L408.2 367.8L402.3 356.3L397.3 346.3L392.8 337.5L388.9 329.7L385.3 322.8L382.2 316.6L379.3 311.0L376.8 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M380.7 396.9L372.8 381.2L366.0 367.8L360.2 356.3L355.1 346.3L350.6 337.5L346.7 329.7L343.2 322.8L340.0 316.6L337.1 311.0L334.6 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M338.5 396.9L330.6 381.2L323.8 367.8L318.0 356.3L312.9 346.3L308.4 337.5L304.5 329.7L301.0 322.8L297.8 316.6L295.0 311.0L292.4 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M296.3 396.9L288.4 381.2L281.6 367.8L275.8 356.3L270.7 346.3L266.2 337.5L262.3 329.7L258.8 322.8L255.6 316.6L252.8 311.0L250.2 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M254.1 396.9L246.2 381.2L239.4 367.8L233.6 356.3L228.5 346.3L224.0 337.5L220.1 329.7L216.6 322.8L213.4 316.6L210.6 311.0L208.0 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M212.0 396.9L204.0 381.2L197.2 367.8L191.4 356.3L186.3 346.3L181.9 337.5L177.9 329.7L174.4 322.8L171.2 316.6L168.4 311.0L165.8 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M169.8 396.9L161.8 381.2L155.0 367.8L149.2 356.3L144.1 346.3L139.7 337.5L135.7 329.7L132.2 322.8L129.0 316.6L126.2 311.0L123.6 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 396.9L147.7 396.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M531.7 361.9L129.9 361.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M519.4 337.5L117.6 337.5" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M510.3 319.6L108.5 319.6" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.3 305.9L101.5 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 57.8L541.5 69.4L534.7 79.3L528.9 87.8L523.8 95.2L519.4 101.7L515.4 107.4L511.9 112.6L508.8 117.2L505.9 121.3L503.3 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 117.2L541.5 124.0L534.7 129.8L528.9 134.8L523.8 139.1L519.4 143.0L515.4 146.3L511.9 149.4L508.8 152.1L505.9 154.5L503.3 156.7" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 176.5L541.5 178.5L534.7 180.3L528.9 181.8L523.8 183.1L519.4 184.2L515.4 185.2L511.9 186.1L508.8 187.0L505.9 187.7L503.3 188.4" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 235.8L541.5 233.1L534.7 230.8L528.9 228.8L523.8 227.0L519.4 225.5L515.4 224.1L511.9 222.9L508.8 221.9L505.9 220.9L503.3 220.0" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 295.2L541.5 287.6L534.7 281.3L528.9 275.8L523.8 271.0L519.4 266.8L515.4 263.1L511.9 259.7L508.8 256.8L505.9 254.1L503.3 251.6" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 354.5L541.5 342.2L534.7 331.8L528.9 322.8L523.8 314.9L519.4 308.0L515.4 302.0L511.9 296.5L508.8 291.7L505.9 287.3L503.3 283.3" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M549.5 57.8L549.5 396.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M531.7 83.7L531.7 361.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M519.4 101.7L519.4 337.5" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M510.3 114.9L510.3 319.6" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M503.3 125.1L503.3 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 57.8L139.7 69.4L132.9 79.3L127.1 87.8L122.0 95.2L117.6 101.7L113.6 107.4L110.1 112.6L106.9 117.2L104.1 121.3L101.5 125.1" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 117.2L139.7 124.0L132.9 129.8L127.1 134.8L122.0 139.1L117.6 143.0L113.6 146.3L110.1 149.4L106.9 152.1L104.1 154.5L101.5 156.7" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 176.5L139.7 178.5L132.9 180.3L127.1 181.8L122.0 183.1L117.6 184.2L113.6 185.2L110.1 186.1L106.9 187.0L104.1 187.7L101.5 188.4" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 235.8L139.7 233.1L132.9 230.8L127.1 228.8L122.0 227.0L117.6 225.5L113.6 224.1L110.1 222.9L106.9 221.9L104.1 220.9L101.5 220.0" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 295.2L139.7 287.6L132.9 281.3L127.1 275.8L122.0 271.0L117.6 266.8L113.6 263.1L110.1 259.7L106.9 256.8L104.1 254.1L101.5 251.6" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 354.5L139.7 342.2L132.9 331.8L127.1 322.8L122.0 314.9L117.6 308.0L113.6 302.0L110.1 296.5L106.9 291.7L104.1 287.3L101.5 283.3" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M147.7 57.8L147.7 396.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M129.9 83.7L129.9 361.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M117.6 101.7L117.6 337.5" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M108.5 114.9L108.5 319.6" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M101.5 125.1L101.5 305.9" fill="none" stroke="#8E8C80" stroke-width="0.55"/><path d="M520.9 99.5L119.1 99.5L119.1 340.5L520.9 340.5Z" fill="none" stroke="#151310" stroke-width="0.8" opacity="0.55"/><path d="M350.1 189.9L289.9 189.9L289.9 250.1L350.1 250.1Z" fill="none" stroke="#151310" stroke-width="1.6"/><line x1="-547.9" y1="201.9" x2="1187.9" y2="201.9" stroke="#ED3121" stroke-width="1" opacity="0.8"/><line x1="450.6" y1="201.9" x2="48.8" y2="201.9" stroke="#ED3121" stroke-width="4" opacity="0.9"/><line x1="520.9" y1="99.5" x2="450.6" y2="201.9" stroke="#ED3121" stroke-width="1.3" opacity="0.85"/><line x1="520.9" y1="340.5" x2="450.6" y2="201.9" stroke="#ED3121" stroke-width="1.3" opacity="0.85"/><line x1="119.1" y1="99.5" x2="48.8" y2="201.9" stroke="#ED3121" stroke-width="1.3" opacity="0.85"/><line x1="119.1" y1="340.5" x2="48.8" y2="201.9" stroke="#ED3121" stroke-width="1.3" opacity="0.85"/><circle cx="450.6" cy="201.9" r="3" fill="#ED3121"/><circle cx="48.8" cy="201.9" r="3" fill="#ED3121"/><text x="628.0" y="195.9" font-family="Helvetica,Arial" font-size="10" fill="#ED3121" letter-spacing="1" text-anchor="end">VANISHING AXIS · IMAGE OF ∞</text><text x="55.8" y="215.9" font-family="Helvetica,Arial" font-size="10" fill="#ED3121" letter-spacing="1">STAGING FANS · SIDES PARALLEL</text></svg>
+    <div class="rowbtn"><span class="tag">SCENE:</span>
+      <button id="bRoom" class="on">gridded room</button>
+      <button id="bSite">site plan · relief</button>
+      <button id="bCorr">deep corridor</button>
+      <button id="bHouse">house plan</button>
+      <button id="bOrient">⟳ orientation</button>
+      <button id="bLoad">↓ load .obj</button>
+    </div>
+    <div class="rowbtn"><span class="tag">ARMATURE (the plate, p. 93):</span>
+      <button class="mode" data-mode="vp">1 · vanishing point</button>
+      <button class="mode" data-mode="vpl">2 · vanishing plane</button>
+      <button class="mode" data-mode="vax">3 · vanishing axis</button>
+      <button class="mode on" data-mode="her">4 · herringbone</button>
+      <button class="mode" data-mode="key">5 · keystone</button>
+      <button class="mode" data-mode="box">6 · box</button>
+    </div>
+    <div class="rowbtn">
+      <button id="bSwap">⇅ swap the axes</button>
+      <button id="bArm" class="on">≡ armature</button>
+      <span class="tag" id="dropHint">drop a SketchUp .obj anywhere on this sheet (Y-up export) to project your own model</span>
+    </div>
+    <div class="ctl">
+      <div class="crow" data-m="vp vpl vax"><label>u₀ seat (across the width · 0 = centered)</label><input id="sU0" type="range" min="-0.5" max="0.5" value="0.15" step="0.01"><span class="val" id="vU0"></span></div>
+      <div class="crow" data-m="vp vpl vax her key"><label>v₀ seat / axis height (0 = centered)</label><input id="sV0" type="range" min="-0.5" max="0.5" value="-0.15" step="0.01"><span class="val" id="vV0"></span></div>
+      <div class="crow" data-m="vax"><label>glide k (0 = one point · 1 = herringbone tube)</label><input id="sK" type="range" min="0" max="1" value="0.6" step="0.01"><span class="val" id="vK"></span></div>
+      <div class="crow" data-m="vpl key"><label>compression λ (brings the infinity plane forward)</label><input id="sLam" type="range" min="0.15" max="1" value="0.55" step="0.01"><span class="val" id="vLam"></span></div>
+      <div class="crow" data-m="her key"><label>staging angle σ (shear · “does not affect the accuracy”)</label><input id="sSig" type="range" min="-0.75" max="0.75" value="0.35" step="0.01"><span class="val" id="vSig"></span></div>
+      <div class="crow" data-m="box"><label>box shear a (across the width)</label><input id="sA" type="range" min="-0.75" max="0.75" value="0.3" step="0.01"><span class="val" id="vA"></span></div>
+      <div class="crow" data-m="box"><label>box shear b (across the height)</label><input id="sB" type="range" min="-0.75" max="0.75" value="0.22" step="0.01"><span class="val" id="vB"></span></div>
+      <div class="crow" data-m="vp vpl vax her key box"><label>station depth Zp (field of view)</label><input id="sP" type="range" min="170" max="330" value="200" step="2"><span class="val" id="vP"></span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="cell"><div class="k">Projection</div><div class="v" id="oProj">…</div></div>
+    <div class="cell"><div class="k">Image of ∞</div><div class="v" id="oInf">…</div></div>
+    <div class="cell"><div class="k">Recession (vs perspective)</div><div class="v" id="oSplay">…</div></div>
+    <div class="cell"><div class="k">Gauge square at Z<sub>g</sub></div><div class="v" id="oAR">…</div></div>
+    <div class="cell" style="grid-column:span 2"><div class="k">Coupling</div><div class="v" id="oCpl">…</div></div>
+    <div class="wide"><span class="badge" id="oBadge">matched</span><span class="v" id="oMsg" style="font-family:var(--serif);font-size:14px;">…</span></div>
+  </div>
+
+  <p class="sub">The plate on p. 93 names <b>six core lateral armatures</b> — vanishing point, vanishing plane,
+  vanishing axis, herringbone, keystone, box. This sheet runs all six through one law: each channel of the picture
+  contracts toward its <b>seat</b> at its own <b>rate</b>, driven by a single depth gauge
+  g(Z) = 1 − p(Z)/p(Z<sub>g</sub>) — the vanishing-diagonals device of pp. 77–78 in closed form. The rates
+  tell the whole taxonomy: <b>(1, 1)</b> a point catches infinity; <b>(λ, λ)</b> infinity arrives early as
+  an <em>area</em>; <b>(1−k, 1)</b> the vanishing axis with its directing axis, 1/k + 1/c = 1;
+  <b>(0, 1)</b> the herringbone — vanishing fans one way, parallel fans the other; <b>(0, λ)</b> the
+  keystone, a compressed herringbone whose would-be axis ghosts to a <em>directing axis</em>; <b>(0, 0)</b> the
+  box, a compressed paraline.</p>
+
+  <p class="sub">Same scenes, same gauge square, same drop-an-.obj pipeline as Sheet 38. What to reach for: the
+  <b>herringbone</b> for long, narrow, shallow fields — street facades and aerial corridors (p. 80); the
+  <b>vanishing axis</b> for the most unified pictorial field (p. 88); keystone, box, and the two point forms mostly
+  as parts awaiting the component glides of pp. 92–97. All six are shallow-space instruments — the deep
+  corridor stays perspective’s.</p>
+
+  <p class="foot" id="footNote">Exact law per channel: <b>w = ŝ + (ŵ − ŝ)·(1 − r·g) + σ̂·g</b>,
+  with staging ŵ the true image at Z<sub>g</sub> and one gauge g(Z) = 1 − p(Z)/p(Z<sub>g</sub>),
+  p(Z) = −Zp/(Z−Zp). At r = 1 the seat <em>is</em> the image of ∞. At 0 &lt; r &lt; 1 infinity arrives at
+  (1−r) scale and the seat goes dashed beyond — a <b>directing seat</b> at gauge 1/r. At r = 0 recession is
+  parallel; only the staging shear σ acts, and it “does not affect the accuracy” (p. 89). The gauge plane
+  Z<sub>g</sub> images identically under all six armatures — the staging rectangle is the common ground every
+  comparison stands on. <b id="oChecks">…</b></p>
+</div>
+
+<script id="houseobj" type="text/plain">
+# Alias OBJ Model File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+# File units = inches
+
+mtllib Cross-slit-plan.mtl
+
+g Mesh1 Model
+
+usemtl FrontColor
+v 12 0 288
+vt 12 -288
+vn 0 1 -0
+v 6 0 282
+vt 6 -282
+v 6 0 288
+vt 6 -288
+f 1/1/1 2/2/1 3/3/1
+
+v 129.819 0 282
+vt 129.819 -282
+f 2/2/1 1/1/1 4/4/1
+
+usemtl BackColor
+vn -0 -1 0
+f 3/3/2 2/2/2 1/1/2
+
+usemtl FrontColor
+vt -282 0
+vn 1 0 -0
+v 6 60 288
+vt -288 60
+vt -288 0
+f 2/5/3 5/6/3 3/7/3
+
+v 6 12 282
+vt -282 12
+f 5/6/3 2/5/3 6/8/3
+
+usemtl BackColor
+vn -1 -0 0
+f 3/7/4 5/6/4 2/5/4
+
+usemtl FrontColor
+vt 6 60
+vn 0 0 1
+v 0 0 288
+vt 0 0
+vt 6 0
+f 5/9/5 7/10/5 3/11/5
+
+v 0 60 288
+vt 0 60
+f 7/10/5 5/9/5 8/12/5
+
+usemtl BackColor
+vn -0 -0 -1
+f 3/11/6 7/10/6 5/9/6
+
+usemtl FrontColor
+vt 12 0
+f 7/10/5 1/13/5 3/11/5
+
+v 129.819 0 288
+vt 129.819 0
+f 7/10/5 9/14/5 1/13/5
+
+v 183.819 0 288
+vt 183.819 0
+f 7/10/5 10/15/5 9/14/5
+
+v 252 0 288
+vt 252 0
+f 7/10/5 11/16/5 10/15/5
+
+v 288 0 288
+vt 288 0
+f 7/10/5 12/17/5 11/16/5
+
+v 0 -24 288
+vt 0 -24
+f 13/18/5 12/17/5 7/10/5
+
+v 288 -24 288
+vt 288 -24
+f 12/17/5 13/18/5 14/19/5
+
+usemtl BackColor
+f 14/19/6 13/18/6 12/17/6
+
+usemtl FrontColor
+vt 0 -288
+vn 0 -1 -0
+v 288 -24 -576
+vt -288 576
+vt -288 -288
+f 13/20/7 15/21/7 14/22/7
+
+v 0 -24 -576
+vt 0 576
+f 15/21/7 13/20/7 16/23/7
+
+usemtl BackColor
+vn -0 1 0
+f 16/23/8 13/20/8 15/21/8
+
+usemtl FrontColor
+vn -1 0 -0
+v 0 -12 -96
+vt -96 -12
+vt -576 -24
+f 13/19/9 17/24/9 16/25/9
+
+v 0 0 -96
+vt -96 0
+f 13/19/9 18/26/9 17/24/9
+
+f 18/26/9 13/19/9 7/17/9
+
+usemtl BackColor
+vn 1 -0 0
+f 7/17/10 13/19/10 18/26/10
+
+f 7/10/6 12/17/6 13/18/6
+
+f 11/16/6 12/17/6 7/10/6
+
+usemtl FrontColor
+v 288 60 288
+vt 288 60
+f 19/27/5 11/16/5 12/17/5
+
+v 252 60 288
+vt 252 60
+f 11/16/5 19/27/5 20/28/5
+
+usemtl BackColor
+f 12/17/6 11/16/6 19/27/6
+
+f 20/28/6 19/27/6 11/16/6
+
+usemtl FrontColor
+vt 288 -288
+v 252 60 153
+vt 252 -153
+vt 252 -288
+f 19/29/1 21/30/1 20/31/1
+
+v 288 60 153
+vt 288 -153
+f 21/30/1 19/29/1 22/32/1
+
+usemtl BackColor
+f 20/31/2 21/30/2 19/29/2
+
+usemtl FrontColor
+vt 153 60
+f 21/33/9 11/17/9 20/27/9
+
+v 252 0 153
+vt 153 0
+f 11/17/9 21/33/9 23/34/9
+
+usemtl BackColor
+f 20/27/10 11/17/10 21/33/10
+
+f 23/34/10 21/33/10 11/17/10
+
+usemtl FrontColor
+vt -252 60
+vn 0 0 -1
+v 288 0 153
+vt -252 0
+f 21/35/11 24/7/11 23/36/11
+
+f 24/7/11 21/35/11 22/6/11
+
+usemtl BackColor
+vn -0 -0 1
+f 23/36/12 24/7/12 21/35/12
+
+usemtl FrontColor
+v 252 0 135
+vt 252 -135
+f 24/32/1 25/37/1 23/30/1
+
+v 288 0 135
+vt 288 -135
+f 25/37/1 24/32/1 26/38/1
+
+usemtl BackColor
+f 23/30/2 25/37/2 24/32/2
+
+usemtl FrontColor
+v 252 0 -576
+vt 252 576
+f 27/39/1 23/30/1 25/37/1
+
+f 27/39/1 11/31/1 23/30/1
+
+v 183.819 0 -576
+vt 183.819 576
+f 28/40/1 11/31/1 27/39/1
+
+v 183.819 0 -528
+vt 183.819 528
+f 29/41/1 11/31/1 28/40/1
+
+v 183.819 0 -288
+vt 183.819 288
+f 30/42/1 11/31/1 29/41/1
+
+v 183.819 0 -90
+vt 183.819 90
+f 31/43/1 11/31/1 30/42/1
+
+v 183.819 0 -6
+vt 183.819 6
+f 32/44/1 11/31/1 31/43/1
+
+v 183.819 0 -5.06438e-14
+vt 183.819 5.06438e-14
+f 33/45/1 11/31/1 32/44/1
+
+v 183.819 0 135
+vt 183.819 -135
+f 34/46/1 11/31/1 33/45/1
+
+v 183.819 0 141
+vt 183.819 -141
+f 35/47/1 11/31/1 34/46/1
+
+v 183.819 0 282
+vt 183.819 -282
+f 36/48/1 11/31/1 35/47/1
+
+vt 183.819 -288
+f 11/31/1 36/48/1 10/49/1
+
+usemtl BackColor
+f 10/49/2 36/48/2 11/31/2
+
+usemtl FrontColor
+v 183.819 60 288
+f 36/5/3 37/6/3 10/7/3
+
+v 183.819 60 282
+vt -282 60
+f 37/6/3 36/5/3 38/50/3
+
+usemtl BackColor
+f 10/7/4 37/6/4 36/5/4
+
+usemtl FrontColor
+vt 183.819 60
+f 37/51/5 9/14/5 10/15/5
+
+v 129.819 60 288
+vt 129.819 60
+f 9/14/5 37/51/5 39/52/5
+
+usemtl BackColor
+f 10/15/6 9/14/6 37/51/6
+
+f 9/14/6 10/15/6 7/10/6
+
+f 10/15/6 11/16/6 7/10/6
+
+f 1/13/6 9/14/6 7/10/6
+
+usemtl FrontColor
+vt 129.819 -288
+f 4/4/1 1/1/1 9/53/1
+
+usemtl BackColor
+f 4/4/2 1/1/2 2/2/2
+
+f 9/53/2 1/1/2 4/4/2
+
+usemtl FrontColor
+v 129.819 60 282
+vt 282 60
+vt 282 0
+f 9/17/9 40/54/9 4/55/9
+
+f 40/54/9 9/17/9 39/27/9
+
+usemtl BackColor
+f 39/27/10 9/17/10 40/54/10
+
+f 39/52/6 37/51/6 9/14/6
+
+usemtl FrontColor
+f 37/49/1 40/4/1 39/53/1
+
+f 40/4/1 37/49/1 38/48/1
+
+usemtl BackColor
+f 39/53/2 40/4/2 37/49/2
+
+f 38/48/2 37/49/2 40/4/2
+
+f 38/50/4 36/5/4 37/6/4
+
+usemtl FrontColor
+v 183.819 12 282
+f 38/50/3 36/5/3 41/8/3
+
+usemtl BackColor
+f 41/8/4 36/5/4 38/50/4
+
+usemtl FrontColor
+vt -141 0
+f 35/56/3 41/8/3 36/5/3
+
+v 183.819 12 141
+vt -141 12
+f 41/8/3 35/56/3 42/57/3
+
+usemtl BackColor
+f 36/5/4 41/8/4 35/56/4
+
+f 42/57/4 35/56/4 41/8/4
+
+usemtl FrontColor
+vt -135 0
+f 34/58/3 42/57/3 35/56/3
+
+v 183.819 60 141
+vt -141 60
+f 42/57/3 34/58/3 43/59/3
+
+usemtl BackColor
+f 35/56/4 42/57/4 34/58/4
+
+f 43/59/4 34/58/4 42/57/4
+
+usemtl FrontColor
+v 183.819 60 135
+vt -135 60
+f 43/59/3 34/58/3 44/60/3
+
+usemtl BackColor
+f 44/60/4 34/58/4 43/59/4
+
+usemtl FrontColor
+vt -183.819 0
+v 135.819 60 135
+vt -135.819 60
+vt -183.819 60
+f 34/61/11 45/62/11 44/63/11
+
+v 135.819 0 135
+vt -135.819 0
+f 45/62/11 34/61/11 46/64/11
+
+usemtl BackColor
+f 46/64/12 34/61/12 45/62/12
+
+usemtl FrontColor
+v 135.819 0 -6
+vt 135.819 6
+vt 135.819 -135
+f 34/46/1 47/65/1 46/66/1
+
+v 135.819 0 -90
+vt 135.819 90
+f 47/65/1 34/46/1 48/67/1
+
+usemtl BackColor
+f 46/66/2 47/65/2 34/46/2
+
+usemtl FrontColor
+f 47/11/3 45/60/3 46/58/3
+
+v 135.819 60 -6
+f 45/60/3 47/11/3 49/9/3
+
+usemtl BackColor
+f 46/58/4 45/60/4 47/11/4
+
+f 49/9/4 47/11/4 45/60/4
+
+usemtl FrontColor
+vt -135.819 2.83454e-33
+vn -4.48791e-17 -4.72423e-34 -1
+v 66 60 -6
+vt -66 60
+f 47/68/13 50/69/13 49/62/13
+
+v 66 0 -6
+vt -66 2.83454e-33
+f 50/69/13 47/68/13 51/70/13
+
+usemtl BackColor
+vn 4.48791e-17 4.72423e-34 1
+f 51/70/14 47/68/14 50/69/14
+
+usemtl FrontColor
+v 66 0 -90
+vt 66 90
+vt 66 6
+f 47/65/1 52/71/1 51/72/1
+
+f 52/71/1 47/65/1 48/67/1
+
+usemtl BackColor
+f 51/72/2 52/71/2 47/65/2
+
+usemtl FrontColor
+vt 90 0
+f 52/73/3 50/9/3 51/11/3
+
+v 66 60 -90
+vt 90 60
+f 50/9/3 52/73/3 53/74/3
+
+usemtl BackColor
+f 51/11/4 50/9/4 52/73/4
+
+f 53/74/4 52/73/4 50/9/4
+
+usemtl FrontColor
+v 135.819 60 -90
+vt 135.819 60
+vt 66 60
+f 52/9/5 54/75/5 53/76/5
+
+vt 135.819 0
+f 54/75/5 52/9/5 48/77/5
+
+usemtl BackColor
+f 48/77/6 52/9/6 54/75/6
+
+f 48/67/2 47/65/2 52/71/2
+
+f 48/67/2 34/46/2 47/65/2
+
+usemtl FrontColor
+v 135.819 0 -96
+vt 135.819 96
+f 48/67/1 34/46/1 55/78/1
+
+usemtl BackColor
+f 55/78/2 34/46/2 48/67/2
+
+usemtl FrontColor
+v 135.819 0 -288
+vt 135.819 288
+f 55/78/1 34/46/1 56/79/1
+
+usemtl BackColor
+f 56/79/2 34/46/2 55/78/2
+
+usemtl FrontColor
+v 177.819 0 -4.5178e-14
+vt 177.819 4.5178e-14
+f 56/79/1 34/46/1 57/80/1
+
+usemtl BackColor
+f 57/80/2 34/46/2 56/79/2
+
+usemtl FrontColor
+f 57/80/1 34/46/1 33/45/1
+
+usemtl BackColor
+f 33/45/2 34/46/2 57/80/2
+
+f 33/45/2 11/31/2 34/46/2
+
+f 32/44/2 11/31/2 33/45/2
+
+f 31/43/2 11/31/2 32/44/2
+
+f 30/42/2 11/31/2 31/43/2
+
+f 29/41/2 11/31/2 30/42/2
+
+f 28/40/2 11/31/2 29/41/2
+
+f 27/39/2 11/31/2 28/40/2
+
+f 23/30/2 11/31/2 27/39/2
+
+f 25/37/2 23/30/2 27/39/2
+
+usemtl FrontColor
+v 252 0 12
+vt 252 -12
+f 27/39/1 25/37/1 58/81/1
+
+usemtl BackColor
+f 58/81/2 25/37/2 27/39/2
+
+usemtl FrontColor
+vt 135 0
+v 252 60 12
+vt 12 60
+f 25/82/9 59/83/9 58/13/9
+
+v 252 60 135
+vt 135 60
+f 59/83/9 25/82/9 60/84/9
+
+usemtl BackColor
+f 60/84/10 25/82/10 59/83/10
+
+usemtl FrontColor
+v 288 60 135
+f 25/16/5 61/27/5 60/28/5
+
+f 61/27/5 25/16/5 26/17/5
+
+usemtl BackColor
+f 26/17/6 25/16/6 61/27/6
+
+f 26/38/2 24/32/2 25/37/2
+
+usemtl FrontColor
+vt -153 0
+v 288 -24 44
+vt -44 -24
+f 24/85/3 62/86/3 26/58/3
+
+f 12/7/3 62/86/3 24/85/3
+
+vt -288 -24
+f 62/86/3 12/7/3 14/87/3
+
+usemtl BackColor
+f 14/87/4 12/7/4 62/86/4
+
+f 24/85/4 62/86/4 12/7/4
+
+f 26/58/4 62/86/4 24/85/4
+
+usemtl FrontColor
+v 288 0 12
+vt -12 0
+f 26/58/3 62/86/3 63/88/3
+
+usemtl BackColor
+f 63/88/4 62/86/4 26/58/4
+
+usemtl FrontColor
+vt 576 -24
+f 63/88/3 62/86/3 15/89/3
+
+usemtl BackColor
+f 15/89/4 62/86/4 63/88/4
+
+usemtl FrontColor
+vt -288 -44
+f 14/22/7 15/21/7 62/90/7
+
+usemtl BackColor
+f 14/22/8 15/21/8 13/20/8
+
+f 62/90/8 15/21/8 14/22/8
+
+usemtl FrontColor
+v 288 0 -6
+f 63/88/3 15/89/3 64/11/3
+
+usemtl BackColor
+f 64/11/4 15/89/4 63/88/4
+
+usemtl FrontColor
+v 288 0 -78
+vt 78 0
+f 64/11/3 15/89/3 65/91/3
+
+usemtl BackColor
+f 65/91/4 15/89/4 64/11/4
+
+usemtl FrontColor
+v 288 0 -90
+f 65/91/3 15/89/3 66/73/3
+
+usemtl BackColor
+f 66/73/4 15/89/4 65/91/4
+
+usemtl FrontColor
+v 288 0 -288
+f 66/73/3 15/89/3 67/17/3
+
+usemtl BackColor
+f 67/17/4 15/89/4 66/73/4
+
+usemtl FrontColor
+v 288 0 -528
+vt 528 0
+f 67/17/3 15/89/3 68/92/3
+
+usemtl BackColor
+f 68/92/4 15/89/4 67/17/4
+
+usemtl FrontColor
+v 288 0 -576
+vt 576 0
+f 68/92/3 15/89/3 69/93/3
+
+usemtl BackColor
+f 69/93/4 15/89/4 68/92/4
+
+usemtl FrontColor
+v 0 0 -576
+f 15/87/11 70/10/11 69/7/11
+
+f 70/10/11 15/87/11 16/18/11
+
+usemtl BackColor
+f 16/18/12 15/87/12 70/10/12
+
+f 69/7/12 70/10/12 15/87/12
+
+usemtl FrontColor
+f 69/7/11 70/10/11 28/61/11
+
+usemtl BackColor
+f 28/61/12 70/10/12 69/7/12
+
+usemtl FrontColor
+v 0 60 -576
+f 71/12/11 28/61/11 70/10/11
+
+v 183.819 60 -576
+f 28/61/11 71/12/11 72/63/11
+
+usemtl BackColor
+f 70/10/12 28/61/12 71/12/12
+
+usemtl FrontColor
+v 6 0 -528
+vt 6 528
+f 70/23/1 73/94/1 28/40/1
+
+v 6 0 -288
+vt 6 288
+f 70/23/1 74/95/1 73/94/1
+
+v 0 0 -288
+vt 0 288
+f 74/95/1 70/23/1 75/96/1
+
+usemtl BackColor
+f 75/96/2 70/23/2 74/95/2
+
+usemtl FrontColor
+vt -576 60
+vt -576 0
+f 75/7/9 71/97/9 70/98/9
+
+v 0 60 -288
+f 71/97/9 75/7/9 76/6/9
+
+usemtl BackColor
+f 76/6/10 75/7/10 71/97/10
+
+usemtl FrontColor
+v 6 60 -288
+f 75/10/5 77/9/5 76/12/5
+
+f 77/9/5 75/10/5 74/11/5
+
+usemtl BackColor
+f 74/11/6 75/10/6 77/9/6
+
+usemtl FrontColor
+v 0 -12 -288
+vt 0 -12
+f 78/99/5 74/11/5 75/10/5
+
+v 6 -12 -288
+vt 6 -12
+f 74/11/5 78/99/5 79/100/5
+
+usemtl BackColor
+f 79/100/6 78/99/6 74/11/6
+
+usemtl FrontColor
+v 135.819 -12 -96
+f 78/96/1 80/78/1 79/95/1
+
+vt 0 96
+f 80/78/1 78/96/1 17/101/1
+
+usemtl BackColor
+f 17/101/2 78/96/2 80/78/2
+
+usemtl FrontColor
+vt -288 -12
+f 16/25/9 17/24/9 78/102/9
+
+usemtl BackColor
+f 16/25/10 17/24/10 13/19/10
+
+f 78/102/10 17/24/10 16/25/10
+
+usemtl FrontColor
+f 16/25/9 78/102/9 70/98/9
+
+usemtl BackColor
+f 70/98/10 78/102/10 16/25/10
+
+usemtl FrontColor
+f 70/98/9 78/102/9 75/7/9
+
+usemtl BackColor
+f 75/7/10 78/102/10 70/98/10
+
+f 75/10/6 74/11/6 78/99/6
+
+f 70/98/10 71/97/10 75/7/10
+
+f 17/24/10 18/26/10 13/19/10
+
+usemtl FrontColor
+vt -135.819 -12
+f 18/10/11 80/103/11 17/99/11
+
+f 80/103/11 18/10/11 55/64/11
+
+usemtl BackColor
+f 17/99/12 80/103/12 18/10/12
+
+f 55/64/12 18/10/12 80/103/12
+
+usemtl FrontColor
+v 6 0 -96
+vt -6 0
+f 55/64/11 18/10/11 81/104/11
+
+usemtl BackColor
+f 81/104/12 18/10/12 55/64/12
+
+usemtl FrontColor
+v 0 60 -96
+f 82/12/11 81/104/11 18/10/11
+
+v 6 60 -96
+vt -6 60
+f 81/104/11 82/12/11 83/105/11
+
+usemtl BackColor
+f 18/10/12 81/104/12 82/12/12
+
+f 83/105/12 82/12/12 81/104/12
+
+usemtl FrontColor
+vt 6 96
+f 82/101/1 5/3/1 83/106/1
+
+f 5/3/1 82/101/1 8/20/1
+
+usemtl BackColor
+f 8/20/2 82/101/2 5/3/2
+
+usemtl FrontColor
+vt -96 60
+f 82/107/9 7/17/9 8/27/9
+
+f 7/17/9 82/107/9 18/26/9
+
+usemtl BackColor
+f 8/27/10 7/17/10 82/107/10
+
+f 8/12/6 5/9/6 7/10/6
+
+f 18/26/10 82/107/10 7/17/10
+
+f 83/106/2 5/3/2 82/101/2
+
+usemtl FrontColor
+vt 96 60
+f 5/6/3 6/8/3 83/108/3
+
+usemtl BackColor
+f 6/8/4 2/5/4 5/6/4
+
+usemtl FrontColor
+v 129.819 12 282
+vt 129.819 12
+vt 6 12
+f 2/11/5 84/109/5 6/110/5
+
+f 84/109/5 2/11/5 4/14/5
+
+usemtl BackColor
+f 4/14/6 2/11/6 84/109/6
+
+f 6/110/6 84/109/6 2/11/6
+
+usemtl FrontColor
+v 6 12 141
+vt 6 -141
+f 84/4/1 85/111/1 6/2/1
+
+v 129.819 12 141
+vt 129.819 -141
+f 85/111/1 84/4/1 86/112/1
+
+usemtl BackColor
+f 6/2/2 85/111/2 84/4/2
+
+usemtl FrontColor
+f 83/108/3 6/8/3 85/57/3
+
+usemtl BackColor
+f 83/108/4 6/8/4 5/6/4
+
+f 85/57/4 6/8/4 83/108/4
+
+usemtl FrontColor
+v 6 0 141
+f 6/8/3 87/56/3 85/57/3
+
+f 87/56/3 6/8/3 2/5/3
+
+usemtl BackColor
+f 2/5/4 6/8/4 87/56/4
+
+f 85/57/4 87/56/4 6/8/4
+
+usemtl FrontColor
+vt 96 0
+f 81/113/3 85/57/3 87/56/3
+
+f 83/108/3 85/57/3 81/113/3
+
+usemtl BackColor
+f 81/113/4 85/57/4 83/108/4
+
+f 87/56/4 85/57/4 81/113/4
+
+usemtl FrontColor
+vt -6 12
+v 129.819 0 141
+vt -129.819 0
+f 85/114/11 88/115/11 87/104/11
+
+vt -129.819 12
+f 88/115/11 85/114/11 86/116/11
+
+usemtl BackColor
+f 87/104/12 88/115/12 85/114/12
+
+usemtl FrontColor
+v 42 0 -1.81497e-15
+vt 42 1.81497e-15
+f 89/117/1 87/111/1 88/112/1
+
+f 87/111/1 89/117/1 81/106/1
+
+usemtl BackColor
+f 81/106/2 89/117/2 87/111/2
+
+usemtl FrontColor
+v 42 0 -96
+vt 42 96
+f 90/118/1 81/106/1 89/117/1
+
+usemtl BackColor
+f 89/117/2 81/106/2 90/118/2
+
+usemtl FrontColor
+vt -42 0
+f 55/64/11 81/104/11 90/119/11
+
+usemtl BackColor
+f 90/119/12 81/104/12 55/64/12
+
+usemtl FrontColor
+v 42 60 -96
+vt -42 60
+f 55/64/11 90/119/11 91/120/11
+
+usemtl BackColor
+f 91/120/12 90/119/12 55/64/12
+
+usemtl FrontColor
+vt -1.81497e-15 0
+f 89/121/9 91/107/9 90/26/9
+
+v 42 60 -1.81497e-15
+vt -1.81497e-15 60
+f 91/107/9 89/121/9 92/122/9
+
+usemtl BackColor
+f 92/122/10 89/121/10 91/107/10
+
+usemtl FrontColor
+vt 42 5.40725e-49
+vn 5.19283e-17 -1.47732e-33 1
+v 129.819 60 -6.37528e-15
+vt 42 60
+f 89/123/15 93/52/15 92/124/15
+
+v 129.819 0 -6.37528e-15
+vt 129.819 5.40725e-49
+f 93/52/15 89/123/15 94/125/15
+
+usemtl BackColor
+vn -5.19283e-17 1.47732e-33 -1
+f 94/125/16 89/123/16 93/52/16
+
+usemtl FrontColor
+vt 129.819 6.37528e-15
+f 89/117/1 88/112/1 94/126/1
+
+usemtl BackColor
+f 88/112/2 87/111/2 89/117/2
+
+f 94/126/2 88/112/2 89/117/2
+
+usemtl FrontColor
+vt 141 0
+vt -6.37528e-15 60
+vt -6.37528e-15 0
+f 88/127/9 93/128/9 94/129/9
+
+vt 141 12
+f 86/130/9 93/128/9 88/127/9
+
+v 129.819 60 141
+vt 141 60
+f 93/128/9 86/130/9 95/131/9
+
+usemtl BackColor
+f 95/131/10 86/130/10 93/128/10
+
+usemtl FrontColor
+f 86/109/5 43/51/5 95/52/5
+
+vt 183.819 12
+f 43/51/5 86/109/5 42/132/5
+
+usemtl BackColor
+f 42/132/6 86/109/6 43/51/6
+
+usemtl FrontColor
+f 86/112/1 41/48/1 42/47/1
+
+f 86/112/1 84/4/1 41/48/1
+
+usemtl BackColor
+f 86/112/2 84/4/2 85/111/2
+
+f 41/48/2 84/4/2 86/112/2
+
+usemtl FrontColor
+vt -129.819 60
+vt -183.819 12
+f 40/133/11 41/134/11 84/116/11
+
+f 41/134/11 40/133/11 38/63/11
+
+usemtl BackColor
+f 84/116/12 41/134/12 40/133/12
+
+f 38/63/12 40/133/12 41/134/12
+
+usemtl FrontColor
+vt 282 12
+f 4/55/9 40/54/9 84/135/9
+
+usemtl BackColor
+f 4/55/10 40/54/10 9/17/10
+
+f 84/135/10 40/54/10 4/55/10
+
+f 42/47/2 41/48/2 86/112/2
+
+f 86/116/12 85/114/12 88/115/12
+
+f 88/127/10 93/128/10 86/130/10
+
+f 94/129/10 93/128/10 88/127/10
+
+f 95/52/6 43/51/6 86/109/6
+
+usemtl FrontColor
+f 45/66/1 95/112/1 43/47/1
+
+f 95/112/1 45/66/1 93/126/1
+
+usemtl BackColor
+f 93/126/2 45/66/2 95/112/2
+
+usemtl FrontColor
+f 49/65/1 93/126/1 45/66/1
+
+f 50/72/1 93/126/1 49/65/1
+
+f 50/72/1 92/117/1 93/126/1
+
+f 92/117/1 50/72/1 91/118/1
+
+usemtl BackColor
+f 91/118/2 50/72/2 92/117/2
+
+usemtl FrontColor
+f 53/71/1 91/118/1 50/72/1
+
+v 135.819 60 -96
+f 91/118/1 53/71/1 96/78/1
+
+usemtl BackColor
+f 96/78/2 53/71/2 91/118/2
+
+usemtl FrontColor
+f 96/78/1 53/71/1 54/67/1
+
+usemtl BackColor
+f 54/67/2 53/71/2 96/78/2
+
+f 53/76/6 54/75/6 52/9/6
+
+usemtl FrontColor
+f 54/74/3 55/113/3 96/108/3
+
+f 55/113/3 54/74/3 48/73/3
+
+usemtl BackColor
+f 48/73/4 54/74/4 55/113/4
+
+f 96/108/4 55/113/4 54/74/4
+
+usemtl FrontColor
+f 55/64/11 91/120/11 96/62/11
+
+usemtl BackColor
+f 96/62/12 91/120/12 55/64/12
+
+f 50/72/2 91/118/2 53/71/2
+
+f 93/126/2 92/117/2 50/72/2
+
+f 92/124/16 93/52/16 89/123/16
+
+f 49/65/2 93/126/2 50/72/2
+
+f 45/66/2 93/126/2 49/65/2
+
+f 49/62/14 50/69/14 47/68/14
+
+f 43/47/2 95/112/2 45/66/2
+
+usemtl FrontColor
+f 45/66/1 43/47/1 44/46/1
+
+usemtl BackColor
+f 44/46/2 43/47/2 45/66/2
+
+f 44/63/12 45/62/12 34/61/12
+
+f 90/26/10 91/107/10 89/121/10
+
+usemtl FrontColor
+f 56/7/9 80/24/9 55/26/9
+
+v 135.819 -12 -288
+f 80/24/9 56/7/9 97/102/9
+
+usemtl BackColor
+f 55/26/10 80/24/10 56/7/10
+
+f 97/102/10 56/7/10 80/24/10
+
+usemtl FrontColor
+vt 135.819 -12
+f 56/77/5 79/100/5 97/136/5
+
+f 79/100/5 56/77/5 74/11/5
+
+usemtl BackColor
+f 97/136/6 79/100/6 56/77/6
+
+usemtl FrontColor
+f 79/95/1 80/78/1 97/79/1
+
+usemtl BackColor
+f 79/95/2 80/78/2 78/96/2
+
+f 97/79/2 80/78/2 79/95/2
+
+f 74/11/6 56/77/6 79/100/6
+
+usemtl FrontColor
+f 56/79/1 73/94/1 74/95/1
+
+f 73/94/1 56/79/1 29/41/1
+
+usemtl BackColor
+f 74/95/2 73/94/2 56/79/2
+
+usemtl FrontColor
+f 73/92/3 77/27/3 74/17/3
+
+v 6 60 -528
+vt 528 60
+f 77/27/3 73/92/3 98/137/3
+
+usemtl BackColor
+f 74/17/4 77/27/4 73/92/4
+
+f 98/137/4 73/92/4 77/27/4
+
+usemtl FrontColor
+v 183.819 60 -528
+f 73/11/5 99/51/5 98/9/5
+
+f 99/51/5 73/11/5 29/15/5
+
+usemtl BackColor
+f 29/15/6 73/11/6 99/51/6
+
+usemtl FrontColor
+f 28/40/1 73/94/1 29/41/1
+
+usemtl BackColor
+f 28/40/2 73/94/2 70/23/2
+
+f 29/41/2 73/94/2 28/40/2
+
+f 29/41/2 56/79/2 73/94/2
+
+usemtl FrontColor
+v 177.819 0 -288
+vt 177.819 288
+f 29/41/1 56/79/1 100/138/1
+
+usemtl BackColor
+f 100/138/2 56/79/2 29/41/2
+
+usemtl FrontColor
+f 100/138/1 56/79/1 57/80/1
+
+usemtl BackColor
+f 57/80/2 56/79/2 100/138/2
+
+usemtl FrontColor
+v 177.819 0 -6
+vt 177.819 6
+f 100/138/1 57/80/1 101/139/1
+
+usemtl BackColor
+f 101/139/2 57/80/2 100/138/2
+
+usemtl FrontColor
+vt -4.5178e-14 0
+v 177.819 60 -6
+f 57/140/9 102/105/9 101/104/9
+
+v 177.819 60 -4.5178e-14
+vt -4.5178e-14 60
+f 102/105/9 57/140/9 103/141/9
+
+usemtl BackColor
+f 103/141/10 57/140/10 102/105/10
+
+usemtl FrontColor
+vt 177.819 0
+vn 9.10974e-16 0 1
+v 183.819 60 -5.06438e-14
+vt 177.819 60
+f 57/142/17 104/51/17 103/143/17
+
+f 104/51/17 57/142/17 33/15/17
+
+usemtl BackColor
+vn -9.10974e-16 -0 -1
+f 33/15/18 57/142/18 104/51/18
+
+f 103/143/18 104/51/18 57/142/18
+
+usemtl FrontColor
+f 104/45/1 102/139/1 103/80/1
+
+v 183.819 60 -6
+f 102/139/1 104/45/1 105/44/1
+
+usemtl BackColor
+f 103/80/2 102/139/2 104/45/2
+
+f 105/44/2 104/45/2 102/139/2
+
+usemtl FrontColor
+vt 5.06438e-14 60
+f 104/144/3 32/11/3 105/9/3
+
+vt 5.06438e-14 0
+f 32/11/3 104/144/3 33/145/3
+
+usemtl BackColor
+f 33/145/4 104/144/4 32/11/4
+
+f 105/9/4 32/11/4 104/144/4
+
+usemtl FrontColor
+vt -177.819 60
+f 32/61/11 102/146/11 105/63/11
+
+vt -177.819 0
+f 102/146/11 32/61/11 101/147/11
+
+usemtl BackColor
+f 101/147/12 32/61/12 102/146/12
+
+usemtl FrontColor
+v 177.819 0 -90
+vt 177.819 90
+f 32/44/1 106/148/1 101/139/1
+
+f 106/148/1 32/44/1 31/43/1
+
+usemtl BackColor
+f 101/139/2 106/148/2 32/44/2
+
+usemtl FrontColor
+f 100/138/1 101/139/1 106/148/1
+
+usemtl BackColor
+f 106/148/2 101/139/2 100/138/2
+
+usemtl FrontColor
+vt -90 0
+v 177.819 60 -288
+f 106/149/9 107/6/9 100/7/9
+
+v 177.819 60 -90
+vt -90 60
+f 107/6/9 106/149/9 108/150/9
+
+usemtl BackColor
+f 108/150/10 106/149/10 107/6/10
+
+usemtl FrontColor
+v 183.819 60 -90
+f 106/142/5 109/51/5 108/143/5
+
+f 109/51/5 106/142/5 31/15/5
+
+usemtl BackColor
+f 31/15/6 106/142/6 109/51/6
+
+usemtl FrontColor
+f 31/43/1 100/138/1 106/148/1
+
+f 100/138/1 31/43/1 30/42/1
+
+usemtl BackColor
+f 106/148/2 100/138/2 31/43/2
+
+f 100/7/10 107/6/10 106/149/10
+
+usemtl FrontColor
+f 107/146/11 30/61/11 100/147/11
+
+v 183.819 60 -288
+f 30/61/11 107/146/11 110/63/11
+
+usemtl BackColor
+f 100/147/12 30/61/12 107/146/12
+
+f 30/42/2 31/43/2 100/138/2
+
+usemtl FrontColor
+f 30/17/3 109/74/3 31/73/3
+
+f 109/74/3 30/17/3 110/27/3
+
+usemtl BackColor
+f 31/73/4 109/74/4 30/17/4
+
+f 110/27/4 30/17/4 109/74/4
+
+f 110/63/12 107/146/12 30/61/12
+
+usemtl FrontColor
+f 107/138/1 109/43/1 110/42/1
+
+f 109/43/1 107/138/1 108/148/1
+
+usemtl BackColor
+f 108/148/2 107/138/2 109/43/2
+
+f 110/42/2 109/43/2 107/138/2
+
+f 108/143/6 109/51/6 106/142/6
+
+usemtl FrontColor
+f 29/41/1 100/138/1 30/42/1
+
+usemtl BackColor
+f 30/42/2 100/138/2 29/41/2
+
+f 31/43/2 32/44/2 106/148/2
+
+f 105/63/12 102/146/12 32/61/12
+
+f 101/104/10 102/105/10 57/140/10
+
+usemtl FrontColor
+f 28/93/3 99/137/3 29/92/3
+
+vt 576 60
+f 99/137/3 28/93/3 72/151/3
+
+usemtl BackColor
+f 29/92/4 99/137/4 28/93/4
+
+f 72/151/4 28/93/4 99/137/4
+
+f 72/63/12 71/12/12 28/61/12
+
+usemtl FrontColor
+f 71/23/1 98/94/1 72/40/1
+
+f 71/23/1 77/95/1 98/94/1
+
+f 77/95/1 71/23/1 76/96/1
+
+usemtl BackColor
+f 76/96/2 71/23/2 77/95/2
+
+f 98/94/2 77/95/2 71/23/2
+
+f 72/40/2 98/94/2 71/23/2
+
+usemtl FrontColor
+f 72/40/1 98/94/1 99/41/1
+
+usemtl BackColor
+f 99/41/2 98/94/2 72/40/2
+
+f 98/9/6 99/51/6 73/11/6
+
+f 76/12/6 77/9/6 75/10/6
+
+f 73/94/2 74/95/2 70/23/2
+
+usemtl FrontColor
+f 69/7/11 28/61/11 27/36/11
+
+usemtl BackColor
+f 27/36/12 28/61/12 69/7/12
+
+usemtl FrontColor
+v 252 60 -576
+f 111/35/11 69/7/11 27/36/11
+
+v 288 60 -576
+f 69/7/11 111/35/11 112/6/11
+
+usemtl BackColor
+f 27/36/12 69/7/12 111/35/12
+
+f 112/6/12 111/35/12 69/7/12
+
+usemtl FrontColor
+v 288 60 -528
+vt 288 528
+vt 288 576
+f 111/39/1 113/152/1 112/153/1
+
+v 252 60 -528
+vt 252 528
+f 113/152/1 111/39/1 114/154/1
+
+usemtl BackColor
+f 114/154/2 111/39/2 113/152/2
+
+usemtl FrontColor
+v 252 0 -528
+vt -528 0
+vt -528 60
+f 111/97/9 115/155/9 114/156/9
+
+f 115/155/9 111/97/9 27/98/9
+
+usemtl BackColor
+f 114/156/10 115/155/10 111/97/10
+
+usemtl FrontColor
+f 115/16/5 113/27/5 114/28/5
+
+f 113/27/5 115/16/5 68/17/5
+
+usemtl BackColor
+f 68/17/6 115/16/6 113/27/6
+
+usemtl FrontColor
+vt 288 288
+f 115/154/1 67/157/1 68/152/1
+
+v 252 0 -288
+vt 252 288
+f 67/157/1 115/154/1 116/158/1
+
+usemtl BackColor
+f 116/158/2 115/154/2 67/157/2
+
+usemtl FrontColor
+f 27/39/1 116/158/1 115/154/1
+
+v 252 0 -90
+vt 252 90
+f 27/39/1 117/159/1 116/158/1
+
+v 252 0 -78
+vt 252 78
+f 27/39/1 118/160/1 117/159/1
+
+v 252 0 -6
+vt 252 6
+f 27/39/1 119/161/1 118/160/1
+
+f 27/39/1 58/81/1 119/161/1
+
+usemtl BackColor
+f 119/161/2 58/81/2 27/39/2
+
+usemtl FrontColor
+vt 288 -12
+f 63/162/1 119/161/1 58/81/1
+
+vt 288 6
+f 119/161/1 63/162/1 64/163/1
+
+usemtl BackColor
+f 58/81/2 119/161/2 63/162/2
+
+f 64/163/2 63/162/2 119/161/2
+
+usemtl FrontColor
+v 288 60 -6
+vn 3.45403e-16 0 1
+f 120/27/19 119/16/19 64/17/19
+
+v 252 60 -6
+f 119/16/19 120/27/19 121/28/19
+
+usemtl BackColor
+vn -3.45403e-16 -0 -1
+f 64/17/20 119/16/20 120/27/20
+
+f 121/28/20 120/27/20 119/16/20
+
+usemtl FrontColor
+v 252 60 -78
+f 120/163/1 122/160/1 121/161/1
+
+v 288 60 -78
+vt 288 78
+f 122/160/1 120/163/1 123/164/1
+
+usemtl BackColor
+f 121/161/2 122/160/2 120/163/2
+
+usemtl FrontColor
+vt -78 60
+f 122/165/9 119/104/9 121/105/9
+
+vt -78 0
+f 119/104/9 122/165/9 118/166/9
+
+usemtl BackColor
+f 121/105/10 119/104/10 122/165/10
+
+f 118/166/10 122/165/10 119/104/10
+
+usemtl FrontColor
+f 122/35/11 65/7/11 118/36/11
+
+f 65/7/11 122/35/11 123/6/11
+
+usemtl BackColor
+f 118/36/12 65/7/12 122/35/12
+
+usemtl FrontColor
+f 65/164/1 117/159/1 118/160/1
+
+vt 288 90
+f 117/159/1 65/164/1 66/167/1
+
+usemtl BackColor
+f 118/160/2 117/159/2 65/164/2
+
+f 117/159/2 118/160/2 27/39/2
+
+f 118/160/2 119/161/2 27/39/2
+
+f 116/158/2 117/159/2 27/39/2
+
+usemtl FrontColor
+f 66/167/1 116/158/1 117/159/1
+
+f 116/158/1 66/167/1 67/157/1
+
+usemtl BackColor
+f 117/159/2 116/158/2 66/167/2
+
+usemtl FrontColor
+v 252 60 -288
+f 117/149/9 124/6/9 116/7/9
+
+v 252 60 -90
+f 124/6/9 117/149/9 125/150/9
+
+usemtl BackColor
+f 125/150/10 117/149/10 124/6/10
+
+usemtl FrontColor
+v 288 60 -90
+f 117/16/5 126/27/5 125/28/5
+
+f 126/27/5 117/16/5 66/17/5
+
+usemtl BackColor
+f 66/17/6 117/16/6 126/27/6
+
+f 66/167/2 65/164/2 117/159/2
+
+f 125/28/6 126/27/6 117/16/6
+
+usemtl FrontColor
+f 126/167/1 124/158/1 125/159/1
+
+v 288 60 -288
+f 124/158/1 126/167/1 127/157/1
+
+usemtl BackColor
+f 125/159/2 124/158/2 126/167/2
+
+f 127/157/2 126/167/2 124/158/2
+
+usemtl FrontColor
+f 126/74/3 67/17/3 127/27/3
+
+f 67/17/3 126/74/3 66/73/3
+
+usemtl BackColor
+f 66/73/4 126/74/4 67/17/4
+
+f 127/27/4 67/17/4 126/74/4
+
+usemtl FrontColor
+f 67/7/11 124/35/11 127/6/11
+
+f 124/35/11 67/7/11 116/36/11
+
+usemtl BackColor
+f 116/36/12 67/7/12 124/35/12
+
+f 67/157/2 66/167/2 116/158/2
+
+f 127/6/12 124/35/12 67/7/12
+
+f 116/7/10 124/6/10 117/149/10
+
+f 115/154/2 116/158/2 27/39/2
+
+f 27/98/10 111/97/10 115/155/10
+
+f 123/6/12 122/35/12 65/7/12
+
+f 123/164/2 120/163/2 122/160/2
+
+usemtl FrontColor
+vt 78 60
+f 120/9/3 65/91/3 123/168/3
+
+f 65/91/3 120/9/3 64/11/3
+
+usemtl BackColor
+f 64/11/4 120/9/4 65/91/4
+
+f 123/168/4 65/91/4 120/9/4
+
+usemtl FrontColor
+vn 9.86865e-17 0 -1
+f 59/35/21 63/7/21 58/36/21
+
+v 288 60 12
+f 63/7/21 59/35/21 128/6/21
+
+usemtl BackColor
+vn -9.86865e-17 -0 1
+f 58/36/22 63/7/22 59/35/22
+
+f 128/6/22 59/35/22 63/7/22
+
+usemtl FrontColor
+f 59/81/1 61/38/1 128/162/1
+
+f 61/38/1 59/81/1 60/37/1
+
+usemtl BackColor
+f 60/37/2 59/81/2 61/38/2
+
+f 128/162/2 61/38/2 59/81/2
+
+usemtl FrontColor
+vt -12 60
+f 61/60/3 63/88/3 128/169/3
+
+f 63/88/3 61/60/3 26/58/3
+
+usemtl BackColor
+f 26/58/4 61/60/4 63/88/4
+
+f 128/169/4 63/88/4 61/60/4
+
+f 60/28/6 61/27/6 25/16/6
+
+f 58/13/10 59/83/10 25/82/10
+
+f 68/152/2 67/157/2 115/154/2
+
+f 114/28/6 113/27/6 115/16/6
+
+usemtl FrontColor
+f 69/93/3 113/137/3 68/92/3
+
+f 113/137/3 69/93/3 112/151/3
+
+usemtl BackColor
+f 68/92/4 113/137/4 69/93/4
+
+f 112/151/4 69/93/4 113/137/4
+
+f 112/153/2 113/152/2 111/39/2
+
+usemtl FrontColor
+f 24/85/3 19/6/3 12/7/3
+
+vt -153 60
+f 19/6/3 24/85/3 22/170/3
+
+usemtl BackColor
+f 12/7/4 19/6/4 24/85/4
+
+f 22/170/4 24/85/4 19/6/4
+
+f 22/6/12 21/35/12 24/7/12
+
+f 22/32/2 19/29/2 21/30/2
+
+f 34/46/2 11/31/2 35/47/2
+
+f 35/47/2 11/31/2 36/48/2
+
+f 3/11/6 1/13/6 7/10/6
+
+g Mesh2 Model
+
+l 12 24
+
+l 11 12
+
+l 11 23
+
+l 10 11
+
+l 36 10
+
+l 36 35
+
+l 36 41
+
+l 84 41
+
+l 6 84
+
+l 6 85
+
+l 2 6
+
+l 2 87
+
+l 3 2
+
+l 3 5
+
+l 3 1
+
+l 7 3
+
+l 7 18
+
+l 7 8
+
+l 7 13
+
+l 14 13
+
+l 12 14
+
+l 12 19
+
+l 20 19
+
+l 20 21
+
+l 11 20
+
+l 21 22
+
+l 23 21
+
+l 23 24
+
+l 24 26
+
+l 24 22
+
+l 19 22
+
+l 26 63
+
+l 25 26
+
+l 25 58
+
+l 25 60
+
+l 60 59
+
+l 60 61
+
+l 61 128
+
+l 26 61
+
+l 59 128
+
+l 58 59
+
+l 58 63
+
+l 64 63
+
+l 119 64
+
+l 119 118
+
+l 119 121
+
+l 121 120
+
+l 121 122
+
+l 122 123
+
+l 118 122
+
+l 118 65
+
+l 66 65
+
+l 67 66
+
+l 67 68
+
+l 67 127
+
+l 116 67
+
+l 117 116
+
+l 117 66
+
+l 117 125
+
+l 125 124
+
+l 125 126
+
+l 127 126
+
+l 124 127
+
+l 124 116
+
+l 66 126
+
+l 68 115
+
+l 68 69
+
+l 68 113
+
+l 113 114
+
+l 113 112
+
+l 111 112
+
+l 114 111
+
+l 115 114
+
+l 115 27
+
+l 28 27
+
+l 28 70
+
+l 29 28
+
+l 29 73
+
+l 29 99
+
+l 30 29
+
+l 100 30
+
+l 106 100
+
+l 31 106
+
+l 31 30
+
+l 31 109
+
+l 109 110
+
+l 109 108
+
+l 108 107
+
+l 106 108
+
+l 107 110
+
+l 100 107
+
+l 110 30
+
+l 99 98
+
+l 99 72
+
+l 72 71
+
+l 28 72
+
+l 76 71
+
+l 75 76
+
+l 75 70
+
+l 75 74
+
+l 75 78
+
+l 78 79
+
+l 17 78
+
+l 80 17
+
+l 80 97
+
+l 55 80
+
+l 55 56
+
+l 48 55
+
+l 48 52
+
+l 48 54
+
+l 54 53
+
+l 54 96
+
+l 96 91
+
+l 55 96
+
+l 91 92
+
+l 90 91
+
+l 90 89
+
+l 90 81
+
+l 87 81
+
+l 88 87
+
+l 88 94
+
+l 88 86
+
+l 86 42
+
+l 86 85
+
+l 86 95
+
+l 95 93
+
+l 95 43
+
+l 43 44
+
+l 42 43
+
+l 41 42
+
+l 41 38
+
+l 40 38
+
+l 39 40
+
+l 39 37
+
+l 9 39
+
+l 9 4
+
+l 9 10
+
+l 1 9
+
+l 10 37
+
+l 38 37
+
+l 2 4
+
+l 4 84
+
+l 84 40
+
+l 35 42
+
+l 35 34
+
+l 46 34
+
+l 46 47
+
+v 135.819 0 141
+l 129 46
+
+l 46 45
+
+l 45 49
+
+l 45 44
+
+l 34 44
+
+l 49 50
+
+l 47 49
+
+l 47 51
+
+l 52 51
+
+l 52 53
+
+l 53 50
+
+l 51 50
+
+l 93 92
+
+l 94 93
+
+l 94 89
+
+l 89 92
+
+l 87 85
+
+l 81 83
+
+l 5 83
+
+l 8 5
+
+l 82 8
+
+l 83 82
+
+l 82 18
+
+l 18 17
+
+l 74 56
+
+l 74 73
+
+l 74 77
+
+l 74 79
+
+l 79 97
+
+l 56 97
+
+l 77 98
+
+l 77 76
+
+l 73 98
+
+l 70 71
+
+l 70 16
+
+l 13 16
+
+l 16 15
+
+l 69 15
+
+l 27 69
+
+l 27 111
+
+l 69 112
+
+l 62 15
+
+l 14 62
+
+l 65 64
+
+l 65 123
+
+l 123 120
+
+l 64 120
+
+l 63 128
+
+g Mesh3 Model
+
+l 57 33
+
+l 57 101
+
+l 57 103
+
+l 103 102
+
+l 103 104
+
+l 104 105
+
+l 33 104
+
+l 33 32
+
+l 101 32
+
+l 101 102
+
+l 102 105
+
+l 32 105
+</script>
+<script id="s39-core">
+window.S39=(function(){
+  // ---------- the unified core-armature law (Glide Drawings, pp. 79-93) ----------
+  // One depth gauge g(Z) = 1 - p(Z)/p(Zg) -- the vanishing-diagonals device (pp. 77-78) in closed form.
+  // Each picture channel contracts toward its SEAT at its own RATE, plus an optional staging SHEAR:
+  //   w = seat + (staging - seat)*(1 - r*g) + shear*g          (staging = true image at Zg)
+  // Rates (r_u, r_v):  point (1,1) . plane (lam,lam) . axis (1-k,1) . herringbone (0,1)+sigma
+  //                    keystone (0,lam)+sigma*lam . box (0,0)+(a,b)
+  function makeProj(Zp,Zg,A){
+    var pg = -Zp/(Zg-Zp);
+    return function(v){
+      var p = -Zp/(v[2]-Zp);                                   // pg*g = pg - p, so shear*pg*g = shear*(pg-p)
+      return [ A.u.s*pg + (v[0]-A.u.s)*((1-A.u.r)*pg + A.u.r*p) + (A.u.h||0)*(pg-p),
+               A.v.s*pg + (v[1]-A.v.s)*((1-A.v.r)*pg + A.v.r*p) + (A.v.h||0)*(pg-p) ];
+    };
+  }
+  // slider travel boxes (must match the #s* range inputs) and which params each armature uses
+  var PBOX={ u0:[-0.5,0.5], v0:[-0.5,0.5], k:[0,1], lam:[0.15,1], sig:[-0.75,0.75], a:[-0.75,0.75], b:[-0.75,0.75] };
+  var MODEP={ vp:['u0','v0'], vpl:['u0','v0','lam'], vax:['u0','v0','k'], her:['v0','sig'], key:['v0','sig','lam'], box:['a','b'] };
+  function armature(mode,P,S,swap){
+    var W = swap? S.hh : S.halfW, H = swap? S.halfW : S.hh;    // channel extents
+    var u0=(P.u0||0)*W, v0=(P.v0||0)*H;
+    if(mode==='vp')  return { u:{r:1,s:u0},                    v:{r:1,s:v0} };
+    if(mode==='vpl') return { u:{r:P.lam,s:u0},                v:{r:P.lam,s:v0} };
+    if(mode==='vax') return { u:{r:1-P.k,s:u0},                v:{r:1,s:v0} };
+    if(mode==='her') return { u:{r:0,s:0,h:P.sig*W},           v:{r:1,s:v0} };
+    if(mode==='key') return { u:{r:0,s:0,h:P.sig*P.lam*W},     v:{r:P.lam,s:v0} };
+    return                  { u:{r:0,s:0,h:P.a*W},             v:{r:0,s:0,h:P.b*H} };
+  }
+  function projFor(Zp,Zg,mode,P,S,swap){
+    var Pr = makeProj(Zp,Zg,armature(mode,P,S,swap));
+    return swap? function(v){ var q=Pr([v[1],v[0],v[2]]); return [q[1],q[0]]; } : Pr;
+  }
+  // ---------- scenes (verbatim from Sheet 37, so the two sheets show the same worlds) ----------
+  function box(x0,x1,y0,y1,z0,z1,Q){
+    Q.push({v:[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0]],f:'front',n:[0,0,-1],solid:1});
+    Q.push({v:[[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]],f:'back', n:[0,0, 1],solid:1});
+    Q.push({v:[[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]],f:'top', n:[0, 1,0],solid:1});
+    Q.push({v:[[x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1]],f:'bot', n:[0,-1,0],solid:1});
+    Q.push({v:[[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1]],f:'side',n:[-1,0,0],solid:1});
+    Q.push({v:[[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1]],f:'side',n:[ 1,0,0],solid:1});
+  }
+  function gridOnPlane(G, kind, a0,a1,b0,b1, step, mk){
+    for(var a=a0;a<=a1+1e-6;a+=step) G.push([mk(a,b0),mk(a,b1)]);
+    for(var b=b0;b<=b1+1e-6;b+=step) G.push([mk(a0,b),mk(a1,b)]);
+  }
+  function sceneRoom(){
+    var Q=[],G=[];
+    Q.push({v:[[-200,-120,560],[200,-120,560],[200,120,560],[-200,120,560]],f:'wall'});
+    gridOnPlane(G,'w',-200,200,-120,120,40,function(a,b){return[a,b,559];});
+    Q.push({v:[[-200,-120,392],[200,-120,392],[200,-120,560],[-200,-120,560]],f:'floor'});
+    gridOnPlane(G,'f',-200,200,392,560,42,function(a,b){return[a,-120,b];});
+    Q.push({v:[[-200,120,392],[200,120,392],[200,120,560],[-200,120,560]],f:'top'});
+    gridOnPlane(G,'c',-200,200,392,560,42,function(a,b){return[a,120,b];});
+    Q.push({v:[[-200,-120,392],[-200,120,392],[-200,120,560],[-200,-120,560]],f:'side'});
+    gridOnPlane(G,'l',-120,120,392,560,42,function(a,b){return[-200,a,b];});
+    Q.push({v:[[200,-120,392],[200,120,392],[200,120,560],[200,-120,560]],f:'side'});
+    gridOnPlane(G,'r',-120,120,392,560,42,function(a,b){return[200,a,b];});
+    return {Q:Q,G:G, halfW:200, Zf:392, Zg:470, gaugeY:0, hh:120, Zback:560, name:'room'};
+  }
+  function sceneSite(){
+    var Q=[],G=[];
+    Q.push({v:[[-250,-160,560],[250,-160,560],[250,160,560],[-250,160,560]],f:'wall'});
+    gridOnPlane(G,'g',-250,250,-160,160,36,function(a,b){return[a,b,559];});
+    var blocks=[[-210,-120,60,70,70],[-90,-118,70,54,44],[60,-125,80,62,88],[185,-120,58,58,58],
+                [-190,15,66,88,52],[-40,10,96,70,96],[120,20,72,60,64],[215,25,44,88,80],
+                [-150,118,54,40,40],[30,120,88,44,72],[170,122,52,42,52]];
+    blocks.forEach(function(b){ box(b[0]-b[2]/2,b[0]+b[2]/2, b[1]-b[3]/2,b[1]+b[3]/2, 560-b[4], 560, Q); });
+    return {Q:Q,G:G, halfW:250, Zf:464, Zg:512, gaugeY:0, hh:160, Zback:560, name:'site'};
+  }
+  function sceneCorridor(){
+    var Q=[],G=[];
+    Q.push({v:[[-90,-90,920],[90,-90,920],[90,90,920],[-90,90,920]],f:'wall'});
+    Q.push({v:[[-90,-90,392],[90,-90,392],[90,-90,920],[-90,-90,920]],f:'floor'});
+    gridOnPlane(G,'f',-90,90,392,920,44,function(a,b){return[a,-90,b];});
+    Q.push({v:[[-90,90,392],[90,90,392],[90,90,920],[-90,90,920]],f:'top'});
+    Q.push({v:[[-90,-90,392],[-90,90,392],[-90,90,920],[-90,-90,920]],f:'side'});
+    gridOnPlane(G,'l',-90,90,392,920,44,function(a,b){return[-90,a,b];});
+    Q.push({v:[[90,-90,392],[90,90,392],[90,90,920],[90,-90,920]],f:'side'});
+    gridOnPlane(G,'r',-90,90,392,920,44,function(a,b){return[90,a,b];});
+    for(var z=470;z<=890;z+=140){ box(-90,-74,-90,90,z,z+16,Q); box(74,90,-90,90,z,z+16,Q); }
+    return {Q:Q,G:G, halfW:90, Zf:392, Zg:520, gaugeY:0, hh:90, Zback:920, name:'corridor'};
+  }
+  // ---------- house plan (embedded OBJ, baked bird's-eye — verbatim from Sheet 37) ----------
+  function parseHouse(text){
+    var V=[],F=[],E=[],seen={},hasL=false;
+    function edge(a,b){ var k=a<b?a+'_'+b:b+'_'+a; if(!seen[k]){seen[k]=1;E.push([a,b]);} }
+    text.split(/\r?\n/).forEach(function(line){ var t=line.trim().split(/\s+/);
+      if(t[0]==='v') V.push([+t[1],+t[2],+t[3]]);
+      else if(t[0]==='f'){ var ids=t.slice(1).map(function(s){return parseInt(s.split('/')[0])-1;}); F.push(ids); }
+      else if(t[0]==='l'){ hasL=true; for(var i=1;i<t.length-1;i++) edge(parseInt(t[i])-1,parseInt(t[i+1])-1); }
+    });
+    if(!hasL) F.forEach(function(ids){ for(var j=0;j<ids.length;j++) edge(ids[j],ids[(j+1)%ids.length]); });
+    return {V:V,F:F,E:E};
+  }
+  function buildHouse(HOUSE,orient){
+    var V=HOUSE.V;
+    var ext=[0,1,2].map(function(ax){ var vs=V.map(function(p){return p[ax];});
+      return {ax:ax, lo:Math.min.apply(0,vs), hi:Math.max.apply(0,vs), span:Math.max.apply(0,vs)-Math.min.apply(0,vs)}; });
+    var up=ext.slice().sort(function(a,b){return a.span-b.span;})[0].ax;
+    var ft=[0,1,2].filter(function(a){return a!==up;});
+    var cU=(ext[up].lo+ext[up].hi)/2, c0=(ext[ft[0]].lo+ext[ft[0]].hi)/2, c1=(ext[ft[1]].lo+ext[ft[1]].hi)/2;
+    var fspan=Math.max(ext[ft[0]].span, ext[ft[1]].span)||1, hy=ext[up].span||1;
+    var Z0=470, fitS=320/fspan, sd=42/hy, r=orient&3;
+    function bake(p){
+      var a=(p[ft[0]]-c0)*fitS, b=(p[ft[1]]-c1)*fitS, h=(cU-p[up])*sd;
+      var X,Y; if(r===0){X=a;Y=b;} else if(r===1){X=b;Y=-a;} else if(r===2){X=-a;Y=-b;} else {X=-b;Y=a;}
+      return [X, Y, Z0+h];
+    }
+    var W=V.map(bake);
+    var Q=HOUSE.F.map(function(ids){
+      var pv=ids.map(function(i){return W[i];});
+      var ux=pv[1][0]-pv[0][0],uy=pv[1][1]-pv[0][1],uz=pv[1][2]-pv[0][2];
+      var vx=pv[2][0]-pv[0][0],vy=pv[2][1]-pv[0][1],vz=pv[2][2]-pv[0][2];
+      var nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx, nl=Math.hypot(nx,ny,nz)||1;
+      var facing=Math.abs(nz/nl);
+      var col = facing>0.55 ? 'rgb(198,196,184)' : 'rgb(156,154,142)';
+      return {v:pv, fill:col};
+    });
+    var G=HOUSE.E.map(function(e){ return [W[e[0]], W[e[1]]]; });
+    var Xs=W.map(function(p){return p[0];}), hw=Math.max.apply(0,Xs.map(Math.abs));
+    return {Q:Q, G:G, mesh:1, halfW:hw, Zf:Z0-22, Zg:Z0, gaugeY:0, hh:Math.max.apply(0,W.map(function(p){return Math.abs(p[1]);})), Zback:Z0+22, name:'house'};
+  }
+  
+  // ---------- framing (per armature: union over that mode's slider-corner projections at Zp=200) ----------
+  // every channel is multilinear in its params, so corner unions bound the whole travel exactly
+  function corners(mode){
+    var ks=MODEP[mode], out=[];
+    (function rec(i,acc){ if(i===ks.length){ out.push(acc); return; }
+      PBOX[ks[i]].forEach(function(val){ var a={}; for(var q in acc)a[q]=acc[q]; a[ks[i]]=val; rec(i+1,a); }); })(0,{});
+    return out;
+  }
+  function fitScene(S,mode,swap){
+    var all=[];
+    corners(mode).forEach(function(P){ var Pr=projFor(200,S.Zg,mode,P,S,swap);
+      S.Q.forEach(function(q){ q.v.forEach(function(pt){ all.push(Pr(pt)); }); }); });
+    var xs=all.map(function(p){return p[0];}), ys=all.map(function(p){return p[1];});
+    return {x0:Math.min.apply(0,xs),x1:Math.max.apply(0,xs),y0:Math.min.apply(0,ys),y1:Math.max.apply(0,ys)};
+  }
+  function makeTx(f){ var pad=26, W=640, H=440;
+    var sc=Math.min((W-2*pad)/((f.x1-f.x0)||1),(H-2*pad)/((f.y1-f.y0)||1));
+    var mx=(f.x0+f.x1)/2,my=(f.y0+f.y1)/2;
+    return function(p){ return [W/2+(p[0]-mx)*sc, H/2-(p[1]-my)*sc]; }; }
+  
+  // ---------- drawing ----------
+  var FILL={front:'#BEBCB0',back:'#B4B2A6',wall:'#C2C0B4',floor:'#B8B6AA',top:'#CCCABE',bot:'#98968A',side:'#A6A498'};
+  function edgePath(PROJ,tx,a,b){
+    if(Math.abs(a[2]-b[2])<1e-9){ var B=tx(PROJ(b));
+      return 'L'+B[0].toFixed(1)+' '+B[1].toFixed(1); }
+    var s=''; for(var i=1;i<=10;i++){ var t=i/10, p=[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+      var Sp=tx(PROJ(p)); s+='L'+Sp[0].toFixed(1)+' '+Sp[1].toFixed(1); }
+    return s;
+  }
+  function quadPath(PROJ,tx,q){
+    var A=tx(PROJ(q.v[0])), d='M'+A[0].toFixed(1)+' '+A[1].toFixed(1), n=q.v.length;
+    for(var i=0;i<n;i++) d+=edgePath(PROJ,tx,q.v[i],q.v[(i+1)%n]);
+    return d+'Z';
+  }
+  
+  function svgFor(state, SCENES, FITS){
+    var S=SCENES[state.cur], Zp=state.Zp, mode=state.mode, swap=state.swap, P=state.P;
+    var PROJ=projFor(Zp,S.Zg,mode,P,S,swap);
+    var F=FITS[state.cur+'_'+mode+(swap?'_s':'')], tx=makeTx(F);
+    var viewer=[0,0,Zp];
+    function avgz(q){ var z=0,n=q.v.length; for(var i=0;i<n;i++) z+=q.v[i][2]; return z/n; }
+    var s='';
+    if(S.mesh){
+      var faces=S.Q.map(function(q){ return {z:avgz(q), d:'<path d="'+quadPath(PROJ,tx,q)+'" fill="'+q.fill+'" stroke="none"/>'}; });
+      faces.sort(function(a,b){ return b.z-a.z; });
+      faces.forEach(function(it){ s+=it.d; });
+      S.G.forEach(function(e){ var A=tx(PROJ(e[0]));
+        s+='<path d="M'+A[0].toFixed(1)+' '+A[1].toFixed(1)+edgePath(PROJ,tx,e[0],e[1])+'" fill="none" stroke="#151310" stroke-width="0.7"/>'; });
+    } else {
+      function faceFill(q){ return '<path d="'+quadPath(PROJ,tx,q)+'" fill="'+(FILL[q.f]||'#B0AEA2')+'" stroke="#151310" stroke-width="0.9"/>'; }
+      var shell=[]; S.Q.forEach(function(q){ if(!q.solid) shell.push({z:avgz(q), d:faceFill(q)}); });
+      shell.sort(function(a,b){ return b.z-a.z; });
+      shell.forEach(function(it){ s+=it.d; });
+      S.G.forEach(function(e){ var A=tx(PROJ(e[0]));
+        s+='<path d="M'+A[0].toFixed(1)+' '+A[1].toFixed(1)+edgePath(PROJ,tx,e[0],e[1])+'" fill="none" stroke="#8E8C80" stroke-width="0.55"/>'; });
+      var solids=[]; S.Q.forEach(function(q){ if(q.solid){
+        var fx=(q.v[0][0]+q.v[1][0]+q.v[2][0]+q.v[3][0])/4, fy=(q.v[0][1]+q.v[1][1]+q.v[2][1]+q.v[3][1])/4, fz=avgz(q);
+        var dot=q.n[0]*(viewer[0]-fx)+q.n[1]*(viewer[1]-fy)+q.n[2]*(viewer[2]-fz);
+        if(dot>0) solids.push({z:fz, d:faceFill(q)}); } });
+      solids.sort(function(a,b){ return b.z-a.z; });
+      solids.forEach(function(it){ s+=it.d; });
+    }
+    
+    var pg=-Zp/(S.Zg-Zp), W=swap?S.hh:S.halfW, H=swap?S.halfW:S.hh;
+    var A=armature(mode,P,S,swap);
+    function pt(cu,cv){ return tx(swap? [cv,cu] : [cu,cv]); }                 // channel space -> picture
+    function ch(c,V,g){ return c.s*pg + (V-c.s)*pg*(1-c.r*g) + (c.h||0)*pg*g; }
+    // staging rectangle: the identity image of the gauge plane -- common ground for all six armatures
+    var SR=[pt(-W*pg,-H*pg),pt(W*pg,-H*pg),pt(W*pg,H*pg),pt(-W*pg,H*pg)];
+    s+='<path d="M'+SR.map(function(q){return q[0].toFixed(1)+' '+q[1].toFixed(1);}).join('L')+'Z" fill="none" stroke="#151310" stroke-width="0.8" opacity="0.55"/>';
+    // gauge square at Zg (identical under every armature and every parameter)
+    var gg=30, GQ=[[-gg,-gg,S.Zg],[gg,-gg,S.Zg],[gg,gg,S.Zg],[-gg,gg,S.Zg]].map(function(v){return tx(PROJ(v));});
+    s+='<path d="'+GQ.map(function(q,i){return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1);}).join('')+'Z" fill="none" stroke="#151310" stroke-width="1.6"/>';
+    if(state.arm){
+      var RED='#ED3121';
+      function seg(a,b,w,dash,op){ return '<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="'+RED+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+(op?' opacity="'+op+'"':'')+'/>'; }
+      function dot(a,r,open){ return open? '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="'+r+'" fill="none" stroke="'+RED+'" stroke-width="1.4" stroke-dasharray="3 3"/>'
+                                         : '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="'+r+'" fill="'+RED+'"/>'; }
+      function lab(x,y,t,anchor){ x=Math.max(6,Math.min(634,x)); y=Math.max(12,Math.min(432,y));
+        return '<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" font-family="Helvetica,Arial" font-size="10" fill="'+RED+'" letter-spacing="1"'+(anchor?' text-anchor="'+anchor+'"':'')+'>'+t+'</text>'; }
+      function rect4(c1,c2,c3,c4,w,dash){ return '<path d="M'+[c1,c2,c3,c4].map(function(q){return q[0].toFixed(1)+' '+q[1].toFixed(1);}).join('L')+'Z" fill="none" stroke="'+RED+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'; }
+      var us=A.u.s*pg, vs=A.v.s*pg;                                          // picture seats
+      var iu1=ch(A.u,-W,1), iu2=ch(A.u,W,1), iv1=ch(A.v,-H,1), iv2=ch(A.v,H,1);   // image of infinity extents
+      var C1=pt(iu1,iv1), C2=pt(iu2,iv1), C3=pt(iu2,iv2), C4=pt(iu1,iv2);
+      var S1=pt(-W*pg,-H*pg), S2=pt(W*pg,-H*pg), S3=pt(W*pg,H*pg), S4=pt(-W*pg,H*pg);
+      if(mode==='vp'){
+        var VPt=pt(us,vs);
+        s+=seg(S1,VPt,1.1,null,0.75)+seg(S2,VPt,1.1,null,0.75)+seg(S3,VPt,1.1,null,0.75)+seg(S4,VPt,1.1,null,0.75);
+        s+=dot(VPt,5)+lab(VPt[0]+9,VPt[1]-8,'IMAGE OF \u221E \u00B7 A POINT');
+        s+=lab(S2[0]-4,S2[1]-6,'THE TUNNEL FIELD','end');
+      }
+      if(mode==='vpl'){
+        var DC=pt(us,vs);
+        s+=seg(C1,DC,1,'4 4',0.85)+seg(C2,DC,1,'4 4',0.85)+seg(C3,DC,1,'4 4',0.85)+seg(C4,DC,1,'4 4',0.85);
+        s+=rect4(C1,C2,C3,C4,3.2)+dot(DC,3.5,true);
+        s+=lab(Math.min(C1[0],C2[0]),Math.min(C1[1],C3[1])-7,'IMAGE OF \u221E \u00B7 AN AREA');
+        s+=lab(DC[0]+8,DC[1]+4,'DIRECTING CENTER');
+      }
+      if(mode==='vax'){
+        var E1=pt(iu1,vs), E2=pt(iu2,vs);
+        s+=seg(pt(-640,vs),pt(640,vs),1,null,0.8);
+        s+=seg(pt(us,-640),pt(us,640),1,'5 4',0.8);
+        s+=seg(E1,E2,4,null,0.9);
+        var pu=swap?-S.hh:S.halfW, pv=swap?S.halfW:-S.hh;
+        var P0=pt(ch(A.u,pu,0)+0*(pg-1),0)&&tx(PROJ([S.halfW,-S.hh,S.Zf])), Vv=pt(ch(A.u,pu,1),vs);
+        s+=seg(P0,Vv,2.2,null,0.95)+dot(P0,3);
+        if(P.k<0.999&&P.k>0.001){ var gs=1/(1-P.k), Dv=pt(ch(A.u,pu,gs),ch(A.v,pv,gs));
+          s+=seg(Vv,Dv,1.4,'6 5',0.9)+dot(Dv,3.5,true); }
+        s+=lab(628,pt(0,vs)[1]-6,'VANISHING AXIS \u00B7 IMAGE OF \u221E','end');
+        s+=lab(pt(us,0)[0]+6,16,'DIRECTING AXIS');
+      }
+      if(mode==='her'){
+        var E1=pt(iu1,vs), E2=pt(iu2,vs);
+        s+=seg(pt(-640,vs),pt(640,vs),1,null,0.8);
+        s+=seg(E1,E2,4,null,0.9);
+        s+=seg(S1,pt(ch(A.u,-W,1),vs),1.3,null,0.85)+seg(S4,pt(ch(A.u,-W,1),vs),1.3,null,0.85);
+        s+=seg(S2,pt(ch(A.u,W,1),vs),1.3,null,0.85)+seg(S3,pt(ch(A.u,W,1),vs),1.3,null,0.85);
+        s+=dot(pt(ch(A.u,-W,1),vs),3)+dot(pt(ch(A.u,W,1),vs),3);
+        s+=lab(628,pt(0,vs)[1]-6,'VANISHING AXIS \u00B7 IMAGE OF \u221E','end');
+        s+=lab(pt(ch(A.u,W,1),vs)[0]+7,pt(0,vs)[1]+14,'STAGING FANS \u00B7 SIDES PARALLEL');
+      }
+      if(mode==='key'){
+        s+=seg(pt(-640,vs),pt(640,vs),1,'5 4',0.8);
+        var Dp1=pt(ch(A.u,-W,1/P.lam),vs), Dp2=pt(ch(A.u,W,1/P.lam),vs);
+        s+=seg(C1,Dp1,1,'4 4',0.85)+seg(C4,Dp1,1,'4 4',0.85)+seg(C2,Dp2,1,'4 4',0.85)+seg(C3,Dp2,1,'4 4',0.85);
+        s+=rect4(C1,C2,C3,C4,3.2)+dot(Dp1,3.5,true)+dot(Dp2,3.5,true);
+        s+=lab(Math.min(C1[0],C2[0]),Math.min(C1[1],C3[1])-7,'IMAGE OF \u221E \u00B7 A PLANE');
+        s+=lab(628,pt(0,vs)[1]-6,'DIRECTING AXIS','end');
+      }
+      if(mode==='box'){
+        s+=seg(S1,C1,1.3,null,0.85)+seg(S2,C2,1.3,null,0.85)+seg(S3,C3,1.3,null,0.85)+seg(S4,C4,1.3,null,0.85);
+        s+=rect4(C1,C2,C3,C4,3.2);
+        s+=lab(Math.min(C1[0],C2[0]),Math.min(C1[1],C3[1])-7,'IMAGE OF \u221E \u00B7 A CONGRUENT RECTANGLE');
+      }
+    }
+    return s;
+  }
+  return {makeProj:makeProj, projFor:projFor, armature:armature, fitScene:fitScene, makeTx:makeTx, svgFor:svgFor,
+          PBOX:PBOX, MODEP:MODEP,
+          sceneRoom:sceneRoom, sceneSite:sceneSite, sceneCorridor:sceneCorridor, parseHouse:parseHouse, buildHouse:buildHouse};
+})();
+</script>
+<script>
+(function(){
+  var C=window.S39;
+  var HOUSE=C.parseHouse(document.getElementById('houseobj').textContent);
+  var SCENES={room:C.sceneRoom(), site:C.sceneSite(), corr:C.sceneCorridor(), house:C.buildHouse(HOUSE,0)};
+  var MODES=['vp','vpl','vax','her','key','box'];
+  var MODENAME={vp:'vanishing point',vpl:'vanishing plane',vax:'vanishing axis',her:'herringbone',key:'keystone',box:'box'};
+  var FITS={};
+  function refit(name){ MODES.forEach(function(m){ FITS[name+'_'+m]=C.fitScene(SCENES[name],m,false); FITS[name+'_'+m+'_s']=C.fitScene(SCENES[name],m,true); }); }
+  Object.keys(SCENES).forEach(refit);
+  var state={cur:'room', mode:'her', swap:false, arm:true, Zp:200, ori:0,
+             P:{u0:0.15, v0:-0.15, k:0.6, lam:0.55, sig:0.35, a:0.3, b:0.22}};
+
+  function checks(){
+    var S=SCENES[state.cur], n=0, pass=0, eps=1e-9, P=state.P, mode=state.mode;
+    function ck(b){n++; if(b)pass++;}
+    var Zp=state.Zp, Zg=S.Zg, pg=-Zp/(Zg-Zp);
+    var A=C.armature(mode,P,S,false), Pk=C.makeProj(Zp,Zg,A);
+    function ch(c,V,g){ return c.s*pg+(V-c.s)*pg*(1-c.r*g)+(c.h||0)*pg*g; }
+    var X=S.halfW, Y=-S.hh;
+    ck([['vp',{u0:0.3,v0:-0.2}],[mode,P],['box',{a:0.4,b:-0.3}]].every(function(t){        // gauge plane pinned under every armature
+      var Pr=C.makeProj(Zp,Zg,C.armature(t[0],t[1],S,false)), q=Pr([37,-19,Zg]);
+      return Math.abs(q[0]-37*pg)<eps && Math.abs(q[1]+19*pg)<eps; }));
+    var A1=Pk([X,Y,S.Zf]), B1=Pk([X,Y,(S.Zf+S.Zback)/2]), D1=Pk([X,Y,S.Zback]);
+    ck(Math.abs((B1[0]-A1[0])*(D1[1]-A1[1])-(B1[1]-A1[1])*(D1[0]-A1[0]))<1e-6);            // orthogonals straight
+    var far=Pk([X,Y,1e9]);
+    ck(Math.abs(far[0]-ch(A.u,X,1))<1e-3 && Math.abs(far[1]-ch(A.v,Y,1))<1e-3);            // image of infinity = closed form at g=1
+    (function(){ var ru=(A.u.r>1e-6&&A.u.r<0.999), rv=(A.v.r>1e-6&&A.v.r<0.999);           // directing seat reached at gauge 1/r
+      if(!ru&&!rv){ ck(true); return; }
+      var okU=!ru||Math.abs(ch(A.u,X,1/A.u.r)-A.u.s*pg)<1e-6;
+      var okV=!rv||Math.abs(ch(A.v,Y,1/A.v.r)-A.v.s*pg)<1e-6;
+      ck(okU&&okV); })();
+    if(mode==='vax'&&P.k>0.001&&P.k<0.999){ var cc=P.k/(P.k-1); ck(Math.abs(1/P.k+1/cc-1)<eps); }   // 1/k + 1/c = 1
+    else if(mode==='vpl'||mode==='key'){ ck(Math.abs((ch(A.v,S.hh,1)-ch(A.v,-S.hh,1))/(2*S.hh*pg)-(1-P.lam))<1e-9); }   // infinity scale = 1-lam
+    else ck(true);
+    (function(){ if(A.u.r>1e-9){ ck(true); return; }                                        // parallel fans truly parallel (r=0 channel)
+      function dir(x){ return [ch(A.u,x,0.8)-ch(A.u,x,0.2), ch(A.v,Y,0.8)-ch(A.v,Y,0.2)]; }
+      var d1=dir(X), d2=dir(-0.3*X); ck(Math.abs(d1[0]-d2[0])<eps&&Math.abs(d1[1]-d2[1])<eps); })();
+    (function(){ if(mode!=='her'){ ck(true); return; }                                      // herringbone: one V per vertical plane
+      var f1=Pk([X,Y,1e10]), f2=Pk([X,S.hh*0.4,1e10]);
+      ck(Math.hypot(f1[0]-f2[0],f1[1]-f2[1])<1e-3); })();
+    (function(){ if(mode!=='box'){ ck(true); return; }                                      // box: transverse planes congruent
+      function side(Z){ var a=Pk([-30,0,Z]), b=Pk([30,0,Z]); return Math.hypot(b[0]-a[0],b[1]-a[1]); }
+      ck(Math.abs(side(S.Zf)-side(Zg))<1e-9 && Math.abs(side(S.Zback)-side(Zg))<1e-9); })();
+    (function(){ if(mode==='box'){ ck(true); return; }                                      // height recession = r_v of its own pinhole
+      var pin=function(v){ var p=-Zp/(v[2]-Zp); return A.v.s*pg+(v[1]-A.v.s)*p; };
+      var num=Pk([X,Y,S.Zf])[1]-Pk([X,Y,S.Zback])[1], den=pin([X,Y,S.Zf])-pin([X,Y,S.Zback]);
+      ck(Math.abs(num/den-A.v.r)<1e-9); })();
+    (function(){ var pts=[[X,Y,S.Zf],[0,S.hh,Zg],[-X,0,S.Zback]];                            // degeneracies: key(1)=her, vpl(1)=vp, vax(0)=vp
+      function eq(Pa,Pb){ return pts.every(function(v){ var a=Pa(v),b=Pb(v); return Math.hypot(a[0]-b[0],a[1]-b[1])<1e-9; }); }
+      var okA=eq(C.makeProj(Zp,Zg,C.armature('key',{v0:P.v0,sig:P.sig,lam:1},S,false)), C.makeProj(Zp,Zg,C.armature('her',{v0:P.v0,sig:P.sig},S,false)));
+      var okB=eq(C.makeProj(Zp,Zg,C.armature('vpl',{u0:P.u0,v0:P.v0,lam:1},S,false)), C.makeProj(Zp,Zg,C.armature('vp',{u0:P.u0,v0:P.v0},S,false)));
+      var okC=eq(C.makeProj(Zp,Zg,C.armature('vax',{u0:P.u0,v0:P.v0,k:0},S,false)), C.makeProj(Zp,Zg,C.armature('vp',{u0:P.u0,v0:P.v0},S,false)));
+      ck(okA&&okB&&okC); })();
+    (function(){ var Av=C.armature('vp',{u0:P.u0,v0:P.v0},S,false), Pv=C.makeProj(Zp,Zg,Av);  // vanishing point = the pinhole at (u0,v0,Zp), re-hung
+      var su=Av.u.s, sv=Av.v.s, hu=su*(pg-1), hv=sv*(pg-1);
+      ck([[X,Y,S.Zf],[0,S.hh,Zg],[-X,0,S.Zback]].every(function(v){ var p=-Zp/(v[2]-Zp), a=Pv(v);
+        return Math.abs(a[0]-(su+(v[0]-su)*p)-hu)<eps && Math.abs(a[1]-(sv+(v[1]-sv)*p)-hv)<eps; })); })();
+    (function(){ var Ps=C.projFor(Zp,Zg,mode,P,S,true), Pk2=C.makeProj(Zp,Zg,C.armature(mode,P,S,true));   // swap wiring symmetry
+      var a2=Ps([Y,X,S.Zf]), q=Pk2([X,Y,S.Zf]);
+      ck(Math.abs(a2[0]-q[1])<eps && Math.abs(a2[1]-q[0])<eps); })();
+    var q=[[-30,-30,Zg],[30,-30,Zg],[30,30,Zg]].map(Pk);
+    ck(Math.abs(Math.abs(q[1][0]-q[0][0])/Math.abs(q[2][1]-q[1][1])-1)<1e-9);               // gauge square stays square
+    return pass+' / '+n+' checks pass';
+  }
+
+  function fmt(x,plus){ return (plus&&x>0?'+':'')+x.toFixed(2); }
+  function render(){
+    var S=SCENES[state.cur], P=state.P, mode=state.mode;
+    document.getElementById('view').innerHTML=C.svgFor(state,SCENES,FITS);
+    document.querySelectorAll('.crow').forEach(function(r){ r.style.display = r.getAttribute('data-m').split(' ').indexOf(mode)>=0 ? 'grid':'none'; });
+    document.getElementById('vU0').textContent='u\u2080 = '+fmt(P.u0,true)+(P.u0===0?' \u00B7 centered':' \u00B7 of half-width');
+    document.getElementById('vV0').textContent='v\u2080 = '+fmt(P.v0,true)+(P.v0===0?' \u00B7 centered':' \u00B7 of half-height');
+    document.getElementById('vK').textContent='k = '+P.k.toFixed(2)+(P.k<=0.005?' \u00B7 collapses to a point':(P.k>=0.995?' \u00B7 herringbone tube':' \u00B7 axes cross inside'));
+    document.getElementById('vLam').textContent='\u03BB = '+P.lam.toFixed(2)+' \u00B7 \u221E at '+((1-P.lam)).toFixed(2)+'\u00B7staging';
+    document.getElementById('vSig').textContent='\u03C3 = '+fmt(P.sig,true)+' \u00B7 projectively free';
+    document.getElementById('vA').textContent='a = '+fmt(P.a,true);
+    document.getElementById('vB').textContent='b = '+fmt(P.b,true);
+    document.getElementById('vP').textContent='Zp = '+state.Zp;
+    var A=C.armature(mode,P,S,false);
+    document.getElementById('oProj').textContent=MODENAME[mode]+' \u00B7 '+C.MODEP[mode].map(function(kk){return kk+' = '+(+P[kk]).toFixed(2);}).join(' \u00B7 ');
+    var inf={vp:'a point', vpl:'an area \u00B7 '+((1-P.lam)*100).toFixed(0)+'% of staging',
+             vax:'a line \u00B7 '+(P.k*100).toFixed(0)+'% of staging width', her:'a line \u00B7 full width, sheared \u03C3',
+             key:'a plane \u00B7 height '+((1-P.lam)*100).toFixed(0)+'% of staging', box:'a congruent rectangle'}[mode];
+    document.getElementById('oInf').textContent=inf;
+    document.getElementById('oSplay').textContent='width '+(A.u.r*100).toFixed(0)+'% \u00B7 height '+(A.v.r*100).toFixed(0)+'%';
+    document.getElementById('oAR').textContent='1.000 \u00B7 square under all six';
+    var cpl={vax:(P.k>0.001&&P.k<0.999)?('1/k + 1/c = 1 \u00B7 c = '+(P.k/(P.k-1)).toFixed(2)):'degenerate end of the family',
+             key:'directing axis at gauge 1/\u03BB = '+(1/P.lam).toFixed(2),
+             vpl:'directing center at gauge 1/\u03BB = '+(1/P.lam).toFixed(2),
+             her:'directing seats at \u221E \u00B7 side fans parallel',
+             box:'both seats at \u221E \u00B7 recession parallel', vp:'the seat is the image of \u221E'}[mode];
+    document.getElementById('oCpl').textContent=cpl;
+    var good = state.cur!=='corr';
+    var msg={her:'long and narrow, yet shallow \u2014 street facades, aerial corridors (p. 80)',
+             vax:'the most unified glide field \u2014 both fans woven through one crossing (p. 88)',
+             vp:'the pinhole\u2019s picture in a tunnel field \u2014 the depicted world is the staging tube, not the pyramid (p. 87)',
+             vpl:'a compressed one-point \u2014 infinity arrives early as an area; the center goes dashed beyond',
+             key:'a compressed herringbone \u2014 the infinity plane steps forward, the axis ghosts to a directing axis (p. 85)',
+             box:'a compressed paraline \u2014 parallel recession against a finite infinity plane (p. 86)'}[mode];
+    if(!good) msg='a deep slot saturates every glide \u2014 the corridor still belongs to perspective (p. 90: keep it shallow)';
+    document.getElementById('oMsg').textContent=msg;
+    var bd=document.getElementById('oBadge'); bd.textContent=good?'matched':'mismatched';
+    bd.style.background='var(--ink)'; bd.style.color=good?'var(--green)':'var(--muted)';
+    document.getElementById('oChecks').textContent='Verified live: '+checks()+'.';
+    ['bRoom','bSite','bCorr','bHouse'].forEach(function(id){ document.getElementById(id).classList.toggle('on',
+      {bRoom:'room',bSite:'site',bCorr:'corr',bHouse:'house'}[id]===state.cur); });
+    document.querySelectorAll('button.mode').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-mode')===mode); });
+    document.getElementById('bSwap').classList.toggle('on',state.swap);
+    document.getElementById('bArm').classList.toggle('on',state.arm);
+  }
+
+  [['bRoom','room'],['bSite','site'],['bCorr','corr'],['bHouse','house']].forEach(function(t){
+    document.getElementById(t[0]).addEventListener('click',function(){ state.cur=t[1]; render(); }); });
+  document.querySelectorAll('button.mode').forEach(function(b){
+    b.addEventListener('click',function(){ state.mode=b.getAttribute('data-mode'); render(); }); });
+  document.getElementById('bSwap').addEventListener('click',function(){ state.swap=!state.swap; render(); });
+  document.getElementById('bArm').addEventListener('click',function(){ state.arm=!state.arm; render(); });
+  document.getElementById('bOrient').addEventListener('click',function(){
+    state.ori=(state.ori+1)%4; SCENES.house=C.buildHouse(HOUSE,state.ori); refit('house');
+    if(state.cur!=='house'){ state.cur='house'; } render(); });
+  [['sU0','u0'],['sV0','v0'],['sK','k'],['sLam','lam'],['sSig','sig'],['sA','a'],['sB','b']].forEach(function(t){
+    var el=document.getElementById(t[0]);
+    el.addEventListener('input',function(){ state.P[t[1]]=+el.value; render(); }); });
+  var sP=document.getElementById('sP');
+  sP.addEventListener('input',function(){ state.Zp=+sP.value; render(); });
+
+  function setHint(t,c){ var h=document.getElementById('dropHint'); h.textContent=t; h.style.color=c||''; }
+  function useObj(text,name){
+    var parsed; try{ parsed=C.parseHouse(text); }catch(e){ setHint('could not parse '+(name||'file'),'var(--ink)'); return; }
+    if(!parsed.V||parsed.V.length<3){ setHint('no geometry found in '+(name||'file')+' (need an OBJ with v/f entries)','var(--ink)'); return; }
+    HOUSE=parsed; state.ori=0; SCENES.house=C.buildHouse(HOUSE,0); refit('house'); state.cur='house';
+    setHint('projected '+(name||'model')+' through the armature \u2014 all six modes live','var(--greendeep)'); render();
+  }
+  var fileIn=document.createElement('input'); fileIn.type='file'; fileIn.accept='.obj'; fileIn.style.display='none';
+  document.body.appendChild(fileIn);
+  fileIn.addEventListener('change',function(){ var f=fileIn.files[0]; if(!f) return;
+    var r=new FileReader(); r.onload=function(){ useObj(r.result,f.name); }; r.onerror=function(){ setHint('could not read '+f.name,'var(--ink)'); }; r.readAsText(f); });
+  document.getElementById('bLoad').addEventListener('click',function(){ fileIn.click(); });
+  ['dragenter','dragover'].forEach(function(ev){ document.body.addEventListener(ev,function(e){ e.preventDefault(); e.stopPropagation(); setHint('drop to project through the armature','var(--greendeep)'); }); });
+  document.body.addEventListener('drop',function(e){ e.preventDefault(); e.stopPropagation();
+    var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+    if(!f){ setHint('nothing readable dropped','var(--ink)'); return; }
+    if(!/\.obj$/i.test(f.name)){ setHint('please drop a .obj file (got '+f.name+')','var(--ink)'); return; }
+    var r=new FileReader(); r.onload=function(){ useObj(r.result,f.name); };
+    r.onerror=function(){ setHint('could not read '+f.name,'var(--ink)'); }; r.readAsText(f); });
+
+  render();
+})();
+</script>
+</body>
+</html>
