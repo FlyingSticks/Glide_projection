@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vanishing-axis glide vs cross-slit</title>
+<style>
+  .gx{
+    --paper:#faf9f5; --ink:#1c1b18; --soft:#6d6a62; --hair:#dcd9d0;
+    --red:#c31f1f; --violet:#6a3fb0; --blue:#1f45c4; --teal:#1d7f8c; --plane:#9b968a;
+    --mono:ui-monospace,"SF Mono","IBM Plex Mono",Menlo,Consolas,monospace;
+    max-width:980px;margin:0 auto;padding:0;border:1px solid var(--ink);
+    background:var(--paper);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  .gx *{box-sizing:border-box}
+  .gx-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--ink);padding:10px 14px}
+  .gx-title{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  .gx-tabs{display:flex;gap:0;border:1px solid var(--ink)}
+  .gx-tabs button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    background:var(--paper);color:var(--ink);border:0;border-right:1px solid var(--ink);
+    padding:6px 10px;cursor:pointer}
+  .gx-tabs button:last-child{border-right:0}
+  .gx-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .gx-tabs button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .gx-stage{background:#fff;touch-action:none;cursor:crosshair}
+  .gx-stage svg{display:block;width:100%;height:auto}
+  .gx-ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;
+    padding:10px 14px;border-top:1px solid var(--ink)}
+  .gx-ctl .row{display:flex;align-items:center;gap:8px}
+  .gx-ctl label{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--soft)}
+  .gx-ctl label b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .gx-ctl input[type=range]{width:130px;height:20px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  .gx-ctl input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ink)}
+  .gx-ctl input[type=range]::-moz-range-track{height:2px;background:var(--ink)}
+  .gx-ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:13px;height:13px;
+    border-radius:50%;background:#fff;border:2px solid var(--red);margin-top:-5.5px}
+  .gx-ctl input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--red)}
+  .gx-ctl input[type=range]:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+  .gx-ctl .tog{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--ink);cursor:pointer}
+  .gx-ctl .tog input{width:14px;height:14px;accent-color:var(--red);cursor:pointer}
+  .gx-cap{font-size:13px;line-height:1.55;color:var(--soft);padding:11px 14px;border-top:1px solid var(--hair);margin:0}
+  .gx-cap b{color:var(--ink)}
+  .gx [data-mode]{display:none}
+  .gx.m-glide [data-mode~="glide"]{display:flex}
+  .gx.m-xslit [data-mode~="xslit"]{display:flex}
+  .gx.m-compare [data-mode~="compare"]{display:flex}
+</style>
+</head>
+<body>
+<figure class="gx m-glide" id="gx">
+  <div class="gx-head">
+    <span class="gx-title">Vanishing-axis glide · construction</span>
+    <div class="gx-tabs" role="tablist" aria-label="Projection mode">
+      <button type="button" data-tab="glide" aria-pressed="true">Glide</button>
+      <button type="button" data-tab="xslit" aria-pressed="false">Cross-slit</button>
+      <button type="button" data-tab="compare" aria-pressed="false">Compare</button>
+    </div>
+  </div>
+
+  <div class="gx-stage" id="gxStage"><svg viewBox="-4.3 -2.95 8.6 5.9" role="img" aria-label="Vanishing-axis glide construction" xmlns="http://www.w3.org/2000/svg"><path d="M-2.560 -0.500 L2.240 -0.500 L2.240 0.500 L-2.560 0.500 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.413 -0.333 L1.987 -0.333 L1.987 0.333 L-2.413 0.333 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.340 -0.250 L1.860 -0.250 L1.860 0.250 L-2.340 0.250 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.296 -0.200 L1.784 -0.200 L1.784 0.200 L-2.296 0.200 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.267 -0.167 L1.733 -0.167 L1.733 0.167 L-2.267 0.167 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.246 -0.143 L1.697 -0.143 L1.697 0.143 L-2.246 0.143 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><path d="M-2.230 -0.125 L1.670 -0.125 L1.670 0.125 L-2.230 0.125 Z" fill="none" stroke="#9b968a" stroke-width="0.015" opacity="0.8"/><line x1="-4.300" y1="0.000" x2="4.300" y2="0.000" stroke="#c31f1f" stroke-width="0.028" /><line x1="-0.800" y1="2.750" x2="-0.800" y2="-2.750" stroke="#6a3fb0" stroke-width="0.026" stroke-dasharray="0.10 0.075"/><text x="4.180" y="-0.110" fill="#6d6a62" font-family="ui-monospace,Menlo,monospace" font-size="0.165" letter-spacing="0.02" text-anchor="end">VANISHING AXIS</text><text x="-0.700" y="-2.620" fill="#6d6a62" font-family="ui-monospace,Menlo,monospace" font-size="0.165" letter-spacing="0.02" text-anchor="start">DIRECTING AXIS</text><line x1="-3.000" y1="1.000" x2="-2.120" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="-3.000" y1="0.500" x2="-2.120" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="-3.000" y1="0.000" x2="-2.120" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="-3.000" y1="-0.500" x2="-2.120" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="-3.000" y1="-1.000" x2="-2.120" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><circle cx="-2.120" cy="0.000" r="0.05" fill="#c31f1f"/><line x1="3.000" y1="1.000" x2="1.480" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="3.000" y1="0.500" x2="1.480" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="3.000" y1="0.000" x2="1.480" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="3.000" y1="-0.500" x2="1.480" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><line x1="3.000" y1="-1.000" x2="1.480" y2="0.000" stroke="#c31f1f" stroke-width="0.016" opacity="0.75"/><circle cx="1.480" cy="0.000" r="0.05" fill="#c31f1f"/><line x1="-3.000" y1="-1.000" x2="-2.120" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-2.120" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-2.120" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="-2.000" y1="-1.000" x2="-1.520" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-1.520" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-1.520" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="-1.000" y1="-1.000" x2="-0.920" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-0.920" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-0.920" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="0.000" y1="-1.000" x2="-0.320" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-0.320" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-0.320" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="1.000" y1="-1.000" x2="0.280" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="0.280" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="0.280" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="2.000" y1="-1.000" x2="0.880" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="0.880" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="0.880" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="3.000" y1="-1.000" x2="1.480" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="1.480" y1="0.000" x2="-0.800" y2="1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="1.480" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><circle cx="-0.800" cy="1.500" r="0.055" fill="#6a3fb0"/><line x1="-3.000" y1="1.000" x2="-2.120" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-2.120" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-2.120" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="-2.000" y1="1.000" x2="-1.520" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-1.520" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-1.520" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="-1.000" y1="1.000" x2="-0.920" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-0.920" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-0.920" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="0.000" y1="1.000" x2="-0.320" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="-0.320" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="-0.320" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="1.000" y1="1.000" x2="0.280" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="0.280" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="0.280" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="2.000" y1="1.000" x2="0.880" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="0.880" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="0.880" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><line x1="3.000" y1="1.000" x2="1.480" y2="0.000" stroke="#6a3fb0" stroke-width="0.015" opacity="0.7"/><line x1="1.480" y1="0.000" x2="-0.800" y2="-1.500" stroke="#6a3fb0" stroke-width="0.013" stroke-dasharray="0.10 0.075" opacity="0.55"/><circle cx="1.480" cy="0.000" r="0.032" fill="#c31f1f" opacity="0.8"/><circle cx="-0.800" cy="-1.500" r="0.055" fill="#6a3fb0"/><line x1="-3.000" y1="-1.000" x2="-2.120" y2="0.000" stroke="#1c1b18" stroke-width="0.02" /><line x1="-2.120" y1="0.000" x2="-0.800" y2="1.500" stroke="#1c1b18" stroke-width="0.017" stroke-dasharray="0.10 0.075" opacity="0.75"/><line x1="3.000" y1="-1.000" x2="1.480" y2="0.000" stroke="#1c1b18" stroke-width="0.02" /><line x1="1.480" y1="0.000" x2="-0.800" y2="1.500" stroke="#1c1b18" stroke-width="0.017" stroke-dasharray="0.10 0.075" opacity="0.75"/><line x1="3.000" y1="1.000" x2="1.480" y2="0.000" stroke="#1c1b18" stroke-width="0.02" /><line x1="1.480" y1="0.000" x2="-0.800" y2="-1.500" stroke="#1c1b18" stroke-width="0.017" stroke-dasharray="0.10 0.075" opacity="0.75"/><line x1="-3.000" y1="1.000" x2="-2.120" y2="0.000" stroke="#1c1b18" stroke-width="0.02" /><line x1="-2.120" y1="0.000" x2="-0.800" y2="-1.500" stroke="#1c1b18" stroke-width="0.017" stroke-dasharray="0.10 0.075" opacity="0.75"/><path d="M-3.000 -1.000 L3.000 -1.000 L3.000 1.000 L-3.000 1.000 Z" fill="none" stroke="#1c1b18" stroke-width="0.045" /><line x1="1.600" y1="-0.550" x2="0.640" y2="0.000" stroke="#c31f1f" stroke-width="0.036" /><circle cx="1.120" cy="-0.275" r="0.028" fill="#c31f1f"/><circle cx="0.960" cy="-0.183" r="0.028" fill="#c31f1f"/><circle cx="0.880" cy="-0.138" r="0.028" fill="#c31f1f"/><circle cx="0.832" cy="-0.110" r="0.028" fill="#c31f1f"/><circle cx="0.800" cy="-0.092" r="0.028" fill="#c31f1f"/><circle cx="0.777" cy="-0.079" r="0.028" fill="#c31f1f"/><circle cx="0.760" cy="-0.069" r="0.028" fill="#c31f1f"/><line x1="0.640" y1="0.000" x2="-0.800" y2="0.825" stroke="#6a3fb0" stroke-width="0.028" stroke-dasharray="0.10 0.075"/><circle cx="1.600" cy="-0.550" r="0.075" fill="#fff" stroke="#1c1b18" stroke-width="0.03" /><circle cx="0.640" cy="0.000" r="0.062" fill="#c31f1f"/><circle cx="-0.800" cy="0.825" r="0.062" fill="#6a3fb0"/><text x="0.740" y="-0.120" fill="#c31f1f" font-family="ui-monospace,Menlo,monospace" font-size="0.165" letter-spacing="0.02" text-anchor="start">V · depth</text><text x="-0.700" y="1.025" fill="#6a3fb0" font-family="ui-monospace,Menlo,monospace" font-size="0.165" letter-spacing="0.02" text-anchor="start">D · direction</text></svg></div>
+
+  <div class="gx-ctl">
+    <div class="row" data-mode="glide compare">
+      <label for="gxK">staging angle · k <b id="gxKv">0.60</b></label>
+      <input type="range" id="gxK" min="0.02" max="1" step="0.01" value="0.6">
+    </div>
+    <div class="row" data-mode="glide">
+      <label for="gxU0">directing-axis position <b id="gxU0v">&minus;0.8</b></label>
+      <input type="range" id="gxU0" min="-1.6" max="1.6" step="0.05" value="-0.8">
+    </div>
+    <div class="row" data-mode="xslit compare">
+      <label for="gxB">slit separation · b : a <b id="gxBv">2.2</b></label>
+      <input type="range" id="gxB" min="0.3" max="3" step="0.05" value="2.2">
+    </div>
+    <div class="row" data-mode="glide">
+      <label class="tog"><input type="checkbox" id="gxOr" checked> staging orthogonals</label>
+    </div>
+    <div class="row" data-mode="glide">
+      <label class="tog"><input type="checkbox" id="gxFV" checked> vanishing fans</label>
+    </div>
+    <div class="row" data-mode="glide">
+      <label class="tog"><input type="checkbox" id="gxFH" checked> directing fans</label>
+    </div>
+    <div class="row" data-mode="glide xslit compare">
+      <label class="tog"><input type="checkbox" id="gxPl" checked> depth planes</label>
+    </div>
+  </div>
+
+  <figcaption class="gx-cap" id="gxCap"></figcaption>
+</figure>
+
+<script id="gx-core">
+window.GX = (function(){
+  "use strict";
+  var W=3, H=1, N=7;                                  // 3:1 staging rectangle, 7 depth steps
+  var VB={x:-4.3,y:-2.95,w:8.6,h:5.9};
+
+  function defaults(){ return { mode:'glide', k:0.6, u0:-0.8, v0:0, a:1, b:2.2,
+    orthos:true, fansV:true, fansH:true, planes:true, probe:{x:1.6,y:0.55} }; }
+
+  function armature(s){
+    var c = Math.abs(s.k-1)<1e-6 ? Infinity : s.k/(s.k-1);
+    return {
+      c:c,
+      V:function(x){ return s.u0 + s.k*(x-s.u0); },
+      D:function(y){ return s.v0 + (isFinite(c)? c*(y-s.v0) : 1e6*Math.sign(-(y-s.v0)||1)); },
+      img:function(x,y,f){ return [ s.u0+(x-s.u0)*(1-f*(1-s.k)), s.v0+(y-s.v0)*(1-f) ]; }
+    };
+  }
+  function xsImg(s,x,y,z){ return [ s.u0+(x-s.u0)*s.b/(z+s.b), s.v0+(y-s.v0)*s.a/(z+s.a) ]; }
+
+  // svg string helpers (y flipped: world y-up -> svg y-down)
+  function X(u){return u.toFixed(3);} function Y(v){return (-v).toFixed(3);}
+  function L(p,q,st){return '<line x1="'+X(p[0])+'" y1="'+Y(p[1])+'" x2="'+X(q[0])+'" y2="'+Y(q[1])+'" '+st+'/>';}
+  function C(p,r,st){return '<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="'+r+'" '+st+'/>';}
+  function PLY(pts,st){var d=pts.map(function(p,i){return (i?'L':'M')+X(p[0])+' '+Y(p[1]);}).join(' ');
+    return '<path d="'+d+' Z" fill="none" '+st+'/>';}
+  function PL(pts,st){var d=pts.map(function(p,i){return (i?'L':'M')+X(p[0])+' '+Y(p[1]);}).join(' ');
+    return '<path d="'+d+'" fill="none" '+st+'/>';}
+  function T(t,p,fill,anchor,size){return '<text x="'+X(p[0])+'" y="'+Y(p[1])+'" fill="'+fill+
+    '" font-family="ui-monospace,Menlo,monospace" font-size="'+(size||0.165)+
+    '" letter-spacing="0.02" text-anchor="'+(anchor||'start')+'">'+t+'</text>';}
+
+  var INK='#1c1b18', SOFT='#6d6a62', RED='#c31f1f', VIO='#6a3fb0', BLU='#1f45c4', TEA='#1d7f8c', PLN='#9b968a';
+  function st(color,w,extra){return 'stroke="'+color+'" stroke-width="'+w+'" '+(extra||'');}
+  var DASH='stroke-dasharray="0.10 0.075"';
+
+  function rectPts(s,f,mapper){
+    var cs=[[-W,H],[W,H],[W,-H],[-W,-H]];
+    return cs.map(function(c){return mapper(c[0],c[1],f);});
+  }
+  function lin(a,b,n){var o=[];for(var i=0;i<n;i++)o.push(a+(b-a)*i/(n-1));return o;}
+  function fOf(z){return z/(z+1);}
+
+  function drawGlide(s,o){
+    var m=armature(s), g='';
+    // depth planes
+    if(s.planes){ for(var z=1;z<=N;z++)
+      g+=PLY(rectPts(s,fOf(z),m.img), st(PLN,0.015,'opacity="0.8"')); }
+    // axes
+    g+=L([VB.x,s.v0],[VB.x+VB.w,s.v0], st(RED,0.028));
+    g+=L([s.u0,-2.75],[s.u0,2.75], st(VIO,0.026,DASH));
+    g+=T('VANISHING AXIS',[VB.x+VB.w-0.12,s.v0+0.11],SOFT,'end');
+    g+=T('DIRECTING AXIS',[s.u0+0.1,2.62],SOFT,'start');
+    // vertical vanishing fans (short edges): common V per vertical plane
+    if(s.fansV){ [-W,W].forEach(function(x){
+      var Vp=[m.V(x),s.v0];
+      lin(-H,H,5).forEach(function(y){ g+=L([x,y],Vp, st(RED,0.016,'opacity="0.75"')); });
+      g+=C(Vp,0.05,'fill="'+RED+'"');
+    }); }
+    // horizontal directing fans (long edges): common D per horizontal plane, own V each
+    if(s.fansH){ [H,-H].forEach(function(y){
+      var Dp=[s.u0, Math.max(-2.7,Math.min(2.7, m.D(y)))];
+      lin(-W,W,7).forEach(function(x){
+        var Vp=[m.V(x),s.v0];
+        g+=L([x,y],Vp, st(VIO,0.015,'opacity="0.7"'));
+        g+=L(Vp,Dp, st(VIO,0.013,DASH+' opacity="0.55"'));
+        g+=C(Vp,0.032,'fill="'+RED+'" opacity="0.8"');
+      });
+      g+=C(Dp,0.055,'fill="'+VIO+'"');
+    }); }
+    // staging orthogonals from the four corners
+    if(s.orthos){ [[-W,H],[W,H],[W,-H],[-W,-H]].forEach(function(cn){
+      var Vp=[m.V(cn[0]),s.v0], Dp=[s.u0, Math.max(-2.7,Math.min(2.7,m.D(cn[1])))];
+      g+=L(cn,Vp, st(INK,0.02));
+      g+=L(Vp,Dp, st(INK,0.017,DASH+' opacity="0.75"'));
+    }); }
+    // staging rectangle
+    g+=PLY(rectPts(s,0,function(x,y){return [x,y];}), st(INK,0.045));
+    // probe orthogonal
+    if(o&&o.probe!==false){
+      var p=s.probe, Vp=[m.V(p.x),s.v0], Dp=[s.u0, Math.max(-2.7,Math.min(2.7,m.D(p.y)))];
+      g+=L([p.x,p.y],Vp, st(RED,0.036));
+      for(var z2=1;z2<=N;z2++){ var q=m.img(p.x,p.y,fOf(z2)); g+=C(q,0.028,'fill="'+RED+'"'); }
+      g+=L(Vp,Dp, st(VIO,0.028,DASH));
+      g+=C([p.x,p.y],0.075,'fill="#fff" '+st(INK,0.03));
+      g+=C(Vp,0.062,'fill="'+RED+'"'); g+=C(Dp,0.062,'fill="'+VIO+'"');
+      g+=T('V · depth',[Vp[0]+0.1,Vp[1]+0.12],RED);
+      g+=T('D · direction',[Dp[0]+0.1,Dp[1]-0.2],VIO);
+    }
+    return g;
+  }
+
+  function drawXslit(s,o){
+    var g='';
+    if(s.planes){ for(var z=1;z<=N;z++)
+      g+=PLY(rectPts(s,z,function(x,y,zz){return xsImg(s,x,y,zz);}), st(PLN,0.015,'opacity="0.8"')); }
+    g+=L([VB.x,s.v0],[VB.x+VB.w,s.v0], st(BLU,0.028));
+    g+=L([s.u0,-2.75],[s.u0,2.75], st(TEA,0.026));
+    g+=T('HORIZONTAL SLIT (image)',[VB.x+VB.w-0.12,s.v0+0.11],SOFT,'end');
+    g+=T('VERTICAL SLIT (image)',[s.u0+0.1,2.62],SOFT,'start');
+    g+=PLY(rectPts(s,0,function(x,y){return [x,y];}), st(INK,0.045));
+    // probe recession track: curved unless a=b
+    if(o&&o.probe!==false){
+      var p=s.probe, pts=[], zt;
+      for(var i=0;i<=64;i++){ zt=40*i*i/(64*64); pts.push(xsImg(s,p.x,p.y,zt)); }
+      g+=PL(pts, st(BLU,0.034));
+      for(var z2=1;z2<=N;z2++) g+=C(xsImg(s,p.x,p.y,z2),0.028,'fill="'+BLU+'"');
+      g+=L(pts[pts.length-1],[s.u0,s.v0], st(BLU,0.02,DASH));
+      g+=C([p.x,p.y],0.075,'fill="#fff" '+st(INK,0.03));
+      g+=C([s.u0,s.v0],0.062,'fill="none" '+st(BLU,0.032));
+      g+=T('every ray meets both slits · track bends',[p.x+0.12,p.y+0.16],BLU);
+    }
+    return g;
+  }
+
+  function drawCompare(s){
+    var m=armature(s), g='';
+    for(var z=1;z<=N;z++){
+      g+=PLY(rectPts(s,z,function(x,y,zz){return xsImg(s,x,y,zz);}), st(BLU,0.016,'opacity="0.55"'));
+      g+=PLY(rectPts(s,fOf(z),m.img), st(RED,0.016,'opacity="0.6"'));
+    }
+    g+=L([VB.x,s.v0],[VB.x+VB.w,s.v0], st(SOFT,0.02));
+    g+=L([s.u0,-2.2],[s.u0,2.2], st(SOFT,0.018,DASH));
+    g+=PLY(rectPts(s,0,function(x,y){return [x,y];}), st(INK,0.045));
+    // images of infinity: a line vs a point
+    g+=L([m.V(-W),s.v0],[m.V(W),s.v0], st(RED,0.085));
+    g+=C([s.u0,s.v0],0.075,'fill="#fff" '+st(BLU,0.045));
+    g+=T('image of ∞ · GLIDE = a line',[m.V(W)+0.15,s.v0+0.16],RED);
+    g+=T('image of ∞ · CROSS-SLIT = a point',[s.u0+0.16,s.v0-0.34],BLU);
+    return g;
+  }
+
+  function svgFor(s){
+    var inner = s.mode==='glide' ? drawGlide(s,{probe:true})
+              : s.mode==='xslit' ? drawXslit(s,{probe:true})
+              : drawCompare(s);
+    return '<svg viewBox="'+VB.x+' '+VB.y+' '+VB.w+' '+VB.h+'" role="img" aria-label="'+
+      (s.mode==='glide'?'Vanishing-axis glide construction':
+       s.mode==='xslit'?'Cross-slit projection':'Glide and cross-slit compared')+
+      '" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
+  }
+
+  var captions={
+    glide:'<b>Vanishing-axis armature</b> (pp. 88–90). A vanishing axis and a perpendicular directing axis cross inside the staging rectangle — anywhere inside it. Every <b>vertical</b> plane of orthogonals vanishes to its own point on the vanishing axis; every <b>horizontal</b> plane converges toward a directing point on the directing axis, past the plane of infinity (dashed). One staging angle fixes the whole armature — intercepts obey 1/k + 1/c = 1, so the angle chosen “does not affect the accuracy.” Drag the white point. At k → 0 the fans collapse to one station point (one-point perspective); at k = 1 the walls run parallel — the glide tube.',
+    xslit:'<b>Cross-slit</b>. Every projector passes through both slits. Each slit sets its own harmonic rate — width shrinks with the vertical slit’s distance, height with the horizontal’s — so equal depth steps nest anisotropically toward the slits’ crossing, and a receding perpendicular bends into a curve unless it lies on an axis. Drag the white point; set b : a = 1 to recover perspective.',
+    compare:'<b>Same rectangle, same equal depth steps.</b> Cross-slit sections (blue) collapse toward a point; glide sections (red) flatten onto the vanishing axis. Infinity is a <b>point</b> in one and a <b>line</b> in the other. The glide’s two axes echo the two slits — the tetrahedron — but no ray passes through both: one axis meters depth, the other assigns direction, held together by 1/k + 1/c = 1.'
+  };
+
+  return { defaults:defaults, svgFor:svgFor, captions:captions, VB:VB, W:W, H:H };
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  if(!window.GX) return;
+  var S=window.GX.defaults(), VB=window.GX.VB, W=window.GX.W, H=window.GX.H;
+  var root=document.getElementById('gx'), stage=document.getElementById('gxStage'),
+      cap=document.getElementById('gxCap');
+  function render(){
+    stage.innerHTML=window.GX.svgFor(S);
+    cap.innerHTML=window.GX.captions[S.mode];
+    root.className='gx m-'+(S.mode==='xslit'?'xslit':S.mode);
+  }
+  // tabs
+  Array.prototype.forEach.call(document.querySelectorAll('.gx-tabs button'),function(b){
+    b.addEventListener('click',function(){
+      S.mode=b.getAttribute('data-tab');
+      Array.prototype.forEach.call(document.querySelectorAll('.gx-tabs button'),function(x){
+        x.setAttribute('aria-pressed', x===b ? 'true':'false');});
+      render();
+    });
+  });
+  // sliders + toggles
+  function bindR(id,key,lab,fmt){var e=document.getElementById(id);
+    e.addEventListener('input',function(){S[key]=parseFloat(e.value);
+      document.getElementById(lab).textContent=fmt(S[key]);render();});}
+  bindR('gxK','k','gxKv',function(v){return v.toFixed(2);});
+  bindR('gxU0','u0','gxU0v',function(v){return (v<0?'−':'')+Math.abs(v).toFixed(1);});
+  bindR('gxB','b','gxBv',function(v){return v.toFixed(1);});
+  function bindT(id,key){var e=document.getElementById(id);
+    e.addEventListener('change',function(){S[key]=e.checked;render();});}
+  bindT('gxOr','orthos'); bindT('gxFV','fansV'); bindT('gxFH','fansH'); bindT('gxPl','planes');
+  // draggable probe
+  var drag=false;
+  function toWorld(ev){
+    var svg=stage.querySelector('svg'); if(!svg) return null;
+    var r=svg.getBoundingClientRect();
+    var u=VB.x+(ev.clientX-r.left)/r.width*VB.w;
+    var v=-(VB.y+(ev.clientY-r.top)/r.height*VB.h);
+    return [u,v];
+  }
+  stage.addEventListener('pointerdown',function(ev){
+    if(S.mode==='compare') return;
+    var p=toWorld(ev); if(!p) return;
+    if(Math.abs(p[0])<=W+0.25&&Math.abs(p[1])<=H+0.25){
+      drag=true; stage.setPointerCapture(ev.pointerId);
+      S.probe={x:Math.max(-W,Math.min(W,p[0])),y:Math.max(-H,Math.min(H,p[1]))}; render();
+    }
+  });
+  stage.addEventListener('pointermove',function(ev){
+    if(!drag) return; var p=toWorld(ev); if(!p) return;
+    S.probe={x:Math.max(-W,Math.min(W,p[0])),y:Math.max(-H,Math.min(H,p[1]))}; render();
+  });
+  stage.addEventListener('pointerup',function(){drag=false;});
+  stage.addEventListener('pointercancel',function(){drag=false;});
+  render();
+})();
+</script>
+</body>
+</html>
