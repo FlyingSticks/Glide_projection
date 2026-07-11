@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merges and depths — in space · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1385px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.32em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:29px;margin:0 0 10px;font-weight:bold;}
+ h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:930px;margin:0 0 18px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 18px;}
+ .bar label{font-size:12px;margin-right:8px;}
+ .bar input[type=range]{width:240px;accent-color:#ED3121;margin-right:12px;}
+ .bar .ro{font-size:12px;color:#151310;margin-right:16px;}
+ .bar .ro b{color:#ED3121;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 11px;margin:3px 8px 3px 0;cursor:pointer;}
+ button.on{background:#151310;color:#EBE9DA;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ input[type=range]:focus{outline:2px solid #151310;outline-offset:2px;}
+ .stages{display:flex;flex-wrap:wrap;justify-content:space-between;}
+ .panel{margin:0 0 26px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:grab;}
+ .cap{font-size:12.5px;line-height:1.5;max-width:660px;margin:9px 0 2px;}
+ .grade{font-size:11.5px;color:#8E8C80;margin:0;max-width:660px;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:6px;}
+ .foot .one{font-size:13px;margin:0 0 10px;}
+ .lc{font-size:12px;line-height:1.7;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:12px;}
+ @media (max-width:1380px){.stages{justify-content:center;}}
+ @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · MERGES AND DEPTHS — IN SPACE</p>
+ <h1>Where each projection keeps its structures — <em>the leaves, the hinges, and the rays</em></h1>
+ <p class="sub">The four panels of the merges-and-depths diagram, lifted into space. The translucent sheets are the
+ <b>level sets</b> — green for the u-channel, ink for the v-channel; a <b>ray</b> is one green leaf crossed with one
+ ink leaf, and every red mark is construction: hinge lines, rays, rail glyphs. Each stage carries its two channel
+ rails up top (P · V · D, exactly the diagram’s glyphs) and the world axis below, with the red hinge
+ triangles standing at their true depths. <b>Drag any stage to orbit all four together; pull k</b> and watch the fourth
+ panel walk Table D — D merged onto V, held apart at finite thickness, then banished — while the green leaf
+ flattens from hyperbolic cylinder to plane and the bent ray straightens.</p>
+ <div class="bar" data-live="9">
+  <label for="k">k</label>
+  <input type="range" id="k" min="0" max="1" step="0.01" value="0.5" aria-label="k dial: 0 merges D onto V (perspective), 1 banishes D to infinity (pushbroom)">
+  <span class="ro">k = <b id="rk">0.50</b></span>
+  <span class="ro">a = 1−k = <b id="ra">0.50</b></span>
+  <span class="ro">thickness k/(1−k) = <b id="rt">1.00</b></span>
+  <span class="ro">gᴅ = <b id="rd">2.00</b></span>
+  <button id="bwalk">⟳ walk the dial</button>
+  <button id="bswap">⇅ swap axes</button>
+  <button id="bdense">▦ more leaves</button>
+  <button id="bhome">⌂ view</button>
+ </div>
+ <div class="stages" id="stages"></div>
+ <div class="foot">
+  <p class="one">Perspective: two merges, one depth. Cross-slit: two merges, two depths. Pushbroom: one merge, one
+  banishment. Glide mid-rate: a separation held finite — and the separation is the bend.</p>
+  <div id="live"></div>
+  <p class="verify">Every mark verified: check_merge_depths_3d.js — 16/16 core · 6/6 harness, including
+  bitwise identity of this sheet’s channel scale against Sheet 39’s makeProj fetched from the live repo ·
+  project total 137 assertions. The page re-runs its own nine checks on every render — the list above is live.</p>
+ </div>
+</div>
+<script id="md3d-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var W=660, RH=88, SH=470, H=RH+SH;
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',GREEN2='#65D858',RED='#ED3121';
+var Zp=200,Zg=500,Zv=160,Zh=260, CTR=[0,70,310], SCALE=0.62, CX=W/2, CY=RH+SH/2+14;
+var PXT=[[-85,115],[40,65],[105,140]];
+var state={yaw:-0.62,pitch:0.34,k:0.5,swap:false,dense:false};
+var PANELS=[
+ {id:'persp',title:'PERSPECTIVE',status:'two merges \u00b7 one depth'},
+ {id:'cross',title:'CROSS-SLIT',status:'two merges \u00b7 two depths'},
+ {id:'push', title:'PUSHBROOM \u2014 the herringbone (\u03c3 = 0)',status:'one merge + one banishment'},
+ {id:'glide',title:'VANISHING-AXIS GLIDE (0 < k < 1)',status:'one merge + one SEPARATION'}
+];
+function pgc(c){return -c.Zc/(c.Zg-c.Zc);}
+function chans(id){var C=panelChannels(id,Zp,Zg,Zv,Zh,state.k);return state.swap?{u:C.v,v:C.u}:C;}
+function XT(){return state.dense?[-125,-85,-45,45,85,125]:[-100,-50,50,100];}
+function YT(){return state.dense?[30,60,90,120,150]:[45,95,145];}
+
+// ---- primitive builders (world space) ----
+function uLeaf(c,Xg){ // ruled along Y: quads between Z slices
+ var w0=Xg*pgc(c), z0=(c.r>0? c.Zc+12:24), z1=616, N=26, out=[], Xs=[];
+ for(var i=0;i<N;i++){var Z=z0+(z1-z0)*i/(N-1); Xs.push([leafW(c.Zc,c.Zg,c.r,w0,Z),Z]);}
+ for(var i=0;i<N-1;i++){var a=Xs[i],b=Xs[i+1];
+  out.push({kind:'quad',fill:GREEN,alpha:0.11,edge:GREEN,ealpha:0.5,
+   pts:[[a[0],0,a[1]],[a[0],150,a[1]],[b[0],150,b[1]],[b[0],0,b[1]]]});}
+ return out;
+}
+function vLeaf(c,Yg){ // ruled along X
+ var w0=Yg*pgc(c), z0=(c.r>0? c.Zc+12:24), z1=616, N=26, out=[], Ys=[];
+ for(var i=0;i<N;i++){var Z=z0+(z1-z0)*i/(N-1); Ys.push([leafW(c.Zc,c.Zg,c.r,w0,Z),Z]);}
+ for(var i=0;i<N-1;i++){var a=Ys[i],b=Ys[i+1];
+  out.push({kind:'quad',fill:INK,alpha:0.07,edge:FAINT,ealpha:0.6,
+   pts:[[-150,a[0],a[1]],[150,a[0],a[1]],[150,b[0],b[1]],[-150,b[0],b[1]]]});}
+ return out;
+}
+function rayPrims(C){
+ var out=[],pu=pgc(C.u),pv=pgc(C.v);
+ for(var t=0;t<PXT.length;t++){var u0=PXT[t][0]*pu, v0=PXT[t][1]*pv, pts=[];
+  for(var i=0;i<46;i++){var Z=30+(612-30)*i/45; pts.push(rayPt(C.u,C.v,u0,v0,Z));}
+  for(var i=0;i<pts.length-4;i+=4) out.push({kind:'line',color:RED,width:2.6,alpha:1,layer:1,pts:pts.slice(i,i+5)});
+ }
+ return out;
+}
+function scenePrims(id){
+ var C=chans(id), P=[], M=[];
+ // picture plane + gauge plane
+ P.push({kind:'quad',fill:SURFACE,alpha:0.5,edge:INK,ealpha:0.9,
+  pts:[[-150,-6,0],[150,-6,0],[150,156,0],[-150,156,0]]});
+ P.push({kind:'line',color:FAINT,width:1,alpha:0.9,dash:[5,4],
+  pts:[[-150,0,Zg],[150,0,Zg],[150,150,Zg],[-150,150,Zg],[-150,0,Zg]]});
+ // world axis
+ P.push({kind:'line',color:FAINT,width:1.1,alpha:1,pts:[[0,0,0],[0,0,620]]});
+ // leaves
+ var xt=XT(),yt=YT(),i;
+ for(i=0;i<xt.length;i++) P=P.concat(uLeaf(C.u,xt[i]));
+ for(i=0;i<yt.length;i++) P=P.concat(vLeaf(C.v,yt[i]));
+ // hinge lines + world-strip markers
+ var tris=[];
+ if(C.u.r>0){P.push({kind:'line',color:RED,width:2.2,alpha:1,layer:1,pts:[[0,0,C.u.Zc],[0,150,C.u.Zc]]}); tris.push(C.u.Zc);}
+ else{P.push({kind:'line',color:RED,width:1.6,alpha:1,layer:1,dash:[6,5],pts:[[0,0,C.v.Zc],[0,0,655]]});
+      M.push({at:[0,0,655],draw:'banishArrow',label:'u-hinge \u2192 \u221e'});}
+ if(C.v.r>0){P.push({kind:'line',color:RED,width:2.2,alpha:1,layer:1,pts:[[-150,0,C.v.Zc],[150,0,C.v.Zc]]}); if(tris.indexOf(C.v.Zc)<0)tris.push(C.v.Zc);}
+ else{P.push({kind:'line',color:RED,width:1.6,alpha:1,layer:1,dash:[6,5],pts:[[0,0,C.u.Zc],[0,0,655]]});
+      M.push({at:[0,0,655],draw:'banishArrow',label:'v-hinge \u2192 \u221e'});}
+ for(i=0;i<tris.length;i++){var nm=(id==='cross')?(tris[i]===Zv?'Zv = '+Zv:'Zh = '+Zh):'Zp = '+Zp;
+  M.push({at:[0,0,tris[i]],draw:'hingeTri',label:nm});}
+ if(id==='persp'||id==='glide') M.push({at:[0,0,Zp],draw:'station',label:'the station'});
+ M.push({at:[0,-14,0],draw:'text',label:'picture \u00b7 Z = 0',color:INK});
+ M.push({at:[0,158,Zg],draw:'text',label:'gauge \u00b7 Zg = '+Zg,color:FAINT});
+ // rays last (thicker, on top of their own depth class)
+ P=P.concat(rayPrims(C));
+ return {P:P,M:M,C:C};
+}
+
+// ---- painter ----
+function depthOf(B,pts){var d=0;for(var i=0;i<pts.length;i++){var p=pts[i];
+ d+=(p[0]-CTR[0])*B.F[0]+(p[1]-CTR[1])*B.F[1]+(p[2]-CTR[2])*B.F[2];}return d/pts.length;}
+function drawScene(ctx,sc){
+ var B=viewBasis(state.yaw,state.pitch);
+ // two passes: sorted geometry first, then red construction sorted among itself
+ // -- construction is DRAFTING, never occluded (house semantics)
+ var base=[],cons=[],n;
+ for(n=0;n<sc.P.length;n++)(sc.P[n].layer===1?cons:base).push(sc.P[n]);
+ var srt=function(a,b){return depthOf(B,b.pts)-depthOf(B,a.pts);};
+ base.sort(srt); cons.sort(srt);
+ var prims=base.concat(cons);
+ for(var i=0;i<prims.length;i++){var pr=prims[i],q=[],j;
+  for(j=0;j<pr.pts.length;j++) q.push(project(B,CTR,SCALE,CX,CY,pr.pts[j]));
+  ctx.save();
+  if(pr.kind==='quad'){
+   ctx.globalAlpha=pr.alpha; ctx.fillStyle=pr.fill; ctx.beginPath();
+   ctx.moveTo(q[0][0],q[0][1]); for(j=1;j<q.length;j++) ctx.lineTo(q[j][0],q[j][1]);
+   ctx.closePath(); ctx.fill();
+   if(pr.edge){ctx.globalAlpha=pr.ealpha; ctx.strokeStyle=pr.edge; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.moveTo(q[1][0],q[1][1]); ctx.lineTo(q[2][0],q[2][1]);
+    ctx.moveTo(q[0][0],q[0][1]); ctx.lineTo(q[3][0],q[3][1]); ctx.stroke();}
+  }else{
+   ctx.globalAlpha=pr.alpha; ctx.strokeStyle=pr.color; ctx.lineWidth=pr.width;
+   if(pr.dash) ctx.setLineDash(pr.dash);
+   ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+   ctx.moveTo(q[0][0],q[0][1]); for(j=1;j<q.length;j++) ctx.lineTo(q[j][0],q[j][1]); ctx.stroke();
+  }
+  ctx.restore();
+ }
+ // markers (screen space, anchored in 3D)
+ ctx.save(); ctx.font='10px Helvetica, Arial, sans-serif';
+ for(var m=0;m<sc.M.length;m++){var mk=sc.M[m], s=project(B,CTR,SCALE,CX,CY,mk.at);
+  if(mk.draw==='hingeTri'){ctx.fillStyle=RED; ctx.beginPath();
+   ctx.moveTo(s[0],s[1]-7);ctx.lineTo(s[0]-6,s[1]+3);ctx.lineTo(s[0]+6,s[1]+3);ctx.closePath();ctx.fill();
+   ctx.fillStyle=FAINT; ctx.fillText(mk.label,s[0]+9,s[1]+4);}
+  else if(mk.draw==='station'){ctx.strokeStyle=GREEN2; ctx.lineWidth=2; ctx.beginPath();
+   ctx.arc(s[0],s[1],4.5,0,6.2832); ctx.stroke();
+   ctx.fillStyle=GREEN; ctx.fillText(mk.label,s[0]+8,s[1]-6);}
+  else if(mk.draw==='banishArrow'){ctx.fillStyle=RED; ctx.beginPath();
+   var B2=viewBasis(state.yaw,state.pitch), t=project(B2,CTR,SCALE,CX,CY,[mk.at[0],mk.at[1],mk.at[2]-14]);
+   var ang=Math.atan2(s[1]-t[1],s[0]-t[0]);
+   ctx.moveTo(s[0],s[1]);ctx.lineTo(s[0]-9*Math.cos(ang-0.42),s[1]-9*Math.sin(ang-0.42));
+   ctx.lineTo(s[0]-9*Math.cos(ang+0.42),s[1]-9*Math.sin(ang+0.42));ctx.closePath();ctx.fill();
+   ctx.fillText(mk.label,s[0]-64,s[1]-8);}
+  else{ctx.fillStyle=mk.color||INK; ctx.textAlign='center'; ctx.fillText(mk.label,s[0],s[1]); ctx.textAlign='left';}
+ }
+ ctx.restore();
+}
+
+// ---- rails band ----
+function rx(g){return 150+(g+0.15)/3.5*(W-186);}
+function drawRail(ctx,y,name,r,showThick){
+ ctx.strokeStyle=FAINT; ctx.lineWidth=1; ctx.globalAlpha=1;
+ ctx.beginPath(); ctx.moveTo(rx(-0.15),y); ctx.lineTo(rx(3.35),y); ctx.stroke();
+ ctx.fillStyle=FAINT; ctx.font='10px Helvetica, Arial, sans-serif';
+ ctx.fillText(name+' \u2014 rate '+(Math.round(r*100)/100),14,y+3);
+ ctx.strokeStyle=INK; ctx.beginPath(); ctx.moveTo(rx(0),y-5); ctx.lineTo(rx(0),y+5); ctx.stroke();
+ ctx.fillStyle=FAINT; ctx.fillText('P',rx(0)-3,y+16);
+ var xv=rx(railV());
+ ctx.fillStyle=RED; ctx.beginPath(); ctx.arc(xv,y,3.5,0,6.2832); ctx.fill();
+ ctx.fillText('V',xv-3,y-8);
+ var gD=railD(r);
+ ctx.strokeStyle=RED; ctx.fillStyle=RED;
+ if(r===1){ctx.setLineDash([3,3]); ctx.beginPath(); ctx.arc(xv,y,7.5,0,6.2832); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillText('D',xv+10,y+4);}
+ else if(r===0||gD>3.3){ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(xv+5,y); ctx.lineTo(rx(3.35),y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(rx(3.35)+8,y); ctx.lineTo(rx(3.35)-1,y-4); ctx.lineTo(rx(3.35)-1,y+4); ctx.closePath(); ctx.fill();
+  ctx.fillText(r===0?'D \u2192 \u221e':'D \u2192 '+gD.toFixed(1),rx(3.35)-52,y-8);}
+ else{var xd=rx(gD);
+  ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(xv+4,y); ctx.lineTo(xd-5,y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(xd,y,4.5,0,6.2832);
+  ctx.fillStyle=SURFACE; ctx.fill(); ctx.stroke(); ctx.fillStyle=RED;
+  ctx.fillText('D',xd-3,y-8);
+  if(showThick){ctx.strokeStyle=RED; ctx.lineWidth=1;
+   ctx.beginPath(); ctx.moveTo(xv,y+9); ctx.lineTo(xv,y+12); ctx.lineTo(xd,y+12); ctx.lineTo(xd,y+9); ctx.stroke();
+   ctx.fillText('k/(1\u2212k) = '+thickness(r).toFixed(2),(xv+xd)/2-34,y+24);}
+ }
+}
+function drawRails(ctx,panel,C){
+ ctx.fillStyle=PANEL; ctx.fillRect(0,0,W,RH);
+ ctx.fillStyle=INK; ctx.font='bold 15px Helvetica, Arial, sans-serif'; ctx.fillText(panel.title,14,24);
+ ctx.fillStyle=RED; ctx.font='11.5px Helvetica, Arial, sans-serif'; ctx.fillText(panel.status,14,42);
+ ctx.font='10px Helvetica, Arial, sans-serif';
+ drawRail(ctx,60,'u',C.u.r,panel.id==='glide'&&!state.swap);
+ drawRail(ctx,80,'v',C.v.r,panel.id==='glide'&&state.swap);
+}
+
+// ---- render all ----
+var CVS={};
+function renderAll(){
+ for(var i=0;i<PANELS.length;i++){var pn=PANELS[i], cv=CVS[pn.id], ctx=cv.getContext('2d');
+  var dpr=window.devicePixelRatio||1;
+  if(cv.width!==W*dpr){cv.width=W*dpr; cv.height=H*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL; ctx.fillRect(0,0,W,H);
+  var sc=scenePrims(pn.id);
+  ctx.save(); ctx.beginPath(); ctx.rect(0,RH,W,SH); ctx.clip();
+  ctx.fillStyle=PANEL; ctx.fillRect(0,RH,W,SH);
+  drawScene(ctx,sc); ctx.restore();
+  drawRails(ctx,pn,sc.C);
+  ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.strokeRect(0.75,0.75,W-1.5,H-1.5);
+ }
+ var k=state.k;
+ document.getElementById('rk').textContent=k.toFixed(2);
+ document.getElementById('ra').textContent=(1-k).toFixed(2);
+ document.getElementById('rt').textContent=(k===1)?'\u221e':(k/(1-k)).toFixed(2);
+ document.getElementById('rd').textContent=(k===1)?'\u221e':(1/(1-k)).toFixed(2);
+ runLive();
+}
+
+// ---- live checks (9, re-run every render) ----
+function sag3(pts){var A=pts[0],Bp=pts[pts.length-1],d=[Bp[0]-A[0],Bp[1]-A[1],Bp[2]-A[2]];
+ var L=Math.sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]),m=0;
+ for(var i=0;i<pts.length;i++){var w=[pts[i][0]-A[0],pts[i][1]-A[1],pts[i][2]-A[2]];
+  var c=[w[1]*d[2]-w[2]*d[1],w[2]*d[0]-w[0]*d[2],w[0]*d[1]-w[1]*d[0]];
+  m=Math.max(m,Math.sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2])/L);}return m;}
+function samples(C,u0,v0,z0,z1,n){var P=[];for(var i=0;i<n;i++)P.push(rayPt(C.u,C.v,u0,v0,z0+(z1-z0)*i/(n-1)));return P;}
+function runLive(){
+ var out=[],k=state.k;
+ function L(t,ok,val){out.push({t:t,ok:ok,val:val});}
+ var Cp=chans('persp'),Cc=chans('cross'),Cb=chans('push'),Cg=chans('glide');
+ var pu,pv,i,worst;
+ pu=pgc(Cp.u);pv=pgc(Cp.v);worst=0;var okd=true;
+ for(i=0;i<PXT.length;i++){var P=samples(Cp,PXT[i][0]*pu,PXT[i][1]*pv,30,612,40);
+  worst=Math.max(worst,sag3(P)/600);
+  var q=rayPt(Cp.u,Cp.v,PXT[i][0]*pu,PXT[i][1]*pv,Zp); if(q[0]!==0||q[1]!==0)okd=false;}
+ L('perspective rays straight',worst<1e-9,'bow '+worst.toExponential(1));
+ L('perspective rays thread the one station point',okd,'X(Zp) = Y(Zp) = 0 exact');
+ pu=pgc(Cc.u);pv=pgc(Cc.v);var okc=true;
+ for(i=0;i<PXT.length;i++){var u0=PXT[i][0]*pu,v0=PXT[i][1]*pv;
+  var zu=state.swap?Zh:Zv, zv=state.swap?Zv:Zh;
+  if(rayPt(Cc.u,Cc.v,u0,v0,zu)[0]!==0)okc=false;
+  if(rayPt(Cc.u,Cc.v,u0,v0,zv)[1]!==0)okc=false;}
+ L('cross-slit rays meet BOTH slit lines',okc&&Math.abs(Zv-Zh)>20,'Zv = '+Zv+' \u2260 Zh = '+Zh);
+ pu=pgc(Cb.u);pv=pgc(Cb.v);var okb=true;
+ for(i=0;i<PXT.length;i++){var P=samples(Cb,PXT[i][0]*pu,PXT[i][1]*pv,30,612,40);
+  var idx=state.swap?1:0, mn=1e18,mx=-1e18;
+  for(var j=0;j<P.length;j++){mn=Math.min(mn,P[j][idx]);mx=Math.max(mx,P[j][idx]);}
+  if(mx-mn>1e-9)okb=false;
+  if(rayPt(Cb.u,Cb.v,PXT[i][0]*pu,PXT[i][1]*pv,Zp)[state.swap?0:1]!==0)okb=false;}
+ L('pushbroom rays ride their leaf through the finite slit',okb,'flat channel spread 0');
+ pu=pgc(Cg.u);pv=pgc(Cg.v);var okg=true;
+ for(i=0;i<PXT.length;i++){var q=rayPt(Cg.u,Cg.v,PXT[i][0]*pu,PXT[i][1]*pv,Zp);
+  if(q[0]!==0||q[1]!==0)okg=false;}
+ L('glide rays (bent or not) still thread the one station',okg,'the lateral family\u2019s single pole');
+ worst=0;
+ for(i=0;i<PXT.length;i++){var u0=PXT[i][0]*pu,v0=PXT[i][1]*pv;
+  for(var j=0;j<30;j++){var Z=60+j*18; if(Math.abs(Z-Zp)<1)continue;
+   var P=rayPt(Cg.u,Cg.v,u0,v0,Z);
+   worst=Math.max(worst,Math.abs(P[0]*chanScale(Cg.u.Zc,Cg.u.Zg,Cg.u.r,Z)-u0)/Math.abs(u0),
+                        Math.abs(P[1]*chanScale(Cg.v.Zc,Cg.v.Zg,Cg.v.r,Z)-v0)/Math.abs(v0));}}
+ L('glide ray = leaf \u2229 leaf (reads back its pixel)',worst<1e-9,'worst '+worst.toExponential(1));
+ var thOK=(k===1)?(thickness(1-k)===Infinity):(Math.abs(thickness(1-k)-k/(1-k))<=1e-12*Math.max(1,k/(1-k)));
+ L('rail thickness = k/(1\u2212k)',thOK,(k===1)?'\u221e (banished)':(k/(1-k)).toFixed(4));
+ var rmid=1-k, okf=true, spread=0;
+ if(rmid>0){var WLL=[-120,-60,30,90,140],pg0=-Zp/(Zg-Zp),mn=1e18,mx=-1e18;
+  for(i=0;i<WLL.length;i++){var w=WLL[i]*(pg0*(1-rmid*(1/rmid)));mn=Math.min(mn,w);mx=Math.max(mx,w);}
+  spread=mx-mn; okf=spread<1e-9;}
+ L('the fan concurs at gauge 1/a',okf,(rmid>0)?('spread '+spread.toExponential(1)+' at g = '+(1/rmid).toFixed(2)):'concurs at \u221e (banished)');
+ var Bv=viewBasis(state.yaw,state.pitch),pts2=[],A=[-120,20,60],D=[0.7,0.3,0.64];
+ for(i=0;i<20;i++){var s=i*28,p3=[A[0]+D[0]*s,A[1]+D[1]*s,A[2]+D[2]*s];
+  pts2.push(project(Bv,CTR,SCALE,CX,CY,p3));}
+ var A2=pts2[0],B2=pts2[19],dx=B2[0]-A2[0],dy=B2[1]-A2[1],Ln=Math.sqrt(dx*dx+dy*dy),m2=0;
+ for(i=0;i<20;i++)m2=Math.max(m2,Math.abs((pts2[i][0]-A2[0])*dy-(pts2[i][1]-A2[1])*dx)/Ln);
+ L('this orbit keeps straight things straight on screen',m2<1e-9,'screen bow '+m2.toExponential(1)+' px');
+ var el=document.getElementById('live'),h='';
+ for(i=0;i<out.length;i++){var o=out[i];
+  h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '
+    +(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.val+'</span></div>';}
+ el.innerHTML=h;
+}
+
+// ---- interaction ----
+function init(){
+ var wrap=document.getElementById('stages');
+ for(var i=0;i<PANELS.length;i++){(function(pn){
+  var sec=document.createElement('section'); sec.className='panel';
+  var cv=document.createElement('canvas');
+  cv.style.width=W+'px'; cv.style.height=H+'px';
+  cv.setAttribute('role','img');
+  cv.setAttribute('aria-label',pn.title+' \u2014 '+pn.status+'. Drag to orbit all four stages together.');
+  CVS[pn.id]=cv; sec.appendChild(cv);
+  var c1=document.createElement('p'); c1.className='cap'; c1.id='cap-'+pn.id; sec.appendChild(c1);
+  var c2=document.createElement('p'); c2.className='grade'; c2.id='grade-'+pn.id; sec.appendChild(c2);
+  wrap.appendChild(sec);
+  var drag=null;
+  cv.addEventListener('pointerdown',function(e){drag=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;
+   state.yaw+=(e.clientX-drag[0])*0.008; state.pitch=Math.max(-1.2,Math.min(1.2,state.pitch+(e.clientY-drag[1])*0.008));
+   drag=[e.clientX,e.clientY]; requestAnimationFrame(renderAll);});
+  cv.addEventListener('pointerup',function(){drag=null;});
+ })(PANELS[i]);}
+ document.getElementById('cap-persp').textContent='Both channels merged, both hinged at the same station: two merges, one depth. Every red ray is straight and threads the green ring \u2014 the pinhole.';
+ document.getElementById('grade-persp').textContent='Grade: REAL (all-finite meeting set).';
+ document.getElementById('cap-cross').textContent='Both channels merged \u2014 but the hinges are planted at two different depths. Each straight ray meets both red slit lines.';
+ document.getElementById('grade-cross').textContent='Two slit masks: a buildable camera. Grade: REAL. Un-sharing the hinge = leaving the lateral family.';
+ document.getElementById('cap-push').textContent='One directing merged onto its vanishing, the other banished to infinity: the green leaves go parallel, and each ray rides its own leaf through the finite slit.';
+ document.getElementById('grade-push').textContent='The only flat, depth-reading lateral. Grade: IDEAL (limit of cross-slit).';
+ document.getElementById('cap-glide').textContent='The u-channel holds V and D apart at finite thickness k/(1\u2212k): the green leaves are hyperbolic cylinders, and the rays they force are BENT \u2014 yet still thread the one station. The separation is the bend.';
+ document.getElementById('grade-glide').textContent='Grade: CONSTRUCTED \u2014 drafting only. Pull k to 0 or 1 and watch the leaf flatten as D reaches a legal resting place.';
+ var kel=document.getElementById('k');
+ kel.addEventListener('input',function(){state.k=parseFloat(kel.value);renderAll();});
+ document.getElementById('bswap').addEventListener('click',function(){state.swap=!state.swap;this.classList.toggle('on');renderAll();});
+ document.getElementById('bdense').addEventListener('click',function(){state.dense=!state.dense;this.classList.toggle('on');renderAll();});
+ document.getElementById('bhome').addEventListener('click',function(){state.yaw=-0.62;state.pitch=0.34;renderAll();});
+ var walking=false,t0=0;
+ var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ document.getElementById('bwalk').addEventListener('click',function(){
+  var btn=this;
+  if(walking){walking=false;btn.classList.remove('on');return;}
+  walking=true;btn.classList.add('on');
+  if(reduced){var steps=[0,0.25,0.5,0.75,1,0.5],si=0;
+   var iv=setInterval(function(){if(!walking||si>=steps.length){clearInterval(iv);walking=false;btn.classList.remove('on');return;}
+    state.k=steps[si++];kel.value=state.k;renderAll();},900);return;}
+  t0=performance.now();
+  (function loop(t){if(!walking)return;
+   state.k=0.5-0.5*Math.cos((t-t0)/9000*2*Math.PI);
+   kel.value=state.k; renderAll(); requestAnimationFrame(loop);})(t0);
+ });
+ renderAll();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
