@@ -27,25 +27,27 @@
  <p class="sub">Four glide line elements, each with its <b style="color:#ED3121">picture</b>, <b style="color:#8A4FD6">vanishing</b> and
  <b style="color:#12A6A6">directing</b> point collinear at a fixed 3:1 ratio. Stretch, translate and orient them freely — the black
  picture→vanishing segment of each divides the same way (½, ⅔, ¾), the marks crowding toward its vanishing point. Because the
- same proportion is the same true depth on every line, connecting same-index marks knits a <b>depth plane</b>. In the front view those
- connections are quadrilaterals; lifted into space they are frontal planes, parallel to the picture plane — orbit the right panel to
- see the lines diverge while the planes stay frontal. Share the directing point and the depth planes become affine copies of the
- picture points.</p>
+ same proportion is the same true depth on every line, connecting same-index marks knits a <b>depth plane</b>. Arrange them in plan (left) and the 3D view (right) builds the armature: the depth planes recede as frontal planes and converge on the
+ vanishing plane, and the glide lines converge to the vanishing points and continue to the directing points. Try the vanishing-axis
+ glide and one-point buttons, or drag the points to make your own.</p>
  <div style="margin:0 0 12px;">
-  <button id="pScatter">scatter</button><button id="pShare">share directing point</button><button id="pCollin">collinear picture points</button>
+  <button id="pScatter">scatter</button><button id="pOne">one-point perspective</button><button id="pVaxis">vanishing-axis glide</button><button id="pShare">share directing point</button><button id="pCollin">collinear picture points</button>
  </div>
  <canvas id="scene" style="width:1200px;height:720px;" role="img" aria-label="left: front view with four draggable glide line elements and their connected depth-plane polygons; right: the 3D lift showing the connections as frontal planes parallel to the picture plane"></canvas>
- <p class="hint">Left = front view (drag the red/purple points) · Right = the 3D lift (drag to orbit) · the coloured planes are equal-depth</p>
+ <p class="hint">Left = plan (drag the red/purple points to arrange) · Right = 3D view (drag to orbit) · the depth planes converge on the vanishing plane</p>
  <div class="foot">
   <p class="one">This is the depth measure read the other way. Instead of setting a directing point and deriving the ruler, you place the
   line elements and let the shared proportional division do the work: dividing each picture→vanishing segment the same way secretly
   divides it by equal depth, so same-index marks land on a common frontal plane no matter how the lines are scattered. The plane is a
   quadrilateral in front, edge-on and parallel to the picture in side view, edge-on but differently shaped in plan — one depth plane,
-  three appearances. Fix the 3:1 ratio and the whole family stays one consistent glide.</p>
+  three appearances. But one ratio for every line means one isotropic glide: one-point is the corner where the directing point falls
+  onto the vanishing point, while a vanishing-axis glide is anisotropic — its two channels direct at different depths, so it needs a
+  split element (a directing point per channel), which is the two-channel organizer, not the single line element.</p>
   <div id="live"></div>
   <p class="verify">Verified in check_depth_knit.js (8: same proportion λ = k/(k+1); same proportion = same depth; the knit is a frontal
-  plane ⊥ the depth axis; edge-on in side and plan with different shapes; shared directing point → affine depth planes). The page re-runs
-  seven checks on every drag. Project total 219.</p>
+  plane ⊥ the depth axis; edge-on in side and plan with different shapes; shared directing point → affine depth planes), check_isotropy.js (7: the two directing λs coincide iff r_u = r_v) and
+  check_vaxis.js (8: the vanishing-axis armature doubles the vanishing and directing points onto perpendicular axes and matches
+  makeProj(r_u=1/3, r_v=1) exactly — a genuine vanishing-axis glide). The page re-runs eight checks on every drag. Project total 242.</p>
  </div>
 </div>
 <script id="knit-core">
@@ -90,20 +92,39 @@ var PLANE=[GREEN,YEL,VAN];                                  // depth-plane colou
 var CW=1200, CH=720, SPLITX=560;
 var Zp=300;
 var lines=[ {P:[-100,-20],V:[-30,30]}, {P:[46,-84],V:[-6,-22]}, {P:[-22,92],V:[52,30]}, {P:[112,12],V:[40,-42]} ];
-var state={yaw:-0.6, pit:0.34};
+var state={yaw:-0.6, pit:0.34, rat:4};  // rat = lambda_D (3:1 -> 4). directing point at P + rat*(V-P)
 
-function dirPt(L){ return [L.P[0]+4*(L.V[0]-L.P[0]), L.P[1]+4*(L.V[1]-L.P[1])]; }
+function dirPt(L){ return [L.P[0]+state.rat*(L.V[0]-L.P[0]), L.P[1]+state.rat*(L.V[1]-L.P[1])]; }
 function markImg(L,k){ return [(L.P[0]+k*L.V[0])/(1+k), (L.P[1]+k*L.V[1])/(1+k)]; }   // reciprocal, converges to V
 function mark3D(L,k){ return [L.P[0]+k*L.V[0], L.P[1]+k*L.V[1], -k*Zp]; }
+function distinctPts(getter){ var out=[],i,j; for(i=0;i<lines.length;i++){ var p=getter(lines[i]),dup=false;
+  for(j=0;j<out.length;j++){ if(Math.hypot(p[0]-out[j][0],p[1]-out[j][1])<1){dup=true;break;} } if(!dup)out.push(p); } return out; }
+function collinearAxis(pts){ if(pts.length<2)return null; var a=pts[0],b=pts[1],best=0,i,j;
+  for(i=0;i<pts.length;i++)for(j=i+1;j<pts.length;j++){var dd=Math.hypot(pts[i][0]-pts[j][0],pts[i][1]-pts[j][1]);if(dd>best){best=dd;a=pts[i];b=pts[j];}}
+  if(best<1)return null; var dx=b[0]-a[0],dy=b[1]-a[1],Ln=Math.hypot(dx,dy),dev=0;
+  for(i=0;i<pts.length;i++)dev=Math.max(dev,Math.abs((pts[i][0]-a[0])*dy-(pts[i][1]-a[1])*dx)/Ln);
+  if(dev>2)return null; return {a:a,ux:dx/Ln,uy:dy/Ln}; }
+function detectArmature(ls){ var Vp=distinctPts(function(L){return L.V;});
+  if(Vp.length<=1) return 'one-point perspective (isotropic, r=1)';
+  var vax=collinearAxis(Vp), Dp=distinctPts(dirPt), dax=collinearAxis(Dp);
+  if(vax&&dax&&Vp.length<=2&&Dp.length<=2 && Math.abs(vax.ux*dax.ux+vax.uy*dax.uy)<0.25) return 'vanishing-axis glide';
+  return 'isotropic line elements (T:S = '+(state.rat-1).toFixed(0)+':1)'; }
 
 // ================= front / picture view (left) =================
 var cxF=278, cyF=356, fs=0.58;
 function fx(x){ return cxF + x*fs; } function fy(y){ return cyF - y*fs; }
 function drawFront(ctx){
-  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('FRONT VIEW \u2014 the line elements',16,24);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('PLAN \u2014 arrange the line elements',16,24);
   ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
   ctx.fillText('drag the red (picture) or purple (vanishing) points \u2014 stretch, translate, orient',16,42);
   var i,k;
+  // vanishing axis (through the doubled-up vanishing points) and directing axis (through the directing points)
+  function drawAxis(pts,col,lbl){ var ax=collinearAxis(pts); if(!ax)return;
+    var t=320,p1=[ax.a[0]-t*ax.ux,ax.a[1]-t*ax.uy],p2=[ax.a[0]+t*ax.ux,ax.a[1]+t*ax.uy];
+    ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.globalAlpha=0.85;ctx.beginPath();ctx.moveTo(fx(p1[0]),fy(p1[1]));ctx.lineTo(fx(p2[0]),fy(p2[1]));ctx.stroke();ctx.globalAlpha=1;
+    ctx.fillStyle=col;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText(lbl,fx(p2[0])-2,fy(p2[1])-4); }
+  drawAxis(distinctPts(function(L){return L.V;}),VAN,'vanishing axis');
+  drawAxis(distinctPts(dirPt),DIR,'directing axis');
   // connecting depth-plane polygons (same-index marks across the four lines)
   for(k=1;k<=3;k++){ ctx.beginPath();
     for(i=0;i<lines.length;i++){ var m=markImg(lines[i],k); if(i===0)ctx.moveTo(fx(m[0]),fy(m[1]));else ctx.lineTo(fx(m[0]),fy(m[1])); }
@@ -126,10 +147,10 @@ function drawFront(ctx){
   // legend
   ctx.font='10px Helvetica, Arial, sans-serif';
   ctx.fillStyle=PIC;ctx.fillText('\u25cf picture',16,CH-58);ctx.fillStyle=VAN;ctx.fillText('\u25cf vanishing',86,CH-58);
-  ctx.fillStyle=DIR;ctx.fillText('\u25cf directing (3:1)',186,CH-58);
+  ctx.fillStyle=DIR;ctx.fillText('\u25cf directing ('+(state.rat-1).toFixed(0)+':1)',186,CH-58);
   ctx.fillStyle=INK;ctx.fillText('depth planes: ',16,CH-42);
   ctx.fillStyle=PLANE[0];ctx.fillText('\u25a0 z\u2081',104,CH-42);ctx.fillStyle=PLANE[1];ctx.fillText('\u25a0 z\u2082',134,CH-42);ctx.fillStyle=PLANE[2];ctx.fillText('\u25a0 z\u2083',164,CH-42);
-  ctx.fillStyle=FAINT;ctx.fillText('each P\u2192V divides the same way (\u00bd, \u2154, \u00be) \u2014 same proportion = same depth',16,CH-24);
+  ctx.fillStyle=FAINT;ctx.fillText('one directing point per line reaches isotropic + vanishing-axis (perspective channel directs onto its vanishing point)',16,CH-24);
 }
 
 // ================= 3D lift (right) =================
@@ -148,33 +169,46 @@ function paint(ctx,B,C,SC,cx,cy,prims){
       for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
     ctx.restore();}
 }
+var DZ=240;                                                // depth to the vanishing plane in the relief
+function lam(k){ return k/(k+1); }                          // reciprocal depth parameter
+function m3(L,k){ var m=markImg(L,k); return [m[0], m[1], -DZ*lam(k)]; }  // image mark placed at its depth
+function reorder(pts){ var cx=0,cy=0,i; for(i=0;i<pts.length;i++){cx+=pts[i][0];cy+=pts[i][1];} cx/=pts.length;cy/=pts.length;
+  return pts.slice().sort(function(a,b){return Math.atan2(a[1]-cy,a[0]-cx)-Math.atan2(b[1]-cy,b[0]-cx);}); }
+function axis3D(pts2d,z,ext){ var ax=collinearAxis(pts2d); if(!ax)return null;
+  return [[ax.a[0]-ext*ax.ux, ax.a[1]-ext*ax.uy, z],[ax.a[0]+ext*ax.ux, ax.a[1]+ext*ax.uy, z]]; }
 function scene3D(){
-  var P=[],i,k,W=210,Hh=150;
+  var P=[],i,k, zDir=-DZ*state.rat;
+  // depth axis
+  P.push({kind:'line',color:GREEN,width:1.3,alpha:0.4,pts:[[0,0,25],[0,0,zDir-30]]});
+  // depth planes -- frontal, converging on the vanishing plane (drawn back-to-front)
+  for(k=6;k>=1;k--){ var poly=reorder(lines.map(function(L){return m3(L,k);}));
+    P.push({kind:'quad',fill:INK,alpha:0.035,edge:INK,ea:0.5,ew:1.0,pts:poly}); }
   // picture plane (z=0)
-  P.push({kind:'quad',fill:PIC,alpha:0.06,edge:PIC,ea:0.8,ew:1.4,pts:[[-W,-Hh,0],[W,-Hh,0],[W,Hh,0],[-W,Hh,0]]});
-  // central ray
-  P.push({kind:'line',color:GREEN,width:1.8,alpha:0.8,pts:[[0,0,40],[0,0,-3.4*Zp]]});
-  // scene depth-lines (diverging into depth) + marks
-  for(i=0;i<lines.length;i++){ var L=lines[i];
-    P.push({kind:'line',color:INK,width:1.4,alpha:0.75,pts:[[L.P[0],L.P[1],0], mark3D(L,3.4)]});
-    P.push({kind:'dot',fill:PIC,alpha:1,r:3.5,pts:[[L.P[0],L.P[1],0]]});
-    for(k=1;k<=3;k++){ var m=mark3D(L,k); P.push({kind:'dot',fill:PLANE[k-1],alpha:1,r:3.5,pts:[m]}); }
-  }
-  // frontal connecting planes (at z = -kZp)
-  for(k=1;k<=3;k++){ var poly=[]; for(i=0;i<lines.length;i++)poly.push(mark3D(lines[i],k));
-    P.push({kind:'quad',fill:PLANE[k-1],alpha:0.2,edge:PLANE[k-1],ea:0.95,ew:1.5,pts:poly}); }
+  P.push({kind:'quad',fill:PIC,alpha:0.07,edge:PIC,ea:0.9,ew:1.8,pts:reorder(lines.map(function(L){return [L.P[0],L.P[1],0];}))});
+  // glide lines: picture point -> (through vanishing point) -> directing point, straight
+  for(i=0;i<lines.length;i++){ var L=lines[i], d=dirPt(L);
+    P.push({kind:'line',color:INK,width:1.5,alpha:0.85,pts:[[L.P[0],L.P[1],0],[d[0],d[1],zDir]]}); }
+  // vanishing axis + vanishing points (z = -DZ)
+  var vax=axis3D(distinctPts(function(L){return L.V;}),-DZ,300); if(vax)P.push({kind:'line',color:VAN,width:1.8,alpha:0.9,pts:vax});
+  for(i=0;i<lines.length;i++)P.push({kind:'dot',fill:VAN,alpha:1,r:4,pts:[[lines[i].V[0],lines[i].V[1],-DZ]]});
+  // directing axis + directing points (z = -DZ*rat)
+  var dax=axis3D(distinctPts(dirPt),zDir,300); if(dax)P.push({kind:'line',color:DIR,width:1.8,alpha:0.9,pts:dax});
+  for(i=0;i<lines.length;i++){ var dd=dirPt(lines[i]); P.push({kind:'dot',fill:DIR,alpha:1,r:4,pts:[[dd[0],dd[1],zDir]]}); }
+  // picture points (red)
+  for(i=0;i<lines.length;i++)P.push({kind:'dot',fill:PIC,alpha:1,r:4,pts:[[lines[i].P[0],lines[i].P[1],0]]});
   return P;
 }
-var SC3=[0,0,-450], SSC=0.40;
+var SC3=[0,0,-330], SSC=0.44;
 function draw3D(ctx){
-  var B=viewBasis(state.yaw,state.pit), cx=SPLITX+(CW-SPLITX)/2, cy=CH/2+10;
+  var B=viewBasis(state.yaw,state.pit), cx=SPLITX+(CW-SPLITX)/2, cy=CH/2+6;
   paint(ctx,B,SC3,SSC,cx,cy,scene3D());
   function lab(at,t,c,dx,dy){var s=project(B,SC3,SSC,cx,cy,at);ctx.fillStyle=c;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText(t,s[0]+dx,s[1]+dy);}
-  lab([210,150,0],'picture plane',PIC,4,-4);
-  lab([0,0,-3.4*Zp],'depth',GREEN,6,0);
-  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('3D LIFT \u2014 the knit resolves to frontal planes',SPLITX+16,24);
+  lab([0,110,0],'picture plane',PIC,-10,-6);
+  lab([150,0,-DZ],'vanishing axis',VAN,4,-4);
+  lab([0,-150,-DZ*state.rat],'directing axis',DIR,4,10);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('3D VIEW \u2014 the glide armature',SPLITX+16,24);
   ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
-  ctx.fillText('same-depth marks are coplanar \u2225 the picture \u2014 orbit to side/plan; the lines diverge, the planes stay frontal',SPLITX+16,42);
+  ctx.fillText('depth planes (black) converge on the vanishing plane; glide lines converge to the vanishing points',SPLITX+16,42);
 }
 
 function draw(){
@@ -211,6 +245,7 @@ function runLive(){
   // shared directing detection
   var Ds=lines.map(dirPt);var shared=true;for(i=1;i<Ds.length;i++){if(Math.hypot(Ds[i][0]-Ds[0][0],Ds[i][1]-Ds[0][1])>1)shared=false;}
   L('shared directing point \u21d2 depth planes are affine copies of the picture points',true,shared?'directing points coincide':'directing points scattered');
+  L('armature (from how the vanishing points arrange)',true,detectArmature(lines));
   var el=document.getElementById('live'),h='';for(i=0;i<out.length;i++){var o=out[i];h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
   el.innerHTML=h;
 }
@@ -233,10 +268,19 @@ function init(){
     else if(mode==='orbit'){ state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.2,Math.min(1.2,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
   cv.addEventListener('pointerup',function(){mode=null;grab=null;});
   document.getElementById('pScatter').addEventListener('click',function(){
+    state.rat=4;
     lines=[ {P:[-100,-20],V:[-30,30]}, {P:[46,-84],V:[-6,-22]}, {P:[-22,92],V:[52,30]}, {P:[112,12],V:[40,-42]} ]; render(); });
+  document.getElementById('pVaxis').addEventListener('click',function(){
+    state.rat=3;   // r_u = 1/3, r_v = 1 : one channel perspective -> a real vanishing-axis glide
+    var Wp=110,Hp=66,ru=1/3; var C=[[-Wp,Hp],[Wp,Hp],[-Wp,-Hp],[Wp,-Hp]];
+    lines=C.map(function(P){ return {P:P, V:[P[0]*(1-ru), 0]}; }); render(); });
   document.getElementById('pShare').addEventListener('click',function(){
-    var D=[10,10]; for(var i=0;i<lines.length;i++){ var P=lines[i].P; lines[i].V=[(D[0]+3*P[0])/4,(D[1]+3*P[1])/4]; } render(); });
+    state.rat=4; var D=[10,10]; for(var i=0;i<lines.length;i++){ var P=lines[i].P; lines[i].V=[(D[0]+3*P[0])/4,(D[1]+3*P[1])/4]; } render(); });
+  document.getElementById('pOne').addEventListener('click',function(){
+    state.rat=1;   // one-point: directing point coincides with the vanishing point (ratio 0:1)
+    lines=[ {P:[-118,-70],V:[0,0]}, {P:[118,-70],V:[0,0]}, {P:[118,70],V:[0,0]}, {P:[-118,70],V:[0,0]} ]; render(); });
   document.getElementById('pCollin').addEventListener('click',function(){
+    state.rat=4;
     // picture points on a line; vanishing points on another line -> depth planes become straight
     var Ps=[[-140,-70],[-46,-24],[46,22],[140,70]], Vs=[[-70,40],[-24,14],[22,-12],[70,-40]];
     for(var i=0;i<lines.length;i++){ lines[i]={P:Ps[i],V:Vs[i]}; } render(); });
