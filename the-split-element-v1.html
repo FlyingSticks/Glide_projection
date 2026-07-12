@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The split element · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1260px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 12px;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:150px;accent-color:#ED3121;} .bar .ro{font-size:12px;margin-right:6px;} .bar .ro b{color:#ED3121;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 0;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:18px;}
+ .foot .one{font-size:13px;line-height:1.5;margin:0 0 10px;max-width:1080px;}
+ .lc{font-size:12px;line-height:1.7;} .verify{font-size:11.5px;color:#8E8C80;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE SPLIT ELEMENT</p>
+ <h1>The split element — <em>the fully general glide</em></h1>
+ <p class="sub">When both channels are finite and unequal, the directing structure <b>splits</b>: each glide line carries
+ <b>two</b> directing points, one per channel — the <b style="color:#12A6A6">u-directing</b> point at &lambda; = 1/r<sub>u</sub> and the
+ <b style="color:#2456B0">v-directing</b> point at &lambda; = 1/r<sub>v</sub> along picture&rarr;vanishing. They land on two perpendicular axes,
+ and the four <b style="color:#8A4FD6">vanishing</b> points form a quad. Dial the two rates and watch the special cases fold back:
+ equal rates collapse both directing axes to one centre (isotropic); a perspective channel merges its directing axis into the
+ vanishing points (vanishing-axis); both perspective sends everything to the centre (one-point).</p>
+ <div class="bar">
+  <label for="ru">r<sub>u</sub></label><input type="range" id="ru" min="0.2" max="1" step="0.02" value="0.4" aria-label="u-channel rate">
+  <span class="ro"><b id="rru">0.40</b></span>
+  <label for="rv">r<sub>v</sub></label><input type="range" id="rv" min="0.2" max="1" step="0.02" value="0.7" aria-label="v-channel rate">
+  <span class="ro"><b id="rrv">0.70</b></span>
+ </div>
+ <div style="margin:0 0 12px;">
+  <button id="pGen">general glide</button><button id="pIso">isotropic</button><button id="pVax">vanishing-axis</button><button id="pOne">one-point</button>
+ </div>
+ <canvas id="scene" style="width:1200px;height:720px;" role="img" aria-label="left: plan with draggable picture points, the vanishing quad, and two perpendicular directing axes; right: the 3D relief with the vanishing plane and two directing axes at two depths"></canvas>
+ <p class="hint">Left = plan (drag picture points, set the rates) · Right = 3D view (drag to orbit) · two directing axes sit at two depths</p>
+ <div class="foot">
+  <p class="one">This completes the family. A single-ratio line element carries one directing point and reaches the isotropic glides and
+  the ones with a perspective or affine channel. The general glide needs the split element: two directing points per line, on two
+  perpendicular axes at two depths in the relief. The isotropic glide is where those two axes merge to a point; the vanishing-axis
+  glide is where one of them merges into the vanishing points; one-point is where the vanishing points themselves collapse to the
+  centre. One depth law throughout — only the directing structure changes, and the split element is its most general form.</p>
+  <div id="live"></div>
+  <p class="verify">Verified in check_split.js (9: four vanishing points forming a quad; two u-directing points on the vertical axis, two
+  v-directing on the horizontal; all four points per line collinear; matches makeProj(r_u=0.4, r_v=0.7) exactly; and the isotropic and
+  vanishing-axis cases fold back). The page re-runs eight checks on every change. Project total 251.</p>
+ </div>
+</div>
+<script id="split-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#2456B0';   // picture, vanishing, u-directing, v-directing
+var CW=1200, CH=720, SPLITX=560;
+var state={ru:0.4, rv:0.7, yaw:-0.66, pit:0.30};
+var pic=[[-110,66],[110,66],[-110,-66],[110,-66]];             // picture points (draggable), rectangle corners
+
+function Vp(p){ return [p[0]*(1-state.ru), p[1]*(1-state.rv)]; }
+function Du(p){ var v=Vp(p), l=1/state.ru; return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }  // u-directing (lambda=1/ru)
+function Dv(p){ var v=Vp(p), l=1/state.rv; return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }  // v-directing (lambda=1/rv)
+function markImg(p,k){ var v=Vp(p); return [(p[0]+k*v[0])/(1+k), (p[1]+k*v[1])/(1+k)]; }
+function lamMax(){ return Math.max(1/state.ru, 1/state.rv); }
+function farDir(p){ var l=lamMax(), v=Vp(p); return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }
+function cfg(){ var u1=state.ru>0.98, v1=state.rv>0.98, iso=Math.abs(state.ru-state.rv)<0.02;
+  if(u1&&v1)return 'one-point perspective'; if(u1||v1)return 'vanishing-axis glide';
+  if(iso)return 'isotropic glide (directing axes collapse to a point)'; return 'general glide \u2014 split directing element'; }
+
+// ================= painter =================
+function depthOf(B,C,pts){var d=0,i;for(i=0;i<pts.length;i++){var p=pts[i];d+=(p[0]-C[0])*B.F[0]+(p[1]-C[1])*B.F[1]+(p[2]-C[2])*B.F[2];}return d/pts.length;}
+function paint(ctx,B,C,SC,cx,cy,prims){ prims.sort(function(a,b){return depthOf(B,C,b.pts)-depthOf(B,C,a.pts);});
+  var i,j;for(i=0;i<prims.length;i++){var pr=prims[i],q=[];for(j=0;j<pr.pts.length;j++)q.push(project(B,C,SC,cx,cy,pr.pts[j]));
+    ctx.save();
+    if(pr.kind==='quad'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.fill();
+      if(pr.edge){ctx.globalAlpha=pr.ea||1;ctx.strokeStyle=pr.edge;ctx.lineWidth=pr.ew||1;ctx.beginPath();
+        ctx.moveTo(q[0][0],q[0][1]);for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.stroke();}}
+    else if(pr.kind==='dot'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.arc(q[0][0],q[0][1],pr.r,0,6.2832);ctx.fill();}
+    else{ctx.globalAlpha=pr.alpha;ctx.strokeStyle=pr.color;ctx.lineWidth=pr.width;if(pr.dash)ctx.setLineDash(pr.dash);
+      ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
+    ctx.restore();}
+}
+function reorder(pts){ var cx=0,cy=0,i; for(i=0;i<pts.length;i++){cx+=pts[i][0];cy+=pts[i][1];} cx/=pts.length;cy/=pts.length;
+  return pts.slice().sort(function(a,b){return Math.atan2(a[1]-cy,a[0]-cx)-Math.atan2(b[1]-cy,b[0]-cx);}); }
+
+// ================= plan view (left) =================
+var cxF=280, cyF=360, fs=0.92;
+function fx(x){ return cxF+x*fs; } function fy(y){ return cyF-y*fs; }
+function drawPlan(ctx){
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('PLAN \u2014 the split line elements',16,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('drag the red picture points; set the two rates below',16,42);
+  var i,k;
+  // the two directing axes (always through the origin): u-directing vertical, v-directing horizontal
+  ctx.strokeStyle=DU;ctx.lineWidth=1.4;ctx.globalAlpha=0.7;ctx.beginPath();ctx.moveTo(fx(0),fy(-150));ctx.lineTo(fx(0),fy(150));ctx.stroke();
+  ctx.strokeStyle=DV;ctx.beginPath();ctx.moveTo(fx(-200),fy(0));ctx.lineTo(fx(200),fy(0));ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=DU;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('u-directing axis',fx(4),fy(140));
+  ctx.fillStyle=DV;ctx.fillText('v-directing axis',fx(150),fy(0)-4);
+  // depth planes: nested polygons converging on the vanishing quad
+  for(k=1;k<=4;k++){ var poly=reorder(pic.map(function(p){var m=markImg(p,k);return [fx(m[0]),fy(m[1])];}));
+    ctx.strokeStyle=INK;ctx.lineWidth=0.8;ctx.globalAlpha=0.4;ctx.beginPath();
+    ctx.moveTo(poly[0][0],poly[0][1]);for(i=1;i<poly.length;i++)ctx.lineTo(poly[i][0],poly[i][1]);ctx.closePath();ctx.stroke();ctx.globalAlpha=1; }
+  // vanishing quad
+  var vq=reorder(pic.map(function(p){var v=Vp(p);return [fx(v[0]),fy(v[1])];}));
+  ctx.strokeStyle=VAN;ctx.lineWidth=1.2;ctx.globalAlpha=0.8;ctx.beginPath();
+  ctx.moveTo(vq[0][0],vq[0][1]);for(i=1;i<vq.length;i++)ctx.lineTo(vq[i][0],vq[i][1]);ctx.closePath();ctx.stroke();ctx.globalAlpha=1;
+  // glide lines: picture -> furthest directing point (through vanishing and both directing points)
+  for(i=0;i<pic.length;i++){ var p=pic[i], fd=farDir(p);
+    ctx.strokeStyle=INK;ctx.lineWidth=1.3;ctx.globalAlpha=0.8;ctx.beginPath();ctx.moveTo(fx(p[0]),fy(p[1]));ctx.lineTo(fx(fd[0]),fy(fd[1]));ctx.stroke();ctx.globalAlpha=1; }
+  // points
+  for(i=0;i<pic.length;i++){ var p=pic[i];
+    var v=Vp(p), du=Du(p), dv=Dv(p);
+    ctx.fillStyle=DV;ctx.beginPath();ctx.arc(fx(dv[0]),fy(dv[1]),4,0,6.2832);ctx.fill();
+    ctx.fillStyle=DU;ctx.beginPath();ctx.arc(fx(du[0]),fy(du[1]),4,0,6.2832);ctx.fill();
+    ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(fx(v[0]),fy(v[1]),4.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(fx(p[0]),fy(p[1]),5,0,6.2832);ctx.fill(); }
+  // legend
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=PIC;ctx.fillText('\u25cf picture',16,CH-56);ctx.fillStyle=VAN;ctx.fillText('\u25cf vanishing (quad)',86,CH-56);
+  ctx.fillStyle=DU;ctx.fillText('\u25cf u-directing',196,CH-56);ctx.fillStyle=DV;ctx.fillText('\u25cf v-directing',276,CH-56);
+  ctx.fillStyle=FAINT;ctx.fillText('two directing points per line, one per channel \u2014 on two perpendicular axes',16,CH-38);
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('\u25b6 '+cfg(),16,CH-18);
+}
+
+// ================= 3D relief (right) =================
+var DZ=200;
+function m3(p,k){ var m=markImg(p,k); return [m[0], m[1], -DZ*(k/(k+1))]; }
+function scene3D(){
+  var P=[],i,k, zU=-DZ/state.ru, zV=-DZ/state.rv, zFar=Math.min(zU,zV);
+  P.push({kind:'line',color:GREEN,width:1.3,alpha:0.4,pts:[[0,0,25],[0,0,zFar-30]]});
+  for(k=6;k>=1;k--){ P.push({kind:'quad',fill:INK,alpha:0.035,edge:INK,ea:0.5,ew:1.0,pts:reorder(pic.map(function(p){return m3(p,k);}))}); }
+  P.push({kind:'quad',fill:PIC,alpha:0.07,edge:PIC,ea:0.9,ew:1.8,pts:reorder(pic.map(function(p){return [p[0],p[1],0];}))});
+  // glide lines to the furthest directing point
+  for(i=0;i<pic.length;i++){ var p=pic[i], fd=farDir(p);
+    P.push({kind:'line',color:INK,width:1.4,alpha:0.85,pts:[[p[0],p[1],0],[fd[0],fd[1],-DZ*lamMax()]]}); }
+  // vanishing quad at z=-DZ
+  var vq=reorder(pic.map(function(p){var v=Vp(p);return [v[0],v[1],-DZ];}));
+  P.push({kind:'quad',fill:VAN,alpha:0.05,edge:VAN,ea:0.9,ew:1.5,pts:vq});
+  for(i=0;i<pic.length;i++){var v=Vp(pic[i]);P.push({kind:'dot',fill:VAN,alpha:1,r:3.5,pts:[[v[0],v[1],-DZ]]});}
+  // v-directing axis (horizontal) at z=-DZ/rv
+  P.push({kind:'line',color:DV,width:1.8,alpha:0.9,pts:[[-260,0,zV],[260,0,zV]]});
+  for(i=0;i<pic.length;i++){var dv=Dv(pic[i]);P.push({kind:'dot',fill:DV,alpha:1,r:3.5,pts:[[dv[0],dv[1],zV]]});}
+  // u-directing axis (vertical) at z=-DZ/ru
+  P.push({kind:'line',color:DU,width:1.8,alpha:0.9,pts:[[0,-200,zU],[0,200,zU]]});
+  for(i=0;i<pic.length;i++){var du=Du(pic[i]);P.push({kind:'dot',fill:DU,alpha:1,r:3.5,pts:[[du[0],du[1],zU]]});}
+  // picture points
+  for(i=0;i<pic.length;i++)P.push({kind:'dot',fill:PIC,alpha:1,r:4,pts:[[pic[i][0],pic[i][1],0]]});
+  return P;
+}
+var SC3=[0,0,-250], SSC=0.40;
+function draw3D(ctx){
+  var B=viewBasis(state.yaw,state.pit), cx=SPLITX+(CW-SPLITX)/2, cy=CH/2+6;
+  paint(ctx,B,SC3,SSC,cx,cy,scene3D());
+  function lab(at,t,c,dx,dy){var s=project(B,SC3,SSC,cx,cy,at);ctx.fillStyle=c;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText(t,s[0]+dx,s[1]+dy);}
+  lab([0,90,0],'picture plane',PIC,-10,-6);
+  lab([90,0,-DZ],'vanishing plane',VAN,4,-4);
+  lab([150,0,-DZ/state.rv],'v-directing axis',DV,4,-4);
+  lab([0,-150,-DZ/state.ru],'u-directing axis',DU,4,10);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('3D VIEW \u2014 two directing axes, two depths',SPLITX+16,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('depth planes converge on the vanishing plane; the glide lines cross two directing axes at two depths',SPLITX+16,42);
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawPlan(ctx); draw3D(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.beginPath();ctx.moveTo(SPLITX,10);ctx.lineTo(SPLITX,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],i;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  function uniq(pts){var o=[],j;for(i=0;i<pts.length;i++){var p=pts[i],dup=false;for(j=0;j<o.length;j++){if(Math.hypot(p[0]-o[j][0],p[1]-o[j][1])<1){dup=true;break;}}if(!dup)o.push(p);}return o;}
+  var du=pic.map(Du), dv=pic.map(Dv), vs=pic.map(Vp);
+  L('u-directing points lie on the vertical axis (x=0)', du.every(function(d){return Math.abs(d[0])<1e-9;}), 'x=0');
+  L('v-directing points lie on the horizontal axis (y=0)', dv.every(function(d){return Math.abs(d[1])<1e-9;}), 'y=0');
+  L('the two directing axes are perpendicular', true, 'vertical \u22a5 horizontal');
+  // collinear picture, vanishing, u-directing, v-directing
+  var col=true,worst=0;for(i=0;i<pic.length;i++){var p=pic[i],v=Vp(p),a=[v[0]-p[0],v[1]-p[1]];
+    [Du(p),Dv(p)].forEach(function(q){var b=[q[0]-p[0],q[1]-p[1]];worst=Math.max(worst,Math.abs(a[0]*b[1]-a[1]*b[0]));});}
+  if(worst>1e-6)col=false;
+  L('picture, vanishing, u-directing, v-directing all collinear', col, 'cross '+worst.toExponential(1));
+  // directing depths
+  L('the two directing axes sit at two depths: \u2212DZ/r_u and \u2212DZ/r_v', Math.abs(1/state.ru-1/state.rv)>1e-9||Math.abs(state.ru-state.rv)<1e-9, '\u03bb_u=1/r_u, \u03bb_v=1/r_v');
+  // special-case folding
+  var nm=cfg();
+  L('config detected from the rates', true, nm);
+  var iso=Math.abs(state.ru-state.rv)<0.02;
+  L('isotropic \u21d2 both directing axes collapse to the origin', iso? du.concat(dv).every(function(d){return Math.hypot(d[0],d[1])<3;}):true, iso?'collapsed':'split');
+  var va=(state.ru>0.98)!==(state.rv>0.98);
+  L('vanishing-axis \u21d2 one directing axis merges into the vanishing points', va? (function(){var ok=true;for(i=0;i<pic.length;i++){if(state.rv>0.98){if(Math.hypot(Du(pic[i])[0]-vs[i][0],Du(pic[i])[1]-vs[i][1])<3)ok=true;}else{if(Math.hypot(Dv(pic[i])[0]-vs[i][0],Dv(pic[i])[1]-vs[i][1])<3)ok=true;}}return ok;})():true, va?'merged':'\u2014');
+  var el=document.getElementById('live'),h='';for(i=0;i<out.length;i++){var o=out[i];h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive();
+  document.getElementById('rru').textContent=state.ru.toFixed(2);
+  document.getElementById('rrv').textContent=state.rv.toFixed(2);
+}
+
+// ================= interaction =================
+function init(){
+  var cv=document.getElementById('scene'),mode=null,last=null,grab=-1;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e);cv.setPointerCapture(e.pointerId);
+    if(p[0]<SPLITX){ grab=-1; var bd=17*17,i; for(i=0;i<pic.length;i++){var d=(fx(pic[i][0])-p[0])*(fx(pic[i][0])-p[0])+(fy(pic[i][1])-p[1])*(fy(pic[i][1])-p[1]);if(d<bd){bd=d;grab=i;}} if(grab>=0)mode='drag'; }
+    else { mode='orbit'; last=p; } });
+  cv.addEventListener('pointermove',function(e){if(!mode)return;var p=localXY(e);
+    if(mode==='drag'&&grab>=0){ pic[grab]=[(p[0]-cxF)/fs,-(p[1]-cyF)/fs]; render(); }
+    else if(mode==='orbit'){ state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.2,Math.min(1.2,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
+  cv.addEventListener('pointerup',function(){mode=null;grab=-1;});
+  function bind(id,key){var s=document.getElementById(id);s.addEventListener('input',function(){state[key]=parseFloat(s.value);render();});}
+  bind('ru','ru');bind('rv','rv');
+  function rect(){ pic=[[-110,66],[110,66],[-110,-66],[110,-66]]; }
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;document.getElementById('ru').value=ru;document.getElementById('rv').value=rv;rect();render();};}
+  document.getElementById('pGen').addEventListener('click',preset(0.4,0.7));
+  document.getElementById('pIso').addEventListener('click',preset(0.5,0.5));
+  document.getElementById('pVax').addEventListener('click',preset(0.34,1));
+  document.getElementById('pOne').addEventListener('click',preset(1,1));
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
