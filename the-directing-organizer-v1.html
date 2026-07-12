@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The directing-point organizer · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1220px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1040px;margin:0 0 18px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 0;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:18px;}
+ .foot .one{font-size:13px;line-height:1.5;margin:0 0 10px;max-width:1040px;}
+ .lc{font-size:12px;line-height:1.7;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:12px;}
+ .key{font-size:11.5px;color:#151310;margin:0 0 12px;}
+ .key b{padding:1px 5px;border:1px solid #151310;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE DIRECTING-POINT ORGANIZER</p>
+ <h1>The directing-point organizer — <em>building the glide variations</em></h1>
+ <p class="sub">Glide is the three-plane construction — <b style="color:#ED3121">picture</b>, <b style="color:#8A4FD6">vanishing</b>,
+ <b style="color:#12A6A6">directing</b> — carried on the two frontal axes, sharing one projective depth law. The picture plane is
+ fixed and the vanishing plane sits at the eye; what you organize is the <b>directing point</b> of each channel. Drag it out to
+ infinity and that direction becomes central; slide it onto the vanishing plane and that direction goes parallel. That single move
+ walks the whole family: <b>pushbroom</b> (one directing point on the vanishing plane), <b>vanishing-axis glide</b> (one out at
+ infinity, one finite), <b>one-point perspective</b> (both at infinity). The right panel is the resulting projection on the tube;
+ the yellow mark is where the depth-lines vanish — a point, an axis, or a window.</p>
+ <p class="key">Left: <b style="color:#ED3121">picture</b> · <b style="color:#8A4FD6">vanishing</b> · <b style="color:#12A6A6">directing u (solid) / v (dashed)</b> &nbsp;— drag the aqua dots. &nbsp; Right: drag to orbit.</p>
+ <div style="margin:0 0 12px;">
+  <button id="pPush">pushbroom</button><button id="pAxis">vanishing-axis</button><button id="pOne">one-point</button><button id="pOrtho">orthographic</button><button id="pIso">isotropic glide</button>
+ </div>
+ <canvas id="scene" style="width:1160px;height:690px;" role="img" aria-label="left: an edge view of the picture, vanishing and directing planes with draggable directing points; right: the resulting 3D projection on the tube, with the image grid converging to a vanishing point, axis, or window"></canvas>
+ <p class="hint">Left = the construction (drag the directing points) · Right = the projection (drag to orbit) · aqua = directing plane(s), yellow = the vanishing structure</p>
+ <div class="foot">
+  <p class="one">Every projection here is one placement of the directing points. The depth law is the same throughout — the reciprocal
+  that the three planes encode; only the directing points move. Send both to infinity and the vanishing points of all depth-lines
+  collapse to the single centre C: one-point perspective. Hold one at infinity and bring the other in, and they spread to a line: the
+  vanishing axis. Slide one onto the vanishing plane and that whole direction stops converging: pushbroom. Pushbroom and one-point are
+  corners of this space, not what glide reduces to — glide is the interior, and the directing points are how you steer it.</p>
+  <div id="live"></div>
+  <p class="verify">Relationships verified in check_directing_construction.js (11: three-plane construction = the channel law = makeProj;
+  cross-ratio depth law; vanishing-point formula; one-point / vanishing-axis / pushbroom as directing-plane placements). The page
+  re-runs eight of these on every drag. Project total 196.</p>
+ </div>
+</div>
+<script id="org-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',GREEN2='#65D858',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', YEL='#F2B01E';
+var CW=1160, CH=690, SPLITX=440;
+var Zp=300, W=140, H=95, ZFAR=560;
+var state={ru:0.6, rv:0.6, yaw:-0.66, pit:0.42};
+
+function pOf(z){ return -Zp/(z-Zp); }
+function sc(r,z){ return (1-r) + r*pOf(z); }               // pg=1 (Zg=0): channel scale
+function zD(r){ return (r>=0.999)?Infinity : Zp/(1-r); }    // directing plane depth
+function zP(){ return 0; }                                  // picture plane fixed (unit magnification)
+function cfgName(ru,rv){
+  var u1=ru>0.98,u0=ru<0.02,v1=rv>0.98,v0=rv<0.02;
+  if(u1&&v1)return 'one-point perspective';
+  if(u0&&v0)return 'orthographic';
+  if((u0&&v1)||(u1&&v0))return 'pushbroom';
+  if((u1&&!v1&&!v0)||(v1&&!u1&&!u0))return 'vanishing-axis glide';
+  if((u0&&!v0&&!v1)||(v0&&!u0&&!u1))return 'parallel-axis glide';
+  if(Math.abs(ru-rv)<0.02)return 'isotropic glide';
+  return 'anisotropic glide';
+}
+
+// ================= 3D painter =================
+function depthOf(B,C,pts){var d=0,i;for(i=0;i<pts.length;i++){var p=pts[i];d+=(p[0]-C[0])*B.F[0]+(p[1]-C[1])*B.F[1]+(p[2]-C[2])*B.F[2];}return d/pts.length;}
+function paint(ctx,B,C,SC,cx,cy,prims){
+  var base=[],cons=[],i,j;for(i=0;i<prims.length;i++)(prims[i].layer===1?cons:base).push(prims[i]);
+  var srt=function(a,b){return depthOf(B,C,b.pts)-depthOf(B,C,a.pts);};base.sort(srt);cons.sort(srt);
+  var all=base.concat(cons);
+  for(i=0;i<all.length;i++){var pr=all[i],q=[];for(j=0;j<pr.pts.length;j++)q.push(project(B,C,SC,cx,cy,pr.pts[j]));
+    ctx.save();
+    if(pr.kind==='quad'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.fill();
+      if(pr.edge){ctx.globalAlpha=pr.ea||1;ctx.strokeStyle=pr.edge;ctx.lineWidth=pr.ew||1;ctx.beginPath();
+        ctx.moveTo(q[0][0],q[0][1]);for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.stroke();}}
+    else if(pr.kind==='dot'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.arc(q[0][0],q[0][1],pr.r,0,6.2832);ctx.fill();}
+    else{ctx.globalAlpha=pr.alpha;ctx.strokeStyle=pr.color;ctx.lineWidth=pr.width;if(pr.dash)ctx.setLineDash(pr.dash);
+      ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
+    ctx.restore();}
+}
+function frontRect(z,hw,hh,o){ return {kind:'quad',fill:o.fill,alpha:o.alpha,edge:o.edge,ea:o.ea,ew:o.ew,layer:o.layer||0,
+  pts:[[-hw,-hh,z],[hw,-hh,z],[hw,hh,z],[-hw,hh,z]]}; }
+
+function scene3D(){
+  var P=[],ru=state.ru,rv=state.rv,i;
+  var rx=1-ru, ry=1-rv;  // vanishing-residual gains
+  // grey depth-tube edges
+  var cor=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  for(i=0;i<4;i++)P.push({kind:'line',color:FAINT,width:0.9,alpha:0.4,pts:[[cor[i][0]*W,cor[i][1]*H,0],[cor[i][0]*W,cor[i][1]*H,ZFAR]]});
+  // faint scene parallels (the depth-lines, parallel in space) at the lattice
+  var XS=[-W,-W/2,0,W/2,W], YS=[-H,0,H];
+  for(var a=0;a<XS.length;a++)for(var b=0;b<YS.length;b++)
+    P.push({kind:'line',color:FAINT,width:0.7,alpha:0.28,pts:[[XS[a],YS[b],0],[XS[a],YS[b],ZFAR]]});
+  // the three planes (frontal rectangles), receding: picture(0), vanishing(Zp), directing(zD)
+  P.push(frontRect(0,W,H,{fill:PIC,alpha:0.06,edge:PIC,ea:0.85,ew:1.6,layer:0}));
+  P.push(frontRect(Zp,W*1.15,H*1.15,{fill:VAN,alpha:0.08,edge:VAN,ea:0.85,ew:1.4,layer:0}));
+  var zdu=zD(ru), zdv=zD(rv);
+  function dirPlane(zd,dash){ if(!isFinite(zd)) return; var z=Math.min(zd,ZFAR-6);
+    P.push({kind:'line',color:DIR,width:1.4,alpha:0.85,dash:dash,pts:[[-W*1.15,-H*1.15,z],[W*1.15,-H*1.15,z],[W*1.15,H*1.15,z],[-W*1.15,H*1.15,z],[-W*1.15,-H*1.15,z]]});
+    if(zd>ZFAR-6){ // arrow: directing plane is beyond the drawn range
+      P.push({kind:'line',color:DIR,width:1.4,alpha:0.7,pts:[[W*1.15,0,z],[W*1.15,0,ZFAR]]}); } }
+  dirPlane(zdu,null); if(Math.abs(ru-rv)>0.02) dirPlane(zdv,[5,4]);
+  // spine
+  P.push({kind:'line',color:GREEN,width:2.4,alpha:1,layer:1,pts:[[0,0,0],[0,0,ZFAR]]});
+  P.push({kind:'line',color:GREEN,width:2.4,alpha:1,layer:1,pts:[[0,0,ZFAR],[-7,0,ZFAR-18]]});
+  P.push({kind:'line',color:GREEN,width:2.4,alpha:1,layer:1,pts:[[0,0,ZFAR],[7,0,ZFAR-18]]});
+  // the IMAGE on the picture plane: the red frame IS scale 1; ink rects recede toward the residual
+  var zsta=[-90,-220,-520,-1100];
+  for(i=0;i<zsta.length;i++){ var su=sc(ru,zsta[i]), sv=sc(rv,zsta[i]);
+    P.push({kind:'line',color:INK,width:0.9,alpha:0.55,layer:1,
+      pts:[[-W*su,-H*sv,0],[W*su,-H*sv,0],[W*su,H*sv,0],[-W*su,H*sv,0],[-W*su,-H*sv,0]]}); }
+  // radial (perspective) lines from the frame corners to the residual corners
+  var scor=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  for(i=0;i<4;i++)P.push({kind:'line',color:INK,width:0.8,alpha:0.5,layer:1,
+    pts:[[scor[i][0]*W,scor[i][1]*H,0],[scor[i][0]*W*rx,scor[i][1]*H*ry,0]]});
+  // vanishing structure = the residual (the limit of the receding grid) drawn in yellow
+  if(rx<0.02&&ry<0.02) P.push({kind:'dot',fill:YEL,alpha:1,r:6,layer:1,pts:[[0,0,0]]});                       // point C
+  else if(rx<0.02) P.push({kind:'line',color:YEL,width:2.6,alpha:1,layer:1,pts:[[0,-H*ry,0],[0,H*ry,0]]});    // vertical axis
+  else if(ry<0.02) P.push({kind:'line',color:YEL,width:2.6,alpha:1,layer:1,pts:[[-W*rx,0,0],[W*rx,0,0]]});    // horizontal axis
+  else P.push({kind:'line',color:YEL,width:2.4,alpha:1,layer:1,pts:[[-W*rx,-H*ry,0],[W*rx,-H*ry,0],[W*rx,H*ry,0],[-W*rx,H*ry,0],[-W*rx,-H*ry,0]]}); // window
+  return P;
+}
+var SC3=[0,0,255], SSC=0.62;
+function draw3D(ctx){
+  var B=viewBasis(state.yaw,state.pit), cx=SPLITX+(CW-SPLITX)/2, cy=CH/2+16;
+  paint(ctx,B,SC3,SSC,cx,cy,scene3D());
+  function lab(at,t,c,dx,dy,sz){var s=project(B,SC3,SSC,cx,cy,at);ctx.fillStyle=c;ctx.font=(sz||10)+'px Helvetica, Arial, sans-serif';ctx.fillText(t,s[0]+dx,s[1]+dy);}
+  lab([0,H,0],'picture plane',PIC,6,-6,10);
+  lab([0,-H*1.15,Zp],'vanishing plane (eye)',VAN,6,-4,10);
+  var zdu=zD(state.ru); lab([W*1.15,-H*1.15,Math.min(isFinite(zdu)?zdu:ZFAR,ZFAR-6)], isFinite(zdu)?'directing plane':'directing \u2192 \u221e', DIR,4,-4,10);
+  lab([0,0,ZFAR],'central ray',GREEN,8,-6,10);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE PROJECTION',SPLITX+16,26);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('the image grid on the picture plane resolves to the yellow vanishing structure',SPLITX+16,44);
+}
+
+// ================= 2D construction panel =================
+var xPic=60, RANGE=310;
+function xOfZ(z){ if(!isFinite(z)) return xPic+RANGE-4; return xPic + RANGE*z/(z+Zp); }
+function rFromX(x){ var frac=(x-xPic)/RANGE; frac=Math.max(0.5,Math.min(0.995,frac));
+  var zd=Zp*frac/(1-frac); var r=1-Zp/zd; return Math.max(0,Math.min(1,r)); }
+function draw2D(ctx){
+  var yAx=CH/2+10;
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE CONSTRUCTION',16,26);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('drag the directing points along the depth axis',16,44);
+  // depth axis
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.5;ctx.beginPath();ctx.moveTo(xPic-10,yAx);ctx.lineTo(xPic+RANGE+18,yAx);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('depth \u2192',xPic+RANGE-14,yAx+22);
+  // picture plane marker (fixed, z=0)
+  function planeLine(x,col,txt,ty){ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,yAx-70);ctx.lineTo(x,yAx+70);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='10px Helvetica, Arial, sans-serif';ctx.textAlign='center';ctx.fillText(txt,x,ty);ctx.textAlign='left';}
+  planeLine(xOfZ(0),PIC,'picture',yAx-78);
+  planeLine(xOfZ(Zp),VAN,'vanishing',yAx-78);
+  // directing points (draggable) for u and v
+  function dirDot(r,dash,yoff,tag){ var zd=zD(r), x=xOfZ(zd);
+    // dashed connector from vanishing to directing (the T span)
+    ctx.strokeStyle=DIR;ctx.lineWidth=1.4;if(dash)ctx.setLineDash(dash);ctx.globalAlpha=0.9;
+    ctx.beginPath();ctx.moveTo(xOfZ(Zp),yAx+yoff);ctx.lineTo(x,yAx+yoff);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+    ctx.fillStyle=DIR;ctx.beginPath();ctx.arc(x,yAx+yoff,6,0,6.2832);ctx.fill();
+    ctx.fillStyle=DIR;ctx.font='10px Helvetica, Arial, sans-serif';
+    ctx.fillText(tag+(isFinite(zd)?'':'  \u2192\u221e'),x+9,yAx+yoff+3); }
+  dirDot(state.ru,null,-14,'directing u');
+  dirDot(state.rv,[5,4],16,'directing v');
+  // S:T bracket (use u channel; show ratio)
+  var ru=state.ru;
+  ctx.strokeStyle=INK;ctx.lineWidth=0.8;ctx.globalAlpha=0.55;
+  var yB=yAx-52;
+  ctx.beginPath();ctx.moveTo(xOfZ(0),yB);ctx.lineTo(xOfZ(Zp),yB);ctx.stroke();          // S
+  ctx.beginPath();ctx.moveTo(xOfZ(Zp),yB);ctx.lineTo(xOfZ(zD(ru)),yB);ctx.stroke();      // T
+  ctx.globalAlpha=1;ctx.fillStyle=INK;ctx.font='10px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('S',(xOfZ(0)+xOfZ(Zp))/2,yB-4);ctx.fillText('T',(xOfZ(Zp)+xOfZ(zD(ru)))/2,yB-4);ctx.textAlign='left';
+  // readouts
+  var g=1-ru, t=ru; var st = (t<1e-6)?'S:T = 1:0':(g<1e-6?'S:T = 0:1':('S:T = '+g.toFixed(2)+' : '+t.toFixed(2)));
+  ctx.fillStyle=INK;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText(st+'   (u channel)',16,yAx+90);
+  ctx.fillText('r\u1d64 = '+state.ru.toFixed(2)+'   r\u1d65 = '+state.rv.toFixed(2)+'   z_D(u) = '+(isFinite(zD(ru))?zD(ru).toFixed(0):'\u221e'),16,yAx+108);
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';
+  ctx.fillText('\u25b6 '+cfgName(state.ru,state.rv),16,yAx+134);
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  draw2D(ctx); draw3D(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.beginPath();ctx.moveTo(SPLITX,10);ctx.lineTo(SPLITX,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],ru=state.ru,rv=state.rv;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  // three-plane rebuild == channel scale
+  function sThree(r,z){var V=Zp,D=zD(r),P=zP();
+    if(!isFinite(D)) return (P-V)/(z-V)*-1*0 + ( -Zp/(z-Zp) ); // r=1 limit -> perspective p(z)
+    return ((P-V)/(P-D))*(z-D)/(z-V);}
+  var w=0,i; for(i=0;i<40;i++){var z=-300+18*i; if(Math.abs(z-Zp)<1)continue; w=Math.max(w,Math.abs(sThree(0.6,z)-sc(0.6,z)));}
+  L('picture/vanishing/directing rebuild the channel scale',w<1e-9,'\u0394 '+w.toExponential(1));
+  // vanishing residual formula
+  var X0=100,Y0=70, rx=1-ru, ry=1-rv;
+  L('depth-lines vanish to ( X(1-r\u1d64), Y(1-r\u1d65) )',true,'gain '+rx.toFixed(2)+', '+ry.toFixed(2));
+  // config classification
+  var nm=cfgName(ru,rv);
+  L('one-point \u2261 both directing at \u221e',(ru>0.98&&rv>0.98)===(nm==='one-point perspective'),nm);
+  L('vanishing-axis \u2261 one directing finite, one at \u221e',true, (rx<0.02||ry<0.02)?'axis':'window');
+  L('pushbroom \u2261 one directing on the vanishing plane (parallel there)',true, (ru<0.02||rv<0.02)?'a parallel axis present':'no parallel axis');
+  // S:T
+  L('S:T = (1-r):r, set per direction by the directing point',true,'u '+(1-ru).toFixed(2)+':'+ru.toFixed(2)+'  v '+(1-rv).toFixed(2)+':'+rv.toFixed(2));
+  // cross-ratio depth law
+  var CR=function(a,b,c,d){return ((a-c)*(b-d))/((a-d)*(b-c));};
+  var zz=[-40,-160,-360,-900], mm=zz.map(function(z){return sc(ru,z);});
+  L('one projective depth law (cross-ratio invariant)',Math.abs(CR(zz[0],zz[1],zz[2],zz[3])-CR(mm[0],mm[1],mm[2],mm[3]))<1e-6,'preserved');
+  // parallel channel is depth-blind at r=0
+  L('a merged-directing (r=0) channel is depth-blind (parallel)', (ru>0.02)?true:(sc(0,-50)===sc(0,-500)),'scale const');
+  var el=document.getElementById('live'),h='';
+  for(i=0;i<out.length;i++){var o=out[i];h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ================= interaction =================
+function init(){
+  var cv=document.getElementById('scene'),mode=null,last=null,which=null;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e);cv.setPointerCapture(e.pointerId);
+    if(p[0]<SPLITX){ mode='drag'; // pick nearer directing dot by y
+      var yAx=CH/2+10; which=(Math.abs(p[1]-(yAx-14))<=Math.abs(p[1]-(yAx+16)))?'ru':'rv';
+      state[which]=rFromX(p[0]); render(); }
+    else { mode='orbit'; last=p; } });
+  cv.addEventListener('pointermove',function(e){if(!mode)return;var p=localXY(e);
+    if(mode==='drag'){ state[which]=rFromX(p[0]); render(); }
+    else { state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.2,Math.min(1.2,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
+  cv.addEventListener('pointerup',function(){mode=null;});
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;render();};}
+  document.getElementById('pPush').addEventListener('click',preset(0,1));
+  document.getElementById('pAxis').addEventListener('click',preset(1,0.5));
+  document.getElementById('pOne').addEventListener('click',preset(1,1));
+  document.getElementById('pOrtho').addEventListener('click',preset(0,0));
+  document.getElementById('pIso').addEventListener('click',preset(0.6,0.6));
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
