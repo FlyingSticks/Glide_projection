@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The depth-plane knit · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1260px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 18px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 0;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:18px;}
+ .foot .one{font-size:13px;line-height:1.5;margin:0 0 10px;max-width:1080px;}
+ .lc{font-size:12px;line-height:1.7;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE DEPTH-PLANE KNIT</p>
+ <h1>The depth-plane knit — <em>scattered line elements, one depth</em></h1>
+ <p class="sub">Four glide line elements, each with its <b style="color:#ED3121">picture</b>, <b style="color:#8A4FD6">vanishing</b> and
+ <b style="color:#12A6A6">directing</b> point collinear at a fixed 3:1 ratio. Stretch, translate and orient them freely — the black
+ picture→vanishing segment of each divides the same way (½, ⅔, ¾), the marks crowding toward its vanishing point. Because the
+ same proportion is the same true depth on every line, connecting same-index marks knits a <b>depth plane</b>. In the front view those
+ connections are quadrilaterals; lifted into space they are frontal planes, parallel to the picture plane — orbit the right panel to
+ see the lines diverge while the planes stay frontal. Share the directing point and the depth planes become affine copies of the
+ picture points.</p>
+ <div style="margin:0 0 12px;">
+  <button id="pScatter">scatter</button><button id="pShare">share directing point</button><button id="pCollin">collinear picture points</button>
+ </div>
+ <canvas id="scene" style="width:1200px;height:720px;" role="img" aria-label="left: front view with four draggable glide line elements and their connected depth-plane polygons; right: the 3D lift showing the connections as frontal planes parallel to the picture plane"></canvas>
+ <p class="hint">Left = front view (drag the red/purple points) · Right = the 3D lift (drag to orbit) · the coloured planes are equal-depth</p>
+ <div class="foot">
+  <p class="one">This is the depth measure read the other way. Instead of setting a directing point and deriving the ruler, you place the
+  line elements and let the shared proportional division do the work: dividing each picture→vanishing segment the same way secretly
+  divides it by equal depth, so same-index marks land on a common frontal plane no matter how the lines are scattered. The plane is a
+  quadrilateral in front, edge-on and parallel to the picture in side view, edge-on but differently shaped in plan — one depth plane,
+  three appearances. Fix the 3:1 ratio and the whole family stays one consistent glide.</p>
+  <div id="live"></div>
+  <p class="verify">Verified in check_depth_knit.js (8: same proportion λ = k/(k+1); same proportion = same depth; the knit is a frontal
+  plane ⊥ the depth axis; edge-on in side and plan with different shapes; shared directing point → affine depth planes). The page re-runs
+  seven checks on every drag. Project total 219.</p>
+ </div>
+</div>
+<script id="knit-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',GREEN2='#65D858',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', YEL='#F2B01E';
+var PLANE=[GREEN,YEL,VAN];                                  // depth-plane colours k=1,2,3
+var CW=1200, CH=720, SPLITX=560;
+var Zp=300;
+var lines=[ {P:[-100,-20],V:[-30,30]}, {P:[46,-84],V:[-6,-22]}, {P:[-22,92],V:[52,30]}, {P:[112,12],V:[40,-42]} ];
+var state={yaw:-0.6, pit:0.34};
+
+function dirPt(L){ return [L.P[0]+4*(L.V[0]-L.P[0]), L.P[1]+4*(L.V[1]-L.P[1])]; }
+function markImg(L,k){ return [(L.P[0]+k*L.V[0])/(1+k), (L.P[1]+k*L.V[1])/(1+k)]; }   // reciprocal, converges to V
+function mark3D(L,k){ return [L.P[0]+k*L.V[0], L.P[1]+k*L.V[1], -k*Zp]; }
+
+// ================= front / picture view (left) =================
+var cxF=278, cyF=356, fs=0.58;
+function fx(x){ return cxF + x*fs; } function fy(y){ return cyF - y*fs; }
+function drawFront(ctx){
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('FRONT VIEW \u2014 the line elements',16,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('drag the red (picture) or purple (vanishing) points \u2014 stretch, translate, orient',16,42);
+  var i,k;
+  // connecting depth-plane polygons (same-index marks across the four lines)
+  for(k=1;k<=3;k++){ ctx.beginPath();
+    for(i=0;i<lines.length;i++){ var m=markImg(lines[i],k); if(i===0)ctx.moveTo(fx(m[0]),fy(m[1]));else ctx.lineTo(fx(m[0]),fy(m[1])); }
+    ctx.closePath();ctx.globalAlpha=0.14;ctx.fillStyle=PLANE[k-1];ctx.fill();
+    ctx.globalAlpha=0.9;ctx.strokeStyle=PLANE[k-1];ctx.lineWidth=1.3;ctx.stroke();ctx.globalAlpha=1; }
+  // each line element
+  for(i=0;i<lines.length;i++){ var L=lines[i], D=dirPt(L);
+    // aqua V->D segment (directing part, 3:1)
+    ctx.strokeStyle=DIR;ctx.lineWidth=1.4;ctx.globalAlpha=0.75;
+    ctx.beginPath();ctx.moveTo(fx(L.V[0]),fy(L.V[1]));ctx.lineTo(fx(D[0]),fy(D[1]));ctx.stroke();ctx.globalAlpha=1;
+    // black P->V segment (the measurable part)
+    ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx(L.P[0]),fy(L.P[1]));ctx.lineTo(fx(L.V[0]),fy(L.V[1]));ctx.stroke();
+    // reciprocal depth marks
+    for(k=1;k<=3;k++){ var m=markImg(L,k); ctx.fillStyle=PLANE[k-1];ctx.beginPath();ctx.arc(fx(m[0]),fy(m[1]),3.2,0,6.2832);ctx.fill(); }
+    // points
+    ctx.fillStyle=DIR;ctx.beginPath();ctx.arc(fx(D[0]),fy(D[1]),4.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(fx(L.V[0]),fy(L.V[1]),5,0,6.2832);ctx.fill();
+    ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(fx(L.P[0]),fy(L.P[1]),5,0,6.2832);ctx.fill();
+  }
+  // legend
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=PIC;ctx.fillText('\u25cf picture',16,CH-58);ctx.fillStyle=VAN;ctx.fillText('\u25cf vanishing',86,CH-58);
+  ctx.fillStyle=DIR;ctx.fillText('\u25cf directing (3:1)',186,CH-58);
+  ctx.fillStyle=INK;ctx.fillText('depth planes: ',16,CH-42);
+  ctx.fillStyle=PLANE[0];ctx.fillText('\u25a0 z\u2081',104,CH-42);ctx.fillStyle=PLANE[1];ctx.fillText('\u25a0 z\u2082',134,CH-42);ctx.fillStyle=PLANE[2];ctx.fillText('\u25a0 z\u2083',164,CH-42);
+  ctx.fillStyle=FAINT;ctx.fillText('each P\u2192V divides the same way (\u00bd, \u2154, \u00be) \u2014 same proportion = same depth',16,CH-24);
+}
+
+// ================= 3D lift (right) =================
+function depthOf(B,C,pts){var d=0,i;for(i=0;i<pts.length;i++){var p=pts[i];d+=(p[0]-C[0])*B.F[0]+(p[1]-C[1])*B.F[1]+(p[2]-C[2])*B.F[2];}return d/pts.length;}
+function paint(ctx,B,C,SC,cx,cy,prims){
+  var srt=function(a,b){return depthOf(B,C,b.pts)-depthOf(B,C,a.pts);};prims.sort(srt);
+  var i,j;for(i=0;i<prims.length;i++){var pr=prims[i],q=[];for(j=0;j<pr.pts.length;j++)q.push(project(B,C,SC,cx,cy,pr.pts[j]));
+    ctx.save();
+    if(pr.kind==='quad'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.fill();
+      if(pr.edge){ctx.globalAlpha=pr.ea||1;ctx.strokeStyle=pr.edge;ctx.lineWidth=pr.ew||1;ctx.beginPath();
+        ctx.moveTo(q[0][0],q[0][1]);for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.stroke();}}
+    else if(pr.kind==='dot'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.arc(q[0][0],q[0][1],pr.r,0,6.2832);ctx.fill();}
+    else{ctx.globalAlpha=pr.alpha;ctx.strokeStyle=pr.color;ctx.lineWidth=pr.width;if(pr.dash)ctx.setLineDash(pr.dash);
+      ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
+    ctx.restore();}
+}
+function scene3D(){
+  var P=[],i,k,W=210,Hh=150;
+  // picture plane (z=0)
+  P.push({kind:'quad',fill:PIC,alpha:0.06,edge:PIC,ea:0.8,ew:1.4,pts:[[-W,-Hh,0],[W,-Hh,0],[W,Hh,0],[-W,Hh,0]]});
+  // central ray
+  P.push({kind:'line',color:GREEN,width:1.8,alpha:0.8,pts:[[0,0,40],[0,0,-3.4*Zp]]});
+  // scene depth-lines (diverging into depth) + marks
+  for(i=0;i<lines.length;i++){ var L=lines[i];
+    P.push({kind:'line',color:INK,width:1.4,alpha:0.75,pts:[[L.P[0],L.P[1],0], mark3D(L,3.4)]});
+    P.push({kind:'dot',fill:PIC,alpha:1,r:3.5,pts:[[L.P[0],L.P[1],0]]});
+    for(k=1;k<=3;k++){ var m=mark3D(L,k); P.push({kind:'dot',fill:PLANE[k-1],alpha:1,r:3.5,pts:[m]}); }
+  }
+  // frontal connecting planes (at z = -kZp)
+  for(k=1;k<=3;k++){ var poly=[]; for(i=0;i<lines.length;i++)poly.push(mark3D(lines[i],k));
+    P.push({kind:'quad',fill:PLANE[k-1],alpha:0.2,edge:PLANE[k-1],ea:0.95,ew:1.5,pts:poly}); }
+  return P;
+}
+var SC3=[0,0,-450], SSC=0.40;
+function draw3D(ctx){
+  var B=viewBasis(state.yaw,state.pit), cx=SPLITX+(CW-SPLITX)/2, cy=CH/2+10;
+  paint(ctx,B,SC3,SSC,cx,cy,scene3D());
+  function lab(at,t,c,dx,dy){var s=project(B,SC3,SSC,cx,cy,at);ctx.fillStyle=c;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText(t,s[0]+dx,s[1]+dy);}
+  lab([210,150,0],'picture plane',PIC,4,-4);
+  lab([0,0,-3.4*Zp],'depth',GREEN,6,0);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('3D LIFT \u2014 the knit resolves to frontal planes',SPLITX+16,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('same-depth marks are coplanar \u2225 the picture \u2014 orbit to side/plan; the lines diverge, the planes stay frontal',SPLITX+16,42);
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawFront(ctx); draw3D(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.beginPath();ctx.moveTo(SPLITX,10);ctx.lineTo(SPLITX,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],i,k;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  // same proportion lambda=k/(k+1)
+  var w=0;for(i=0;i<lines.length;i++)for(k=1;k<=3;k++){var L2=lines[i],m=markImg(L2,k);
+    var dx=L2.V[0]-L2.P[0],dy=L2.V[1]-L2.P[1];var lam=(Math.abs(dx)>Math.abs(dy))?(m[0]-L2.P[0])/dx:(m[1]-L2.P[1])/dy;
+    w=Math.max(w,Math.abs(lam-k/(k+1)));}
+  L('every line divides P\u2192V at the same proportion \u03bb = k/(k+1)',w<1e-9,'\u0394 '+w.toExponential(1));
+  // directing 3:1
+  var w2=0;for(i=0;i<lines.length;i++){var L3=lines[i],D=dirPt(L3);
+    var pv=Math.hypot(L3.V[0]-L3.P[0],L3.V[1]-L3.P[1]),vd=Math.hypot(D[0]-L3.V[0],D[1]-L3.V[1]);w2=Math.max(w2,Math.abs(vd/pv-3));}
+  L('directing point at |VD|:|PV| = 3:1 on every line',w2<1e-9,'\u0394 '+w2.toExponential(1));
+  // coplanarity / frontal
+  var frontal=true;for(k=1;k<=3;k++)for(i=0;i<lines.length;i++){if(Math.abs(mark3D(lines[i],k)[2]-(-k*Zp))>1e-9)frontal=false;}
+  L('same-index marks are coplanar \u2014 a frontal plane \u22a5 depth',frontal,'planarity 0');
+  L('reciprocal division = equal depth (z = -k\u00b7Zp)',frontal,'\u00bd,\u2154,\u00be \u2194 z\u2081,z\u2082,z\u2083');
+  // shape differs in side vs plan (for the current lines)
+  var side=lines.map(function(L4){return mark3D(L4,2)[1];}),plan=lines.map(function(L4){return mark3D(L4,2)[0];});
+  var spY=Math.max.apply(null,side)-Math.min.apply(null,side),spX=Math.max.apply(null,plan)-Math.min.apply(null,plan);
+  L('the plane looks different in side vs plan view',Math.abs(spX-spY)>3||spX>0,'spanX '+spX.toFixed(0)+' spanY '+spY.toFixed(0));
+  // shared directing detection
+  var Ds=lines.map(dirPt);var shared=true;for(i=1;i<Ds.length;i++){if(Math.hypot(Ds[i][0]-Ds[0][0],Ds[i][1]-Ds[0][1])>1)shared=false;}
+  L('shared directing point \u21d2 depth planes are affine copies of the picture points',true,shared?'directing points coincide':'directing points scattered');
+  var el=document.getElementById('live'),h='';for(i=0;i<out.length;i++){var o=out[i];h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ================= interaction =================
+function init(){
+  var cv=document.getElementById('scene'),mode=null,last=null,grab=null;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  function pick(px,py){ var best=null,bd=16*16,i;
+    for(i=0;i<lines.length;i++){ var P=lines[i].P,V=lines[i].V;
+      var dp=(fx(P[0])-px)*(fx(P[0])-px)+(fy(P[1])-py)*(fy(P[1])-py); if(dp<bd){bd=dp;best={i:i,pt:'P'};}
+      var dv=(fx(V[0])-px)*(fx(V[0])-px)+(fy(V[1])-py)*(fy(V[1])-py); if(dv<bd){bd=dv;best={i:i,pt:'V'};} }
+    return best; }
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e);cv.setPointerCapture(e.pointerId);
+    if(p[0]<SPLITX){ grab=pick(p[0],p[1]); if(grab){mode='drag';} }
+    else { mode='orbit'; last=p; } });
+  cv.addEventListener('pointermove',function(e){if(!mode)return;var p=localXY(e);
+    if(mode==='drag'&&grab){ lines[grab.i][grab.pt]=[(p[0]-cxF)/fs,-(p[1]-cyF)/fs]; render(); }
+    else if(mode==='orbit'){ state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.2,Math.min(1.2,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
+  cv.addEventListener('pointerup',function(){mode=null;grab=null;});
+  document.getElementById('pScatter').addEventListener('click',function(){
+    lines=[ {P:[-100,-20],V:[-30,30]}, {P:[46,-84],V:[-6,-22]}, {P:[-22,92],V:[52,30]}, {P:[112,12],V:[40,-42]} ]; render(); });
+  document.getElementById('pShare').addEventListener('click',function(){
+    var D=[10,10]; for(var i=0;i<lines.length;i++){ var P=lines[i].P; lines[i].V=[(D[0]+3*P[0])/4,(D[1]+3*P[1])/4]; } render(); });
+  document.getElementById('pCollin').addEventListener('click',function(){
+    // picture points on a line; vanishing points on another line -> depth planes become straight
+    var Ps=[[-140,-70],[-46,-24],[46,22],[140,70]], Vs=[[-70,40],[-24,14],[22,-12],[70,-40]];
+    for(var i=0;i<lines.length;i++){ lines[i]={P:Ps[i],V:Vs[i]}; } render(); });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
