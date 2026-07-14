@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The inversion viewer · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1260px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1100px;margin:0 0 14px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;gap:4px 0;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:110px;} .ro{font-size:12px;margin-right:2px;min-width:34px;display:inline-block;}
+ .bar select,.bar input[type=file]{font-size:12px;border:1.5px solid #151310;background:#EBE9DA;border-radius:0;padding:3px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus,select:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 10px;text-align:center;}
+ .status{font-size:12px;background:#EBE9DA;border:1.5px solid #151310;padding:8px 12px;margin:0 0 10px;}
+ .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:16px;} .foot .one{font-size:13px;line-height:1.5;max-width:1100px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE INVERSION VIEWER</p>
+ <h1>The inversion viewer — <em>any model, both readings</em></h1>
+ <p class="sub">Drop a Wavefront <b>.obj</b> anywhere on the canvas (or choose a file — it is read locally; nothing is uploaded).
+ The mesh is fitted into drawing space — frontal footprint inside the <b style="color:#ED3121">picture frame</b>, depth ζ from the
+ picture plane back — and the <b>same vertices</b> are drawn under both readings: <b>reading 1</b>, the glide, where every vertex
+ marks its drawn line at λ = −ζ/DZ; and <b>reading 2</b>, the cross-slit camera on the same congruence. Model in Blender, export,
+ drop, compare. If a model loads sideways, use <b>rotate</b> (or <b>+90°</b>) to turn it upright.</p>
+ <div class="bar">
+  <label for="ru">rᵤ</label><input type="range" id="ru" min="0" max="1" step="0.01" value="0.3333"><span class="ro" id="v_ru">0.33</span>
+  <label for="rv">rᵥ</label><input type="range" id="rv" min="0" max="1" step="0.01" value="1"><span class="ro" id="v_rv">1.00</span>
+  <label for="fitk">fit</label><input type="range" id="fitk" min="0.3" max="1.2" step="0.05" value="0.85"><span class="ro" id="v_fitk">0.85</span>
+  <label for="zbv">depth</label><input type="range" id="zbv" min="10" max="140" step="5" value="60"><span class="ro" id="v_zbv">60</span>
+  <label for="axis">depth axis</label><select id="axis"><option value="2" selected>Z</option><option value="1">Y</option><option value="0">X</option></select>
+  <label for="rotv">rotate</label><input type="range" id="rotv" min="0" max="359" step="1" value="0"><span class="ro" id="v_rotv">0°</span>
+  <button id="rot90">+90°</button>
+  <label for="objfile">.obj</label><input type="file" id="objfile" accept=".obj,.OBJ,text/plain">
+  <button id="resetHouse">reset to house</button>
+ </div>
+ <div style="margin:0 0 10px;">
+  <button id="pVax">vanishing-axis ⇄ cross-slit</button><button id="pGen">general pair</button><button id="pIso">isotropic</button><button id="pPers">perspective</button><button id="pPush">pushbroom</button><button id="pOrtho">orthographic</button>
+ </div>
+ <canvas id="scene" style="width:1200px;height:560px;" role="img" aria-label="left: the mesh placed in drawing space with the picture plane and the two directing axes; middle: the mesh under reading 1, the glide image in ink with the purple depth frame; right: the same mesh under reading 2, the cross-slit camera image in orange"></canvas>
+ <p class="hint">Left = placement (drag to orbit) · middle = reading 1 (glide, ink) · right = reading 2 (camera, orange) · sliders set the congruence</p>
+ <div class="status" id="status">loading…</div>
+ <div id="live"></div>
+ <div class="foot">
+  <p class="one">This closes the modelling loop: build in Blender (the add-on’s k-slider deformation is reading 1 in the round),
+  export the .obj, drop it here, and see the same solid worn both ways — the glide’s straight-tracked graduation beside the
+  camera’s curved one, splitting exactly where the congruence is genuinely two-axis and fusing on the degenerate catalog. The
+  formulas are the shipped ones: img₁ = the two-frame interpolation, img₂ = the slit-perspective pair; the page re-runs five
+  checks on every change, including the level-A split over all vertices of the loaded mesh.</p>
+  <p class="verify">Verified in check_viewer.js (6: the shipped parser handles comments, quads, n-gons, mixed and negative indices,
+  and dedupes shared edges; the built-in house parses to 10 · 15 · 7; the fit is uniform, centred, and lands depth in [0, −ZB];
+  reading 1 on mesh vertices equals makeProj through the depth bridge z = −λZp/(1−λ); reading 2 collapses congruence lines to
+  their picture points; the picture-plane rotation is an isometry of the footprint that composes correctly and returns to identity at 360°; and the level-A split over the mesh matches the degenerate-catalog predicate) — the check evals these
+  functions out of this very file. Standing on check_inversion (10) and check_transposition (6). Project total 323.</p>
+ </div>
+</div>
+<script id="viewer-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#2456B0', CAM='#E8792B';
+var CW=1200, CH=560, P3D=400, R1=800;
+
+/*VIEWER_CORE_START*/
+var DZ=200, W=130, H=88;
+function parseOBJ(text){
+  var verts=[], edges=[], faces=0, ekeys={}, lines=text.split(/\r?\n/), i, j;
+  for(i=0;i<lines.length;i++){
+    var ln=lines[i]; var hs=ln.indexOf('#'); if(hs>=0) ln=ln.slice(0,hs);
+    var tk=ln.trim().split(/\s+/); if(!tk[0]) continue;
+    if(tk[0]==='v'){ verts.push([parseFloat(tk[1])||0, parseFloat(tk[2])||0, parseFloat(tk[3])||0]); }
+    else if(tk[0]==='f'){ var idx=[];
+      for(j=1;j<tk.length;j++){ var s=tk[j].split('/')[0]; if(!s) continue;
+        var n=parseInt(s,10); if(isNaN(n)) continue;
+        idx.push(n<0 ? verts.length+n : n-1); }
+      if(idx.length<2) continue; faces++;
+      for(j=0;j<idx.length;j++){ var a=idx[j], b=idx[(j+1)%idx.length];
+        if(a===b||a<0||b<0||a>=verts.length||b>=verts.length) continue;
+        var k=(a<b)?(a+':'+b):(b+':'+a);
+        if(!ekeys[k]){ ekeys[k]=1; edges.push([a,b]); } } }
+  }
+  return {verts:verts, edges:edges, faces:faces};
+}
+function fitMesh(m, fitK, ZB, axis, rotDeg){
+  var pts=[], i, a;
+  var th=(rotDeg||0)*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+  for(i=0;i<m.verts.length;i++){ var v=m.verts[i], X, Y, d;
+    if(axis===2){ X=v[0]; Y=v[1]; d=v[2]; }
+    else if(axis===1){ X=v[0]; Y=v[2]; d=v[1]; }
+    else { X=v[2]; Y=v[1]; d=v[0]; }
+    var Xr=X*ct-Y*st, Yr=X*st+Y*ct;              // rotate the footprint in the picture plane
+    pts.push([Xr,Yr,d]); }
+  var mn=[1e30,1e30,1e30], mx=[-1e30,-1e30,-1e30];
+  for(i=0;i<pts.length;i++){ for(a=0;a<3;a++){ if(pts[i][a]<mn[a])mn[a]=pts[i][a]; if(pts[i][a]>mx[a])mx[a]=pts[i][a]; } }
+  var cx=(mn[0]+mx[0])/2, cy=(mn[1]+mx[1])/2;
+  var sx=(mx[0]-mn[0])||1, sy=(mx[1]-mn[1])||1, sd=(mx[2]-mn[2])||1;
+  var s=Math.min(2*W*fitK/sx, 2*H*fitK/sy);
+  var out=[];
+  for(i=0;i<pts.length;i++){ var p=pts[i];
+    out.push([ (p[0]-cx)*s, (p[1]-cy)*s, -ZB*(mx[2]-p[2])/sd ]); }
+  return {verts:out, edges:m.edges, faces:m.faces, scale:s, depth:ZB};
+}
+function img1(ru,rv,X,Y,zt){ var l=-zt/DZ; return [X*(1-l*ru), Y*(1-l*rv)]; }
+function img2(ru,rv,X,Y,zt){ return [X*DZ/(DZ+ru*zt), Y*DZ/(DZ+rv*zt)]; }
+function splitDevMesh(ru,rv,verts){ var m=0,i;
+  for(i=0;i<verts.length;i++){ var X=verts[i][0], Y=verts[i][1], zt=verts[i][2];
+    var V=[X*(1-ru), Y*(1-rv)], Dx=V[0]-X, Dy=V[1]-Y, L=Math.hypot(Dx,Dy);
+    var c=img2(ru,rv,X,Y,zt);
+    if(L<1e-9) m=Math.max(m, Math.hypot(c[0]-X, c[1]-Y));
+    else m=Math.max(m, Math.abs((c[0]-X)*Dy-(c[1]-Y)*Dx)/L); }
+  return m; }
+/*VIEWER_CORE_END*/
+
+var HOUSE_OBJ = '# house\n'+
+ 'v -1 -0.7 0\nv 1 -0.7 0\nv 1 0.5 0\nv -1 0.5 0\nv 0 1 0\n'+
+ 'v -1 -0.7 -1\nv 1 -0.7 -1\nv 1 0.5 -1\nv -1 0.5 -1\nv 0 1 -1\n'+
+ 'f 1 2 3 5 4\nf 6 7 8 10 9\n'+
+ 'f 1 2 7 6\nf 2 3 8 7\nf 3 5 10 8\nf 5 4 9 10\nf 4 1 6 9\n';
+
+var state={ru:1/3, rv:1, yaw:0.7, pit:0.3, fit:0.85, zb:60, axis:2, rot:0};
+var raw=parseOBJ(HOUSE_OBJ), mesh=null, meshName='the built-in house';
+var eps=0.02;
+function degen(){ return state.ru<eps || state.rv<eps || Math.abs(state.ru-state.rv)<eps; }
+function corner(){ var t=function(r){return r<eps||r>1-eps;}; return t(state.ru)&&t(state.rv); }
+function ctype(){ var u0=state.ru<eps,v0=state.rv<eps;
+  if(u0&&v0)return 'parallel bundle'; if(u0||v0)return 'slit + \u221e';
+  if(Math.abs(state.ru-state.rv)<eps)return 'pencil at \u2212DZ/r';
+  return 'hyperbolic congruence (two focal lines)'; }
+function refit(){ mesh=fitMesh(raw, state.fit, state.zb, state.axis, state.rot); }
+
+// ================= painter (3D placement) =================
+function W3(p){ return [p[0], p[2], p[1]]; }
+function depthOf(B,C,pts){var d=0,i;for(i=0;i<pts.length;i++){var p=pts[i];d+=(p[0]-C[0])*B.F[0]+(p[1]-C[1])*B.F[1]+(p[2]-C[2])*B.F[2];}return d/pts.length;}
+var SC3=[0,-150,0], SSC=0.5;
+function paint(ctx,cx,cy,prims){
+  var B=viewBasis(state.yaw,state.pit);
+  prims.sort(function(a,b){return depthOf(B,SC3,b.pts)-depthOf(B,SC3,a.pts);});
+  var i,j;
+  for(i=0;i<prims.length;i++){ var pr=prims[i],q=[];
+    for(j=0;j<pr.pts.length;j++)q.push(project(B,SC3,SSC,cx,cy,pr.pts[j]));
+    ctx.save();
+    if(pr.kind==='quad'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.fill();
+      if(pr.edge){ctx.globalAlpha=pr.ea||1;ctx.strokeStyle=pr.edge;ctx.lineWidth=pr.ew||1;ctx.stroke();}}
+    else if(pr.kind==='dot'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.arc(q[0][0],q[0][1],pr.r,0,6.2832);ctx.fill();}
+    else{ctx.globalAlpha=pr.alpha;ctx.strokeStyle=pr.color;ctx.lineWidth=pr.width;
+      ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
+    ctx.restore(); }
+}
+function drawPlacement(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(0,0,P3D,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE MESH IN DRAWING SPACE',14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('drag to orbit \u00b7 front face on the picture plane',14,42);
+  var P3=[],i;
+  P3.push({kind:'quad',fill:PIC,alpha:0.06,edge:PIC,ea:0.9,ew:1.6,
+    pts:[W3([-150,-105,0]),W3([150,-105,0]),W3([150,105,0]),W3([-150,105,0])]});
+  var capped=false;
+  if(state.ru>=eps){ var zU=-DZ/state.ru; if(zU>=-440){ P3.push({kind:'line',color:DU,width:1.8,alpha:0.9,pts:[W3([0,-170,zU]),W3([0,170,zU])]}); } else capped=true; }
+  if(state.rv>=eps){ var zV=-DZ/state.rv; if(zV>=-440){ P3.push({kind:'line',color:DV,width:1.8,alpha:0.9,pts:[W3([-210,0,zV]),W3([210,0,zV])]}); } else capped=true; }
+  for(i=0;i<mesh.edges.length;i++){ var e=mesh.edges[i], a=mesh.verts[e[0]], b=mesh.verts[e[1]];
+    P3.push({kind:'line',color:INK,width:1.3,alpha:0.9,pts:[W3(a),W3(b)]}); }
+  paint(ctx,200,300,P3);
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  if(capped) ctx.fillText('an axis lies deeper than the view (\u2212DZ/r)',14,CH-34);
+  ctx.fillText('depth 0 \u2026 \u2212'+state.zb.toFixed(0)+' \u00b7 scale '+mesh.scale.toFixed(1),14,CH-18);
+  ctx.restore();
+}
+
+// ================= the two readings (2D) =================
+var s2d=1.15, cy2=282;
+function drawReading(ctx, x0, cx2, useCam){
+  ctx.save();ctx.beginPath();ctx.rect(x0,0,400,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';
+  ctx.fillText(useCam?'READING 2 \u2014 the congruence as RAYS':'READING 1 \u2014 the congruence as EDGES',x0+14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText(useCam?'the cross-slit camera image (orange)':'the glide image (ink) \u2014 \u03bb = \u2212\u03b6/DZ on each drawn line',x0+14,42);
+  // picture frame + (reading 1) the depth frame
+  ctx.strokeStyle=PIC;ctx.lineWidth=1.6;ctx.strokeRect(cx2-W*s2d,cy2-H*s2d,2*W*s2d,2*H*s2d);
+  if(!useCam){ ctx.strokeStyle=VAN;ctx.lineWidth=1.2;ctx.globalAlpha=0.75;
+    ctx.strokeRect(cx2-W*(1-state.ru)*s2d, cy2-H*(1-state.rv)*s2d, 2*W*(1-state.ru)*s2d, 2*H*(1-state.rv)*s2d);ctx.globalAlpha=1; }
+  var col=useCam?CAM:INK, i;
+  ctx.strokeStyle=col;ctx.lineWidth=1.4;ctx.globalAlpha=0.95;
+  for(i=0;i<mesh.edges.length;i++){ var e=mesh.edges[i], a=mesh.verts[e[0]], b=mesh.verts[e[1]];
+    var pa=(useCam?img2:img1)(state.ru,state.rv,a[0],a[1],a[2]);
+    var pb=(useCam?img2:img1)(state.ru,state.rv,b[0],b[1],b[2]);
+    ctx.beginPath();ctx.moveTo(cx2+pa[0]*s2d,cy2-pa[1]*s2d);ctx.lineTo(cx2+pb[0]*s2d,cy2-pb[1]*s2d);ctx.stroke(); }
+  ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawPlacement(ctx); drawReading(ctx,P3D,600,false); drawReading(ctx,R1,1000,true);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(P3D,10);ctx.lineTo(P3D,CH-10);ctx.moveTo(R1,10);ctx.lineTo(R1,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],i;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  // 1: reading 1 marks its drawn line at lambda = -zeta/DZ
+  var w1=0;
+  for(i=0;i<Math.min(mesh.verts.length,200);i++){ var v=mesh.verts[i];
+    var l=-v[2]/DZ, Vq=[v[0]*(1-state.ru), v[1]*(1-state.rv)];
+    var pred=[v[0]+l*(Vq[0]-v[0]), v[1]+l*(Vq[1]-v[1])], got=img1(state.ru,state.rv,v[0],v[1],v[2]);
+    w1=Math.max(w1, Math.hypot(got[0]-pred[0], got[1]-pred[1])); }
+  L('reading 1: every vertex marks its drawn line at \u03bb = \u2212\u03b6/DZ', w1<1e-9, '\u0394 '+w1.toExponential(1));
+  // 2: reading 2 fiber sanity -- points of the congruence line image to one picture point
+  var w2=0, Pp=[110,66], lj;
+  for(lj=0;lj<3;lj++){ var l2=[0.2,0.55,1.35][lj];
+    var q=[Pp[0]*(1-l2*state.ru), Pp[1]*(1-l2*state.rv), -DZ*l2];
+    var im=img2(state.ru,state.rv,q[0],q[1],q[2]);
+    w2=Math.max(w2, Math.hypot(im[0]-Pp[0], im[1]-Pp[1])); }
+  L('reading 2: the congruence line images to one picture point (a ray)', w2<1e-6, '\u0394 '+w2.toExponential(1));
+  // 3: level A on THIS mesh
+  var dd=splitDevMesh(state.ru,state.rv,mesh.verts), okA=(dd>0.5)===(!degen());
+  L('level A on this mesh: split \u21d4 genuine two-axis congruence', okA, (degen()?'agree ':'split ')+dd.toFixed(2)+' px');
+  // 4: mesh info
+  L('mesh', true, meshName+' \u00b7 '+mesh.verts.length+' vertices \u00b7 '+mesh.edges.length+' edges \u00b7 depth 0\u2026\u2212'+state.zb.toFixed(0));
+  // 5: verdict
+  L('verdict', true, ctype()+' \u00b7 '+(degen()?'drawn lines agree':'dual pair \u2014 drawn lines split')+' \u00b7 '+(corner()?'maps fixed (a corner)':'maps differ'));
+  var el=document.getElementById('live'),h='';
+  for(i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ refit(); draw(); runLive(); }
+
+// ================= files + interaction =================
+function setStatus(t){ document.getElementById('status').textContent=t; }
+function loadText(t,name){
+  try{ var m=parseOBJ(t);
+    if(!m.verts.length){ setStatus('no vertices found in '+name); return; }
+    var note='';
+    if(m.edges.length>30000){ m.edges=m.edges.slice(0,30000); note=' (drawing the first 30000 edges)'; }
+    raw=m; meshName=name;
+    setStatus(name+': '+m.verts.length+' vertices, '+m.edges.length+' edges, '+m.faces+' faces'+note);
+    render();
+  }catch(e){ setStatus('parse failed: '+e.message); }
+}
+function init(){
+  refit();
+  var cv=document.getElementById('scene'),drag=false,last=null;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e); if(p[0]<P3D){drag=true;last=p;cv.setPointerCapture(e.pointerId);} });
+  cv.addEventListener('pointermove',function(e){ if(!drag)return; var p=localXY(e);
+    state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.1,Math.min(1.1,state.pit+(p[1]-last[1])*0.006)); last=p;
+    requestAnimationFrame(function(){draw();}); });
+  cv.addEventListener('pointerup',function(){drag=false;});
+  cv.addEventListener('dragover',function(e){e.preventDefault();});
+  cv.addEventListener('drop',function(e){e.preventDefault();
+    var f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(!f)return;
+    var r=new FileReader(); r.onload=function(){loadText(String(r.result),f.name);}; r.readAsText(f); });
+  document.getElementById('objfile').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0]; if(!f)return;
+    var r=new FileReader(); r.onload=function(){loadText(String(r.result),f.name);}; r.readAsText(f); });
+  function bind(id,key,isInt){var s=document.getElementById(id);
+    s.addEventListener('input',function(){state[key]=isInt?parseInt(s.value,10):parseFloat(s.value);
+      var lab=document.getElementById('v_'+id); if(lab)lab.textContent=(isInt?state[key]:state[key].toFixed(2)); render();});}
+  bind('ru','ru');bind('rv','rv');bind('fitk','fit');bind('zbv','zb');
+  (function(){ var s=document.getElementById('rotv');
+    s.addEventListener('input',function(){ state.rot=parseInt(s.value,10);
+      document.getElementById('v_rotv').textContent=state.rot+'°'; render(); }); })();
+  document.getElementById('rot90').addEventListener('click',function(){
+    state.rot=(state.rot+90)%360;
+    document.getElementById('rotv').value=state.rot;
+    document.getElementById('v_rotv').textContent=state.rot+'°'; render(); });
+  document.getElementById('axis').addEventListener('change',function(e){state.axis=parseInt(e.target.value,10);render();});
+  document.getElementById('resetHouse').addEventListener('click',function(){raw=parseOBJ(HOUSE_OBJ);meshName='the built-in house';state.rot=0;document.getElementById('rotv').value=0;document.getElementById('v_rotv').textContent='0°';setStatus('reset to the built-in house');render();});
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;
+    document.getElementById('ru').value=ru;document.getElementById('rv').value=rv;
+    document.getElementById('v_ru').textContent=ru.toFixed(2);document.getElementById('v_rv').textContent=rv.toFixed(2);render();};}
+  document.getElementById('pVax').addEventListener('click',preset(1/3,1));
+  document.getElementById('pGen').addEventListener('click',preset(0.45,0.75));
+  document.getElementById('pIso').addEventListener('click',preset(0.5,0.5));
+  document.getElementById('pPers').addEventListener('click',preset(1,1));
+  document.getElementById('pPush').addEventListener('click',preset(1,0));
+  document.getElementById('pOrtho').addEventListener('click',preset(0,0));
+  setStatus('the built-in house \u00b7 drop an .obj anywhere on the canvas, or choose a file');
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
