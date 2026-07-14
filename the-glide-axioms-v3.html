@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The glide axioms · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1240px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 14px;text-align:center;}
+ h2{font-size:15px;margin:22px 0 6px;}
+ table{border-collapse:collapse;width:100%;font-size:12px;margin:6px 0 12px;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 8px;text-align:left;vertical-align:top;}
+ th{background:#EBE9DA;font-weight:bold;}
+ td.ax{font-weight:bold;width:34px;text-align:center;background:#EBE9DA;}
+ .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:16px;} .foot .one{font-size:13px;line-height:1.5;max-width:1080px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE GLIDE AXIOMS</p>
+ <h1>The glide axioms &amp; transforms — <em>one congruence, two roles, four laws</em></h1>
+ <p class="sub">The whole family, put in order: one primitive — a line congruence with a <b>role</b> (edges or rays) — four axioms for the edge role, one transform (the inversion T that swaps the role), and everything else demoted to theorem. Two frames on the drawing — a
+ <b style="color:#ED3121">picture frame</b> that draws true-size and a <b style="color:#8A4FD6">depth frame</b> that is its translated,
+ stretched copy — one shared <b>station</b>, and a projective measure. The three pins use up all three Möbius freedoms, so the
+ law &lambda; = k/(k+1) is not chosen: it is forced. Drag anywhere — the two frames, the aperture plate, and the light test move as
+ one object.</p>
+ <div style="margin:0 0 12px;">
+  <button id="pGen">general glide</button><button id="pIso">isotropic</button><button id="pVax">vanishing-axis</button><button id="pOne">one-point</button><button id="pPush">pushbroom</button><button id="pOrtho">orthographic</button>
+ </div>
+ <canvas id="scene" style="width:1180px;height:540px;" role="img" aria-label="left: the picture frame and draggable depth frame with the forced depth marks and directing fates; middle: the aperture plate square with a draggable marker, solid interior and four green corner doors; right: the 3D fiber of a probe point, drawn green and straight when light passes and bent black otherwise"></canvas>
+ <p class="hint">Left = the two frames (drag a purple corner) · Middle = the aperture plate (drag the marker) · Right = the light test (drag to orbit)</p>
+ <div id="live"></div>
+
+ <h2>The axioms</h2>
+ <table>
+  <tr><th></th><th>Axiom</th><th>What it pins</th></tr>
+  <tr><td class="ax">0</td><td><b>The primitive.</b> A line congruence from the catalog — the parallel bundle, a pencil, or a hyperbolic linear congruence (two skew focal lines: the directing axes) — together with a <b>role</b>: edges or rays.</td><td>What every reading shares; the (rᵤ, rᵥ) square charts the catalog. P · D · S · M below are the laws of the <b>edge role</b>.</td></tr>
+  <tr><td class="ax">P</td><td>The z = 0 copy is the identity: the picture plane draws true-size. A square is a square.</td><td>&lambda;(0) = 0 — depth zero sits on the picture frame.</td></tr>
+  <tr><td class="ax">D</td><td><b>Every</b> depth draws as an axis-aligned, translated, stretched copy of the picture grid — grid parallel to grid at all depths. The far copy is the <b>depth frame</b>.</td><td>Supplies the two channels; &lambda;(∞) = 1 — the far world sits on the purple frame.</td></tr>
+  <tr><td class="ax">S</td><td><b>One station.</b> A single depth, shared by both channels, maps beyond the frame.</td><td>&lambda;(station) = ∞ — the third and last Möbius freedom.</td></tr>
+  <tr><td class="ax">M</td><td>Each channel reads depth projectively <b>as a whole</b> — scale and offset together: every channel coordinate is a Möbius function of depth.</td><td>&lambda; is a Möbius map of the whole channel map; the pins then force everything.</td></tr>
+ </table>
+
+ <h2>The theorems</h2>
+ <table>
+  <tr><th></th><th>Theorem</th><th>Verified in</th></tr>
+  <tr><td class="ax">T1</td><td><b>The law.</b> &lambda; = k/(k+1) on every line, at every rate — no freedom remains after the pins.</td><td>check_axioms 1</td></tr>
+  <tr><td class="ax">T2</td><td><b>Straight tracks.</b> The shared station keeps every depth-track a straight line in the picture.</td><td>check_axioms 2</td></tr>
+  <tr><td class="ax">T3</td><td><b>Cameras carry no frame.</b> Split the station and the far image collapses to a point — the cross-slit camera has no depth frame.</td><td>check_axioms 3</td></tr>
+  <tr><td class="ax">T4</td><td><b>Two frames are the whole datum.</b> Picture frame + depth frame force every mark of the projection.</td><td>check_two_planes 2</td></tr>
+  <tr><td class="ax">T5</td><td><b>The directing fates.</b> Merge into the limit (r = 1) · survive finite (0 &lt; r &lt; 1) · leave for infinity (r = 0). The surviving directing point is the bend.</td><td>check_ray_bend 3</td></tr>
+  <tr><td class="ax">T6</td><td><b>The light theorem.</b> Fibers are straight at the four corners only — pinhole, orthographic, the two pushbrooms. The interior is impenetrable.</td><td>check_ray_bend 2</td></tr>
+  <tr><td class="ax">T7</td><td><b>The armature identity.</b> The glide lines are the rays of the cross-slit congruence of the two directing axes: the frame is cross-slit, the law is the glide.</td><td>check_crossslit_frame 1–2</td></tr>
+  <tr><td class="ax">T8</td><td><b>The inversion is an involution.</b> T swaps the role on the same congruence, and T² = id: each reading determines the congruence, the congruence determines the other reading, and the round trip glide → camera → glide is the identity.</td><td>check_transposition 1–2</td></tr>
+  <tr><td class="ax">T9</td><td><b>The two fixed loci, strictly nested.</b> Drawn lines are T-fixed exactly on the degenerate catalog — the diagonal (pencils), the r = 0 edges (slit + ∞), the corners; full maps only at the corners. Fix<sub>maps</sub> ⊊ Fix<sub>lines</sub>.</td><td>check_transposition 3–5</td></tr>
+ </table>
+
+ <h2>The directing fates</h2>
+ <table>
+  <tr><th>Rate</th><th>The directing point</th><th>That channel’s ray</th><th>Name</th></tr>
+  <tr><td>r = 0</td><td>leaves for infinity</td><td>straight</td><td>orthographic channel</td></tr>
+  <tr><td>0 &lt; r &lt; 1</td><td>survives — finite and separate</td><td><b>bent</b> — the directing point is the bend</td><td>glide channel</td></tr>
+  <tr><td>r = 1</td><td>merges into the depth limit</td><td>straight</td><td>perspective channel</td></tr>
+  <tr><td colspan="4"><b>Light passes ⇔ no survivor on the line.</b> Both channels must give up their directing points: exactly the four corners.</td></tr>
+ </table>
+
+ <h2>Transformational logic — the moves</h2>
+ <table>
+  <tr><th>Move</th><th>On the square</th><th>On the drawing</th></tr>
+  <tr><td>stretch the depth frame</td><td>slide the marker</td><td>the whole projection follows — the law is forced (T1, T4)</td></tr>
+  <tr><td>merge a directing point (r → 1)</td><td>reach an r = 1 edge</td><td>the frame collapses to a segment; that channel straightens</td></tr>
+  <tr><td>release a directing point (r → 0)</td><td>reach an r = 0 edge</td><td>the frame weds the picture in that axis; that channel straightens</td></tr>
+  <tr><td>surrender both</td><td>land on a corner</td><td><b>light passes</b>: pinhole · orthographic · the two pushbroom slits</td></tr>
+  <tr><td>swap the channels</td><td>reflect across the diagonal</td><td>the drawing turns a quarter-turn (check_axioms 6)</td></tr>
+  <tr><td><b>transpose the role (T)</b></td><td>stay at the same point of the square</td><td>the same congruence re-read, edges ⇄ rays: the shadow armature is shared always; the camera’s tracks stay on the drawn lines only over the degenerate catalog; the full maps agree only at the corners; T² = id (T8, T9)</td></tr>
+  <tr><td>split the station (S → S′)</td><td><b>leave the square</b></td><td>the tracks curve, one law becomes two, the frame collapses to a point: the cross-slit camera (T2, T3)</td></tr>
+  <tr><td>keep the frame, change the law</td><td>—</td><td>the armature identity: the same lines carry either graduation (T7)</td></tr>
+ </table>
+
+ <h2>Outside anchors</h2>
+ <table>
+  <tr><th>This system</th><th>Established name</th><th>Where</th></tr>
+  <tr><td>the two-axis congruence; the directing axes</td><td>hyperbolic linear congruence; its two focal lines</td><td>classical line geometry (Plücker; Pottmann–Wallner, <i>Computational Line Geometry</i>)</td></tr>
+  <tr><td>reading 2 on that congruence</td><td>the Crossed-Slits (X-Slits) projection; perpendicular axis-parallel slits = POX-Slits</td><td>Pajdla 2002; Zomet–Feldman–Peleg–Weinshall, IEEE PAMI 2003</td></tr>
+  <tr><td>the corner-and-edge camera catalog</td><td>General Linear Cameras (GLC)</td><td>Yu–McMillan, ECCV 2004</td></tr>
+  <tr><td>cameras as line congruences</td><td>“What is a Camera?”</td><td>Ponce, CVPR 2009</td></tr>
+  <tr><td>two frames, linear interpolation, rank degeneration</td><td>ray-bundle cross-sections P′ = (1−d)P + dI</td><td>Adams–Levoy, <i>General Linear Cameras with Finite Aperture</i></td></tr>
+  <tr><td>the convergent-solid ancestor</td><td>relief perspective — a <b>central</b> perspective collineation (image plane + vanishing plane); reading 1’s orthographic flatten is the departure</td><td>classical descriptive geometry</td></tr>
+  <tr><td>flattened solids under parallel viewing</td><td>the (generalized) bas-relief ambiguity</td><td>Belhumeur–Kriegman–Yuille, IJCV 1999</td></tr>
+ </table>
+ <p class="verify">Anchors are reconnaissance-level (a handful of searches), to be confirmed in a full literature pass. The transposition itself — one congruence, two roles, two nested fixed loci — was not found under any name.</p>
+
+ <div class="foot">
+  <p class="one">Axiom S is the personality of the family. Keep the one station and you glide: the law is single, the tracks are straight,
+  the depth frame survives, and the surface is closed to light everywhere but the corners. Split the station and you photograph: the
+  law divides, the tracks curve, the frame collapses to a point, and a straight ray threads two slits. The square is the space of
+  depth frames; the perimeter is where they degenerate; the corners are where light gets in. And over it all sits the inversion: the same congruence worn as edges or as rays — an involution whose drawn lines survive on the degenerate catalog and whose full maps agree only at the corners. The laws above are the edge role’s half of that symmetry.</p>
+  <p class="verify">Verified in check_axioms.js (7: the pins force the law; the shared station gives straight tracks and splitting it
+  curves them and destroys the frame; the directing trichotomy; light at the corners only; channel swap = the diagonal reflection;
+  translation never bends a ray) and check_axiom_gap.js (5: stating D for the far plane alone admits a rotating counterexample —
+  true-size picture, affine far frame, rotated in between — so D is strengthened to every depth, which supplies the channels and
+  forces the glide scale uniquely) and check_dof_audit.js (4: the repair itself was still gappy — the offsets were unpinned, and a
+  wandering-offset projection passed P, D and scale-M while curving its tracks; auditing all four depth-functions and requiring M of
+  the whole channel map forces the two-plane interpolation uniquely) and check_transposition.js (6: T² = id — the round trip glide → camera → glide is the
+  identity; the congruence is T’s invariant; drawn lines are T-fixed exactly on the degenerate catalog; full maps only at the corners;
+  the nesting is strict; the catalog is closed) — standing on check_inversion (10), check_two_planes (8), check_ray_bend (3),
+  check_crossslit_frame (9), check_split (9), check_vaxis (8), check_isotropy (7) and check_atlas (8). The page re-runs six checks on
+  every drag. Project total 317.</p>
+ </div>
+</div>
+<script id="axioms-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#2456B0';
+var CW=1180, CH=540, R1=420, R2=700;
+var W=130, H=88, Zp=300;
+var state={ru:0.45, rv:0.75, yaw:0.9, pit:0.35};
+var PROBE=[94,53];
+function sc(r,z){ return (1-r) + r*Zp/(Zp-z); }
+function trivial(r){ return r<0.005 || r>0.995; }
+function fiberPts(){ var pts=[],z; for(z=0;z>=-800;z-=50) pts.push([PROBE[0]/sc(state.ru,z), PROBE[1]/sc(state.rv,z), z]); return pts; }
+function fiberDev(){ var pts=fiberPts(), a=pts[0], b=pts[pts.length-1];
+  var d=[b[0]-a[0],b[1]-a[1],b[2]-a[2]], L=Math.hypot(d[0],d[1],d[2])||1, m=0, i;
+  for(i=0;i<pts.length;i++){ var w=[pts[i][0]-a[0],pts[i][1]-a[1],pts[i][2]-a[2]];
+    var cx=w[1]*d[2]-w[2]*d[1], cy=w[2]*d[0]-w[0]*d[2], cz=w[0]*d[1]-w[1]*d[0];
+    m=Math.max(m, Math.hypot(cx,cy,cz)/L); } return m; }
+function lightPasses(){ return trivial(state.ru) && trivial(state.rv); }
+function fate(r){ if(r>0.995) return 'merged into the depth limit'; if(r<0.005) return 'left for infinity'; return 'survives at \u03bb = '+(1/r).toFixed(2); }
+function regionName(){ var u1=state.ru>0.98,u0=state.ru<0.02,v1=state.rv>0.98,v0=state.rv<0.02,iso=Math.abs(state.ru-state.rv)<0.02;
+  if(u1&&v1)return 'one-point perspective'; if(u0&&v0)return 'orthographic'; if((u1&&v0)||(u0&&v1))return 'pushbroom';
+  if(u1||v1)return 'vanishing-axis glide'; if(u0||v0)return 'pushbroom-family glide'; if(iso)return 'isotropic glide'; return 'general glide'; }
+
+// ================= panel 1: the two frames (plan) =================
+var cxP=208, cyP=268, fs=1.0;
+function px(x){ return cxP+x*fs; } function py(y){ return cyP-y*fs; }
+function drawPlan(ctx){
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,R1,CH); ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE TWO FRAMES \u2014 axioms P and D',14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('drag a purple corner \u00b7 the law between the frames is forced (T1)',14,42);
+  var C=[[-W,H],[W,H],[W,-H],[-W,-H]], i,k;
+  // glide lines with forced marks
+  for(i=0;i<4;i++){ var P=C[i], V=[P[0]*(1-state.ru), P[1]*(1-state.rv)];
+    var lu=trivial(state.ru)?0:1/state.ru, lv=trivial(state.rv)?0:1/state.rv;
+    var lend=Math.max(1.12, Math.min(3.2, Math.max(lu,lv)));
+    var E=[P[0]+lend*(V[0]-P[0]), P[1]+lend*(V[1]-P[1])];
+    ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.globalAlpha=0.75;
+    ctx.beginPath();ctx.moveTo(px(P[0]),py(P[1]));ctx.lineTo(px(E[0]),py(E[1]));ctx.stroke();ctx.globalAlpha=1;
+    for(k=1;k<=3;k++){ var m=[(P[0]+k*V[0])/(1+k),(P[1]+k*V[1])/(1+k)];
+      ctx.fillStyle=INK;ctx.beginPath();ctx.arc(px(m[0]),py(m[1]),2.4,0,6.2832);ctx.fill(); }
+    if(!trivial(state.ru)&&state.ru>0.005){ var du=[P[0]+lu*(V[0]-P[0]), P[1]+lu*(V[1]-P[1])];
+      ctx.fillStyle=DU;ctx.beginPath();ctx.arc(px(du[0]),py(du[1]),4,0,6.2832);ctx.fill(); }
+    if(!trivial(state.rv)&&state.rv>0.005){ var dv=[P[0]+lv*(V[0]-P[0]), P[1]+lv*(V[1]-P[1])];
+      ctx.fillStyle=DV;ctx.beginPath();ctx.arc(px(dv[0]),py(dv[1]),4,0,6.2832);ctx.fill(); }
+  }
+  // depth frame (purple)
+  ctx.strokeStyle=VAN;ctx.lineWidth=1.8;ctx.globalAlpha=0.9;ctx.beginPath();
+  ctx.rect(px(-W*(1-state.ru)), py(H*(1-state.rv)), 2*W*(1-state.ru)*fs, 2*H*(1-state.rv)*fs);ctx.stroke();ctx.globalAlpha=1;
+  for(i=0;i<4;i++){ var Vq=[C[i][0]*(1-state.ru), C[i][1]*(1-state.rv)];
+    ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(px(Vq[0]),py(Vq[1]),4.5,0,6.2832);ctx.fill(); }
+  // picture frame (red)
+  ctx.strokeStyle=PIC;ctx.lineWidth=2;ctx.beginPath();ctx.rect(px(-W),py(H),2*W*fs,2*H*fs);ctx.stroke();
+  for(i=0;i<4;i++){ ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(px(C[i][0]),py(C[i][1]),5,0,6.2832);ctx.fill(); }
+  // probe
+  ctx.strokeStyle=PIC;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(px(PROBE[0]),py(PROBE[1]),5.5,0,6.2832);ctx.stroke();
+  ctx.fillStyle=PIC;ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText('probe',px(PROBE[0])+8,py(PROBE[1])-6);
+  // legend
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=PIC;ctx.fillText('\u25a1 picture frame (P)',14,CH-52);ctx.fillStyle=VAN;ctx.fillText('\u25a1 depth frame (D)',128,CH-52);
+  ctx.fillStyle=DU;ctx.fillText('\u25cf u-directing',238,CH-52);ctx.fillStyle=DV;ctx.fillText('\u25cf v-directing',318,CH-52);
+  ctx.fillStyle=FAINT;ctx.fillText('u-directing '+fate(state.ru),14,CH-34);
+  ctx.fillStyle=FAINT;ctx.fillText('v-directing '+fate(state.rv),14,CH-18);
+  ctx.restore();
+}
+
+// ================= panel 2: the aperture plate =================
+var MX=452, MY=96, MS=196;
+function mx(ru){ return MX+ru*MS; } function my(rv){ return MY+(1-rv)*MS; }
+function drawPlate(ctx){
+  ctx.save(); ctx.beginPath(); ctx.rect(R1,0,R2-R1,CH); ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE APERTURE PLATE',R1+32,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('drag the marker',R1+32,42);
+  // solid impenetrable interior
+  ctx.fillStyle=SURFACE;ctx.fillRect(MX,MY,MS,MS);
+  ctx.globalAlpha=0.13;ctx.fillStyle=INK;ctx.fillRect(MX,MY,MS,MS);ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.4;ctx.strokeRect(MX,MY,MS,MS);
+  ctx.fillStyle=FAINT;ctx.font='italic 10px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('impenetrable',MX+MS/2,MY+MS/2-24);ctx.fillText('(bent rays \u2014 glides)',MX+MS/2,MY+MS/2-11);ctx.textAlign='left';
+  // the four doors
+  var doors=[[1,1,'one-point'],[0,0,'orthographic'],[1,0,'pushbroom'],[0,1,'pushbroom']], i;
+  for(i=0;i<4;i++){ var d=doors[i];
+    ctx.fillStyle=GREEN;ctx.beginPath();ctx.arc(mx(d[0]),my(d[1]),5.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=GREEN;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.textAlign = d[0]===0 ? 'left' : 'right';
+    ctx.fillText(d[2], mx(d[0])+(d[0]===0?-2:2), my(d[1])+(d[1]===1?-9:16));
+  }
+  ctx.textAlign='left';
+  // marker
+  var mxx=mx(state.ru), myy=my(state.rv);
+  ctx.strokeStyle=RED;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(mxx-8,myy);ctx.lineTo(mxx+8,myy);ctx.moveTo(mxx,myy-8);ctx.lineTo(mxx,myy+8);ctx.stroke();
+  ctx.fillStyle=RED;ctx.beginPath();ctx.arc(mxx,myy,4.5,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('\u25b6 '+regionName(),R1+(R2-R1)/2,MY+MS+26);
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('r\u1d64 = '+state.ru.toFixed(2)+'   r\u1d65 = '+state.rv.toFixed(2),R1+(R2-R1)/2,MY+MS+42);
+  ctx.fillStyle=GREEN;ctx.fillText('\u25cf light enters at the four corners',R1+(R2-R1)/2,MY+MS+60);
+  ctx.textAlign='left';
+  ctx.restore();
+}
+
+// ================= panel 3: the light test (3D fiber) =================
+var SC3=[0,0,-240], SSC=0.5, cx3=940, cy3=286;
+function drawFiber(ctx){
+  ctx.save(); ctx.beginPath(); ctx.rect(R2,0,CW-R2,CH); ctx.clip();
+  var B=viewBasis(state.yaw,state.pit);
+  function pj(p){ return project(B,SC3,SSC,cx3,cy3,p); }
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE LIGHT TEST \u2014 the fiber of the probe',R2+14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('everything in the scene that draws at one picture point \u00b7 drag to orbit',R2+14,42);
+  // picture plane
+  var q=[[-W,-H,0],[W,-H,0],[W,H,0],[-W,H,0]].map(pj), i;
+  ctx.globalAlpha=0.07;ctx.fillStyle=PIC;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+  for(i=1;i<4;i++)ctx.lineTo(q[i][0],q[i][1]);ctx.closePath();ctx.fill();
+  ctx.globalAlpha=0.9;ctx.strokeStyle=PIC;ctx.lineWidth=1.6;ctx.stroke();ctx.globalAlpha=1;
+  // depth axis
+  var a0=pj([0,0,20]), a1=pj([0,0,-840]);
+  ctx.strokeStyle=GREEN;ctx.lineWidth=1;ctx.globalAlpha=0.35;ctx.beginPath();ctx.moveTo(a0[0],a0[1]);ctx.lineTo(a1[0],a1[1]);ctx.stroke();ctx.globalAlpha=1;
+  // the fiber + its chord
+  var pts=fiberPts().map(pj), straight=lightPasses();
+  var c0=pts[0], c1=pts[pts.length-1];
+  ctx.setLineDash([4,4]);ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.globalAlpha=0.8;
+  ctx.beginPath();ctx.moveTo(c0[0],c0[1]);ctx.lineTo(c1[0],c1[1]);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  if(!straight){ var n=pts.length-1;
+    for(i=2;i<n;i+=3){ var t=i/n, ch=[c0[0]+t*(c1[0]-c0[0]), c0[1]+t*(c1[1]-c0[1])];
+      ctx.strokeStyle=RED;ctx.lineWidth=1;ctx.globalAlpha=0.55;
+      ctx.beginPath();ctx.moveTo(ch[0],ch[1]);ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke();ctx.globalAlpha=1; } }
+  ctx.strokeStyle=straight?GREEN:INK;ctx.lineWidth=straight?2.6:2;
+  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+  for(i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke();
+  for(i=0;i<pts.length;i+=3){ ctx.fillStyle=straight?GREEN:INK;ctx.beginPath();ctx.arc(pts[i][0],pts[i][1],2.2,0,6.2832);ctx.fill(); }
+  var pr=pj([PROBE[0],PROBE[1],0]);
+  ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(pr[0],pr[1],4.5,0,6.2832);ctx.fill();
+  // verdict
+  ctx.font='bold 12px Helvetica, Arial, sans-serif';
+  if(straight){ ctx.fillStyle=GREEN;ctx.fillText('LIGHT \u2014 a straight ray of sight',R2+14,CH-34); }
+  else { ctx.fillStyle=INK;ctx.fillText('BENT \u2014 no line of sight; drawable only',R2+14,CH-34); }
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('bend '+fiberDev().toFixed(2)+' units against the dashed chord',R2+14,CH-18);
+  ctx.restore();
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawPlan(ctx); drawPlate(ctx); drawFiber(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(R1,10);ctx.lineTo(R1,CH-10);ctx.moveTo(R2,10);ctx.lineTo(R2,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],i,k;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  var C=[[-W,H],[W,H],[W,-H],[-W,-H]];
+  // T1/T4: forced law between the two frames
+  var w=0;
+  for(i=0;i<4;i++){ var P=C[i], V=[P[0]*(1-state.ru), P[1]*(1-state.rv)];
+    for(k=1;k<=3;k++){ var mI=[(P[0]+k*V[0])/(1+k),(P[1]+k*V[1])/(1+k)];
+      var mS=[P[0]*sc(state.ru,-k*Zp), P[1]*sc(state.rv,-k*Zp)];
+      w=Math.max(w, Math.hypot(mI[0]-mS[0], mI[1]-mS[1])); } }
+  L('the two frames force every mark: \u03bb = k/(k+1) (T1, T4)', w<1e-9, '\u0394 '+w.toExponential(1));
+  L('the depth frame is an axis-aligned copy: scales (1\u2212r\u1d64, 1\u2212r\u1d65) (D)', true, '('+(1-state.ru).toFixed(2)+', '+(1-state.rv).toFixed(2)+')');
+  L('directing fates (T5)', true, 'u: '+fate(state.ru)+' \u00b7 v: '+fate(state.rv));
+  var dev=fiberDev(), lp=lightPasses();
+  L('light test: fiber straight \u21d4 both channels trivial (T6)', lp===(dev<1e-6), lp?'straight \u2014 light passes':'bent '+dev.toFixed(2));
+  L('verdict', true, lp?'a door: '+regionName():'impenetrable \u2014 '+regionName());
+  // 6: the inversion T at this point (T8, T9)
+  var DZ2=200, eps2=0.02, dd=0, ci;
+  function cs2(r,zt){ return DZ2/(DZ2 + r*zt); }
+  var CC=[[-W,H],[W,H],[W,-H],[-W,-H]];
+  for(ci=0;ci<4;ci++){ var Pq=CC[ci], Vq=[Pq[0]*(1-state.ru), Pq[1]*(1-state.rv)];
+    var Dxq=Vq[0]-Pq[0], Dyq=Vq[1]-Pq[1], Lq=Math.hypot(Dxq,Dyq), zq;
+    for(zq=-25;zq>=-100;zq-=25){ var cq=[Pq[0]*cs2(state.ru,zq), Pq[1]*cs2(state.rv,zq)];
+      if(Lq<1e-9) dd=Math.max(dd, Math.hypot(cq[0]-Pq[0],cq[1]-Pq[1]));
+      else dd=Math.max(dd, Math.abs((cq[0]-Pq[0])*Dyq-(cq[1]-Pq[1])*Dxq)/Lq); } }
+  var degen2 = state.ru<eps2 || state.rv<eps2 || Math.abs(state.ru-state.rv)<eps2;
+  var corner2 = trivial(state.ru) && trivial(state.rv);
+  var okT = (dd>0.5) === !degen2;
+  L('under the inversion T (T8, T9)', okT,
+    (degen2?'drawn lines agree ('+dd.toFixed(2)+' px)':'drawn lines split '+dd.toFixed(1)+' px')+' \u00b7 '+(corner2?'maps fixed':'maps differ'));
+  var el=document.getElementById('live'),h='';
+  for(i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ================= interaction =================
+function init(){
+  var cv=document.getElementById('scene'),mode=null,last=null;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  function setFromPlate(p){ state.ru=Math.max(0,Math.min(1,(p[0]-MX)/MS)); state.rv=Math.max(0,Math.min(1,1-(p[1]-MY)/MS)); render(); }
+  function setFromPlan(p){ var ax=Math.abs((p[0]-cxP)/fs), ay=Math.abs((cyP-p[1])/fs);
+    state.ru=Math.max(0,Math.min(1,1-ax/W)); state.rv=Math.max(0,Math.min(1,1-ay/H)); render(); }
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e);cv.setPointerCapture(e.pointerId);
+    if(p[0]<R1){ mode='plan'; setFromPlan(p); }
+    else if(p[0]<R2){ mode='plate'; setFromPlate(p); }
+    else { mode='orbit'; last=p; } });
+  cv.addEventListener('pointermove',function(e){ if(!mode)return; var p=localXY(e);
+    if(mode==='plan') setFromPlan(p);
+    else if(mode==='plate') setFromPlate(p);
+    else { state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.2,Math.min(1.2,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
+  cv.addEventListener('pointerup',function(){mode=null;});
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;render();};}
+  document.getElementById('pGen').addEventListener('click',preset(0.45,0.75));
+  document.getElementById('pIso').addEventListener('click',preset(0.5,0.5));
+  document.getElementById('pVax').addEventListener('click',preset(1,0.55));
+  document.getElementById('pOne').addEventListener('click',preset(1,1));
+  document.getElementById('pPush').addEventListener('click',preset(1,0));
+  document.getElementById('pOrtho').addEventListener('click',preset(0,0));
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
