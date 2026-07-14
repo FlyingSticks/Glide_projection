@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The inversion · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1260px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1100px;margin:0 0 16px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ h2{font-size:15px;margin:20px 0 6px;}
+ table{border-collapse:collapse;width:100%;font-size:12px;margin:6px 0 12px;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 8px;text-align:left;vertical-align:top;}
+ th{background:#EBE9DA;font-weight:bold;}
+ td.fx{background:#EBE9DA;}
+ .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:16px;} .foot .one{font-size:13px;line-height:1.5;max-width:1100px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE BIG IDEA</p>
+ <h1>The inversion — <em>one congruence, two roles</em></h1>
+ <p class="sub">Are parallel rays capturing a converging shape, or are converging rays capturing a rectilinear shape? Both — and the
+ choice is the organizing move of the whole family. A projection is a <b>line congruence given a role</b>: used as
+ <b>edges</b> under parallel light it is the glide (<b>reading 1</b>, right — convergent shape, rectilinear projection); used as
+ <b>rays</b> over a rectilinear box it is the cross-slit (<b>reading 2</b>, left — rectilinear shape, convergent projection). The
+ drawn armature is the shadow of the congruence, shared by both readings; the graduations differ. Drag the marker in the square to
+ choose the congruence — at the corners the two readings fuse; off them, one armature splits into the dual pair.</p>
+ <div style="margin:0 0 12px;">
+  <button id="pVax">vanishing-axis ⇄ cross-slit</button><button id="pGen">general pair</button><button id="pIso">isotropic</button><button id="pPers">perspective</button><button id="pPush">pushbroom</button><button id="pOrtho">orthographic</button>
+ </div>
+ <canvas id="scene" style="width:1200px;height:640px;" role="img" aria-label="left: reading 2, converging rays through the two slit axes imaging a rectilinear box, with curved orange tracks on the picture plane; middle: the duals column with the congruence-selecting square and the overlay picture where ink and orange tracks coincide or split; right: reading 1, the convergent relief solid whose edges are the same congruence, flattened by red parallel rays into straight ink tracks"></canvas>
+ <p class="hint">Left / right = the two readings (drag to orbit, shared camera) · Middle = choose the congruence and watch the two pictures agree or split</p>
+ <div id="live"></div>
+
+ <h2>The family under the inversion</h2>
+ <table>
+  <tr><th>Projection</th><th>As rays × rectilinear shape</th><th>As parallel rays × shaped solid</th><th>Under transposition</th></tr>
+  <tr><td>Orthographic</td><td>⊥ parallel bundle</td><td>solid = the scene itself</td><td class="fx"><b>fixed point</b> — the identity</td></tr>
+  <tr><td>Affine (oblique)</td><td>slanted parallel bundle</td><td>sheared, still straight-edged solid</td><td class="fx"><b>fixed</b> — the parallel class</td></tr>
+  <tr><td>Perspective</td><td>pencil through the eye</td><td>frustum — edges = pencil through the relief station</td><td class="fx"><b>fixed point</b> — the readings agree as maps</td></tr>
+  <tr><td>Pushbroom</td><td>slit at station × slit at ∞</td><td>the same congruence as edges</td><td class="fx"><b>fixed point</b></td></tr>
+  <tr><td>Vanishing-axis glide</td><td>— (fibers bent: no camera)</td><td>edges = two-axis congruence, one axis on the depth plane</td><td><b>dual of</b> the cross-slit on that congruence</td></tr>
+  <tr><td>Cross-slit</td><td>two-axis congruence as rays</td><td>— (tracks bent: no straight relief)</td><td><b>dual of</b> the glide on that congruence</td></tr>
+  <tr><td>General glide</td><td>—</td><td>edges = two-axis congruence, both axes free</td><td>dual of the general cross-slit</td></tr>
+ </table>
+
+ <h2>Where every sheet hangs</h2>
+ <table>
+  <tr><th>Sheet</th><th>Its place under the inversion</th></tr>
+  <tr><td>the-glide-atlas</td><td>the space of congruences read as <b>edges</b> (reading 1), charted by (rᵤ, rᵥ)</td></tr>
+  <tr><td>the-glide-axioms</td><td>the laws of reading 1 (P · D · S · M) and the light theorem — which readings admit straight rays</td></tr>
+  <tr><td>the-channel-rates</td><td>the graduation of reading 1, channel by channel: the blend of true-size and foreshortening</td></tr>
+  <tr><td>the-split-element · the-depth-knit · the-directing-organizer</td><td>constructions inside reading 1 — the drawn armature as the shadow of the congruence</td></tr>
+  <tr><td>the-glide-tube</td><td>the enclosing frame of reading 1</td></tr>
+  <tr><td>check_crossslit_frame · check_inversion</td><td>the transposition itself: one congruence, two roles, two graduations, and its two agreement levels</td></tr>
+ </table>
+
+ <div class="foot">
+  <p class="one">Read the middle column twice. The <b>drawn lines</b> — the shadow armature — agree wherever the congruence degenerates:
+  the whole diagonal (pencils), the r = 0 edges (a slit at infinity), and the corners. The <b>full maps</b> — lines and graduation and
+  fibers together — agree only at the corners: perspective, orthographic, the two pushbrooms. Between those two levels lives the whole
+  drama of the family: one congruence, worn two ways, drawing the same lines and measuring them differently. That is the inversion, and
+  every sheet on this board is a chapter of it.</p>
+  <p class="verify">Verified in check_inversion.js (10: the factorization glide = Ortho ∘ Relief; the relief edges thread both axes; the
+  shadow identity; the same congruence as rays is the cross-slit camera with a different graduation; the straightness swap; the fixed
+  points; perspective’s pencil crossing sides; the orthographic identity; the affine parallel class; and the two agreement levels —
+  drawn lines vs full maps). Standing on check_crossslit_frame (9), check_two_planes (8), check_ray_bend (3), check_axioms (7),
+  check_dof_audit (4) and the rest of the stack. The page re-runs five checks on every drag. Project total 311.</p>
+ </div>
+</div>
+<script id="inv-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#2456B0', CAM='#E8792B';
+var CW=1200, CH=640, L2=420, R1=780;
+var W=130, H=88, DZ=200, ZB=60, PLW=190, PLH=132;
+var state={ru:1/3, rv:1, yaw:0.66, pit:0.30};
+var CORNERS=[[-W,H],[W,H],[W,-H],[-W,-H]];
+var eps=0.02;
+
+function csScale(r,zt){ return DZ/(DZ + r*zt); }                 // camera channel scale (slit at -DZ/r; r=0 -> slit at infinity)
+function shadow(P,l){ return [P[0]*(1-l*state.ru), P[1]*(1-l*state.rv)]; }   // the drawn line, parameter lambda
+function reliefPt(P,l){ var s=shadow(P,l); return [s[0], s[1], -DZ*l]; }     // the congruence line in space
+function camPt(P,zt){ return [P[0]*csScale(state.ru,zt), P[1]*csScale(state.rv,zt)]; }
+function degen(){ return state.ru<eps || state.rv<eps || Math.abs(state.ru-state.rv)<eps; }
+function corner(){ var t=function(r){return r<eps||r>1-eps;}; return t(state.ru)&&t(state.rv); }
+function classify(){ var u1=state.ru>1-eps,u0=state.ru<eps,v1=state.rv>1-eps,v0=state.rv<eps,iso=Math.abs(state.ru-state.rv)<eps;
+  if(u0&&v0)return 'parallel bundle \u2014 orthographic';
+  if(u1&&v1)return 'pencil at \u2212DZ \u2014 perspective';
+  if((u1&&v0)||(u0&&v1))return 'slit + \u221e \u2014 pushbroom';
+  if(iso)return 'pencil at \u2212DZ/r \u2014 the isotropic pair';
+  if(u0||v0)return 'slit + \u221e family \u2014 pushbroom-family pair';
+  if(u1||v1)return 'two-axis congruence \u2014 vanishing-axis glide \u21c4 cross-slit';
+  return 'two-axis congruence \u2014 general glide \u21c4 general cross-slit'; }
+function splitDev(){ var m=0,i,zt;
+  for(i=0;i<4;i++){ var P=CORNERS[i], V=shadow(P,1), Dx=V[0]-P[0], Dy=V[1]-P[1], L=Math.hypot(Dx,Dy);
+    for(zt=-15;zt>=-ZB;zt-=15){ var c=camPt(P,zt);
+      if(L<1e-9) m=Math.max(m, Math.hypot(c[0]-P[0],c[1]-P[1]));
+      else m=Math.max(m, Math.abs((c[0]-P[0])*Dy-(c[1]-P[1])*Dx)/L); } }
+  return m; }
+
+// ================= painter (3D) =================
+function W3(p){ return [p[0], p[2], p[1]]; }                     // world: [x, zeta, y] -- picture plane horizontal
+function depthOf(B,C,pts){var d=0,i;for(i=0;i<pts.length;i++){var p=pts[i];d+=(p[0]-C[0])*B.F[0]+(p[1]-C[1])*B.F[1]+(p[2]-C[2])*B.F[2];}return d/pts.length;}
+var SC3=[0,-235,0], SSC=0.52;
+function paint(ctx,cx,cy,prims){
+  var B=viewBasis(state.yaw,state.pit);
+  prims.sort(function(a,b){return depthOf(B,SC3,b.pts)-depthOf(B,SC3,a.pts);});
+  var i,j;
+  for(i=0;i<prims.length;i++){ var pr=prims[i],q=[];
+    for(j=0;j<pr.pts.length;j++)q.push(project(B,SC3,SSC,cx,cy,pr.pts[j]));
+    ctx.save();
+    if(pr.kind==='quad'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.fill();
+      if(pr.edge){ctx.globalAlpha=pr.ea||1;ctx.strokeStyle=pr.edge;ctx.lineWidth=pr.ew||1;ctx.beginPath();
+        ctx.moveTo(q[0][0],q[0][1]);for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.closePath();ctx.stroke();}}
+    else if(pr.kind==='dot'){ctx.globalAlpha=pr.alpha;ctx.fillStyle=pr.fill;ctx.beginPath();ctx.arc(q[0][0],q[0][1],pr.r,0,6.2832);ctx.fill();}
+    else{ctx.globalAlpha=pr.alpha;ctx.strokeStyle=pr.color;ctx.lineWidth=pr.width;if(pr.dash)ctx.setLineDash(pr.dash);
+      ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);
+      for(j=1;j<q.length;j++)ctx.lineTo(q[j][0],q[j][1]);ctx.stroke();}
+    ctx.restore(); }
+}
+function planePrims(P3){ // shared: the picture plane + the two slit / directing axes
+  P3.push({kind:'quad',fill:PIC,alpha:0.06,edge:PIC,ea:0.9,ew:1.7,
+    pts:[W3([-PLW,-PLH,0]),W3([PLW,-PLH,0]),W3([PLW,PLH,0]),W3([-PLW,PLH,0])]});
+  var zU=-DZ/Math.max(state.ru,1e-9), zV=-DZ/Math.max(state.rv,1e-9);
+  if(state.ru>=0.3){ P3.push({kind:'line',color:DU,width:1.8,alpha:0.9,pts:[W3([0,-210,zU]),W3([0,210,zU])]}); }
+  if(state.rv>=0.3){ P3.push({kind:'line',color:DV,width:1.8,alpha:0.9,pts:[W3([-260,0,zV]),W3([260,0,zV])]}); }
+}
+
+// ================= LEFT: reading 2 -- converging rays x rectilinear shape =================
+function drawReading2(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(0,0,L2,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('READING 2 \u2014 the cross-slit side',14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('converging rays \u00d7 rectilinear shape \u00b7 the congruence as RAYS',14,42);
+  var P3=[],i,zt;
+  planePrims(P3);
+  // the rectilinear box: straight edges, shaded sides, blue back face
+  for(i=0;i<4;i++){ var A=CORNERS[i], B2=CORNERS[(i+1)%4];
+    P3.push({kind:'quad',fill:INK,alpha:0.09,pts:[W3([A[0],A[1],0]),W3([B2[0],B2[1],0]),W3([B2[0],B2[1],-ZB]),W3([A[0],A[1],-ZB])]});
+    P3.push({kind:'line',color:INK,width:2.4,alpha:0.95,pts:[W3([A[0],A[1],0]),W3([A[0],A[1],-ZB])]}); }
+  P3.push({kind:'quad',fill:DV,alpha:0.10,edge:DV,ea:0.9,ew:1.6,
+    pts:CORNERS.map(function(c){return W3([c[0],c[1],-ZB]);})});
+  // the rays: from box points through the slits to the picture (curved tracks on the plane)
+  for(i=0;i<4;i++){ var P=CORNERS[i];
+    for(zt=-25;zt>=-ZB;zt-=35){ var img=camPt(P,zt);
+      var top=[img[0]+(img[0]-P[0])*(24/(-zt)), img[1]+(img[1]-P[1])*(24/(-zt)), 24];
+      P3.push({kind:'line',color:INK,width:0.9,alpha:0.4,pts:[W3([P[0],P[1],zt]),W3([img[0],img[1],0]),W3(top)]}); }
+    // curved track drawn on the plane
+    var tr=[],z2; for(z2=0;z2>=-ZB;z2-=10){ var c2=camPt(P,z2); tr.push(W3([c2[0],c2[1],0])); }
+    P3.push({kind:'line',color:CAM,width:2,alpha:0.95,pts:tr});
+    for(z2=0;z2>=-ZB;z2-=15){ var c3=camPt(P,z2); P3.push({kind:'dot',fill:CAM,alpha:1,r:2.6,pts:[W3([c3[0],c3[1],0])]}); }
+    P3.push({kind:'dot',fill:PIC,alpha:1,r:3.6,pts:[W3([P[0],P[1],0])]}); }
+  paint(ctx,210,300,P3);
+  ctx.fillStyle=CAM;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('\u2500 the camera\u2019s tracks on the picture',14,CH-34);
+  ctx.fillStyle=FAINT;ctx.fillText(state.ru<0.3?'aqua slit \u2192 \u221e':'aqua slit at \u2212DZ/r\u1d64', 14, CH-18);
+  ctx.restore();
+}
+
+// ================= RIGHT: reading 1 -- parallel rays x convergent shape =================
+function drawReading1(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(R1,0,CW-R1,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('READING 1 \u2014 the glide side',R1+14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('parallel rays \u00d7 convergent shape \u00b7 the congruence as EDGES',R1+14,42);
+  var P3=[],i,k;
+  planePrims(P3);
+  // the convergent solid: edges = the congruence, shaded sides, purple depth frame
+  for(i=0;i<4;i++){ var A=CORNERS[i], B2=CORNERS[(i+1)%4];
+    var Ae=[reliefPt(A,0),reliefPt(A,1)], Be=[reliefPt(B2,0),reliefPt(B2,1)];
+    P3.push({kind:'quad',fill:INK,alpha:0.06,pts:[W3(Ae[0]),W3(Be[0]),W3(Be[1]),W3(Ae[1])]});
+    P3.push({kind:'line',color:INK,width:2.4,alpha:0.95,pts:[W3(Ae[0]),W3(Ae[1])]});
+    var lcap=Math.min(3.2, Math.max(state.ru<eps?0:1/state.ru, state.rv<eps?0:1/state.rv, 1.12));
+    P3.push({kind:'line',color:INK,width:1,alpha:0.45,pts:[W3(reliefPt(A,1)),W3(reliefPt(A,lcap))]}); }
+  P3.push({kind:'quad',fill:VAN,alpha:0.10,edge:VAN,ea:0.9,ew:1.6,
+    pts:CORNERS.map(function(c){return W3(reliefPt(c,1));})});
+  // depth marks 1/n on the edges
+  for(i=0;i<4;i++){ for(k=1;k<=3;k++){ var l=k/(k+1);
+    P3.push({kind:'dot',fill:INK,alpha:0.9,r:2.2,pts:[W3(reliefPt(CORNERS[i],l))]}); } }
+  // parallel rays (red, vertical): from the solid up through the plane
+  for(i=0;i<4;i++){ var s=reliefPt(CORNERS[i],0.35);
+    P3.push({kind:'line',color:RED,width:1.4,alpha:0.85,pts:[W3(s),W3([s[0],s[1],26])]}); }
+  P3.push({kind:'line',color:RED,width:1.4,alpha:0.85,pts:[W3([0,0,-70]),W3([0,0,26])]});
+  // the straight tracks drawn on the plane, with the same zeta marks as the overlay
+  for(i=0;i<4;i++){ var P=CORNERS[i], V=shadow(P,1);
+    P3.push({kind:'line',color:INK,width:1,alpha:0.45,pts:[W3([P[0],P[1],0]),W3([V[0],V[1],0])]});
+    var e=shadow(P,ZB/DZ);
+    P3.push({kind:'line',color:INK,width:2,alpha:0.95,pts:[W3([P[0],P[1],0]),W3([e[0],e[1],0])]});
+    var z2; for(z2=0;z2>=-ZB;z2-=15){ var m=shadow(P,-z2/DZ); P3.push({kind:'dot',fill:INK,alpha:1,r:2.6,pts:[W3([m[0],m[1],0])]}); }
+    P3.push({kind:'dot',fill:PIC,alpha:1,r:3.6,pts:[W3([P[0],P[1],0])]}); }
+  paint(ctx,990,300,P3);
+  ctx.fillStyle=INK;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('\u2500 the glide\u2019s tracks on the picture (the shadow of the edges)',R1+14,CH-34);
+  ctx.fillStyle=RED;ctx.fillText('\u2502 parallel rays \u22a5 the picture',R1+14,CH-18);
+  ctx.restore();
+}
+
+// ================= MIDDLE: the DUALS column =================
+var MX=475, MY=56, MS=200;
+function mx(ru){ return MX+ru*MS; } function my(rv){ return MY+(1-rv)*MS; }
+var ocx=600, ocy=468, os=0.80;
+function ox(x){ return ocx+x*os; } function oy(y){ return ocy-y*os; }
+function drawMiddle(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(L2,0,R1-L2,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('DUALS',(L2+R1)/2,24);ctx.textAlign='left';
+  // the square: choose the congruence
+  ctx.fillStyle=SURFACE;ctx.fillRect(MX,MY,MS,MS);
+  ctx.globalAlpha=0.10;ctx.fillStyle=INK;ctx.fillRect(MX,MY,MS,MS);ctx.globalAlpha=1;
+  ctx.strokeStyle=GREEN;ctx.lineWidth=1.6;ctx.globalAlpha=0.7;
+  ctx.beginPath();ctx.moveTo(mx(0),my(0));ctx.lineTo(mx(1),my(1));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(MX,MY+MS);ctx.lineTo(MX+MS,MY+MS);ctx.moveTo(MX,MY);ctx.lineTo(MX,MY+MS);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.3;ctx.strokeRect(MX,MY,MS,MS);
+  var doors=[[1,1],[0,0],[1,0],[0,1]],i;
+  for(i=0;i<4;i++){ ctx.fillStyle=GREEN;ctx.beginPath();ctx.arc(mx(doors[i][0]),my(doors[i][1]),5,0,6.2832);ctx.fill(); }
+  var mxx=mx(state.ru), myy=my(state.rv);
+  ctx.strokeStyle=RED;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(mxx-8,myy);ctx.lineTo(mxx+8,myy);ctx.moveTo(mxx,myy-8);ctx.lineTo(mxx,myy+8);ctx.stroke();
+  ctx.fillStyle=RED;ctx.beginPath();ctx.arc(mxx,myy,4.5,0,6.2832);ctx.fill();
+  ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('the congruence \u00b7 green = fixed as maps \u00b7 green lines = drawn-line agreement',(L2+R1)/2,MY+MS+14);
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  ctx.fillText(classify(),(L2+R1)/2,MY+MS+32);ctx.textAlign='left';
+  // the overlay: one picture, both readings
+  ctx.strokeStyle=PIC;ctx.lineWidth=1.6;ctx.strokeRect(ox(-W),oy(H),2*W*os,2*H*os);
+  var dev=splitDev();
+  for(i=0;i<4;i++){ var P=CORNERS[i], V=shadow(P,1);
+    ctx.strokeStyle=INK;ctx.lineWidth=0.8;ctx.globalAlpha=0.4;
+    ctx.beginPath();ctx.moveTo(ox(P[0]),oy(P[1]));ctx.lineTo(ox(V[0]),oy(V[1]));ctx.stroke();ctx.globalAlpha=1;
+    var e=shadow(P,ZB/DZ);
+    ctx.strokeStyle=INK;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(ox(P[0]),oy(P[1]));ctx.lineTo(ox(e[0]),oy(e[1]));ctx.stroke();
+    ctx.strokeStyle=CAM;ctx.lineWidth=1.8;ctx.globalAlpha=0.95;ctx.beginPath();var z2,first=true;
+    for(z2=0;z2>=-ZB;z2-=6){ var c=camPt(P,z2); if(first){ctx.moveTo(ox(c[0]),oy(c[1]));first=false;} else ctx.lineTo(ox(c[0]),oy(c[1])); }
+    ctx.stroke();ctx.globalAlpha=1;
+    for(z2=0;z2>=-ZB;z2-=15){ var m1=shadow(P,-z2/DZ), m2=camPt(P,z2);
+      ctx.fillStyle=INK;ctx.beginPath();ctx.arc(ox(m1[0]),oy(m1[1]),2.2,0,6.2832);ctx.fill();
+      ctx.fillStyle=CAM;ctx.beginPath();ctx.arc(ox(m2[0]),oy(m2[1]),2.2,0,6.2832);ctx.fill(); }
+    ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(ox(P[0]),oy(P[1]),3.4,0,6.2832);ctx.fill(); }
+  ctx.textAlign='center';
+  ctx.fillStyle=INK;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('one picture \u00b7 ink = reading 1 \u00b7 orange = reading 2',(L2+R1)/2,oy(-H)-(-18));
+  ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  if(dev<0.5){ ctx.fillStyle=GREEN;ctx.fillText('the drawn lines coincide \u2014 split '+dev.toFixed(2)+' px',(L2+R1)/2,CH-28); }
+  else { ctx.fillStyle=CAM;ctx.fillText('the readings split \u2014 '+dev.toFixed(1)+' px off the drawn line',(L2+R1)/2,CH-28); }
+  ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText(corner()?'and as full maps they agree: a fixed point of the inversion':'as full maps they differ everywhere but the corners',(L2+R1)/2,CH-13);
+  ctx.textAlign='left';
+  ctx.restore();
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawReading2(ctx); drawMiddle(ctx); drawReading1(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(L2,10);ctx.lineTo(L2,CH-10);ctx.moveTo(R1,10);ctx.lineTo(R1,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ================= live checks =================
+function runLive(){
+  var out=[],i;
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  // 1: same congruence both sides -- edge direction = two-slit ray direction
+  var worst=0;
+  for(i=0;i<4;i++){ var P=CORNERS[i];
+    if(state.ru>eps&&state.rv>eps&&Math.abs(P[0])>5&&Math.abs(P[1])>5){
+      var zU=-DZ/state.ru, zV=-DZ/state.rv;
+      if(Math.abs(zU-zV)>1e-6){
+        var mu0=zU/(zU-zV), A0=[0,P[1]/(1-mu0),zU], B0=[P[0]/mu0,0,zV];
+        var d1=[B0[0]-A0[0],B0[1]-A0[1],B0[2]-A0[2]];
+        var d2=[-P[0]*state.ru,-P[1]*state.rv,-DZ];
+        var cx=d1[1]*d2[2]-d1[2]*d2[1],cy=d1[2]*d2[0]-d1[0]*d2[2],cz=d1[0]*d2[1]-d1[1]*d2[0];
+        worst=Math.max(worst,Math.hypot(cx,cy,cz)/(Math.hypot(d1[0],d1[1],d1[2])*Math.hypot(d2[0],d2[1],d2[2]))); } } }
+  L('one congruence, both panels: edge direction = two-slit ray direction',worst<1e-9,'sin '+worst.toExponential(1));
+  // 2: reading 1 -- the edge's shadow lies on the drawn track
+  var w2=0;
+  for(i=0;i<4;i++){ var P2=CORNERS[i], a=reliefPt(P2,0.2), s=shadow(P2,0.2);
+    w2=Math.max(w2, Math.hypot(a[0]-s[0],a[1]-s[1])); }
+  L('reading 1: Ortho of the edge = the drawn track (the shadow identity)',w2<1e-9,'\u0394 '+w2.toExponential(1));
+  // 3: reading 2 -- points of one congruence line image to ONE picture point
+  var w3=0; var Pp=CORNERS[1];
+  for(i=0;i<3;i++){ var l=[0.2,0.55,1.35][i], q=reliefPt(Pp,l);
+    var img=[ q[0]*DZ/(DZ+state.ru*q[2]), q[1]*DZ/(DZ+state.rv*q[2]) ];
+    w3=Math.max(w3, Math.hypot(img[0]-Pp[0], img[1]-Pp[1])); }
+  L('reading 2: every point of the congruence line images to the same picture point (a ray)',w3<1e-6,'\u0394 '+w3.toExponential(1));
+  // 4: level A -- the drawn-line split matches the congruence type
+  var dv=splitDev(), pred=!degen();
+  L('drawn lines: split \u21d4 genuine two-axis congruence (level A)',(dv>0.5)===pred,(pred?'split ':'agree ')+dv.toFixed(2)+' px');
+  // 5: level B -- as full maps, agreement only at the corners (bent fibers elsewhere)
+  var zs=[-30,-90,-150,-210], fp=[], j;
+  for(j=0;j<zs.length;j++){ var z=zs[j], su=(1-state.ru)+state.ru*300/(300-z), sv=(1-state.rv)+state.rv*300/(300-z);
+    fp.push([120/su, 80/sv, z]); }
+  var a2=fp[0], b2=fp[3], d3=[b2[0]-a2[0],b2[1]-a2[1],b2[2]-a2[2]], Ln=Math.hypot(d3[0],d3[1],d3[2]), fd=0;
+  for(j=0;j<fp.length;j++){ var w4=[fp[j][0]-a2[0],fp[j][1]-a2[1],fp[j][2]-a2[2]];
+    var qx=w4[1]*d3[2]-w4[2]*d3[1], qy=w4[2]*d3[0]-w4[0]*d3[2], qz=w4[0]*d3[1]-w4[1]*d3[0];
+    fd=Math.max(fd, Math.hypot(qx,qy,qz)/Ln); }
+  L('full maps: fibers straight \u21d4 a corner (level B \u2014 the light theorem)',(fd<1e-6)===corner(),corner()?'fixed point':'bent '+fd.toFixed(2));
+  var el=document.getElementById('live'),h='';
+  for(i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ================= interaction =================
+function init(){
+  var cv=document.getElementById('scene'),mode=null,last=null;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  function setFromMap(p){ state.ru=Math.max(0,Math.min(1,(p[0]-MX)/MS)); state.rv=Math.max(0,Math.min(1,1-(p[1]-MY)/MS)); render(); }
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e);cv.setPointerCapture(e.pointerId);
+    if(p[0]>=L2&&p[0]<R1){ if(p[0]>=MX-14&&p[0]<=MX+MS+14&&p[1]>=MY-14&&p[1]<=MY+MS+14){ mode='map'; setFromMap(p); } }
+    else { mode='orbit'; last=p; } });
+  cv.addEventListener('pointermove',function(e){ if(!mode)return; var p=localXY(e);
+    if(mode==='map') setFromMap(p);
+    else { state.yaw+=(p[0]-last[0])*0.006; state.pit=Math.max(-1.1,Math.min(1.1,state.pit+(p[1]-last[1])*0.006)); last=p; requestAnimationFrame(render); } });
+  cv.addEventListener('pointerup',function(){mode=null;});
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;render();};}
+  document.getElementById('pVax').addEventListener('click',preset(1/3,1));
+  document.getElementById('pGen').addEventListener('click',preset(0.45,0.75));
+  document.getElementById('pIso').addEventListener('click',preset(0.5,0.5));
+  document.getElementById('pPers').addEventListener('click',preset(1,1));
+  document.getElementById('pPush').addEventListener('click',preset(1,0));
+  document.getElementById('pOrtho').addEventListener('click',preset(0,0));
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
