@@ -39,7 +39,7 @@
   <button id="harm">make harmonic (λ = −1)</button>
   <button id="coin">make coincident (λ = +1)</button>
  </div>
- <canvas id="scene" style="width:1180px;height:560px;" role="img" aria-label="left: a segment PQ cut at C and D into four lengths a,b,c,d with the cross-ratio lambda; right: the same four points as one channel of the lateral projection on the picture plane, with the mark at the current depth; a shared depth slider moves the mark on both panels together, and an identity bar shows lambda equals the four-point cross-ratio and the harmonic law 1/k+1/c=1"></canvas>
+ <canvas id="scene" style="width:1180px;height:620px;" role="img" aria-label="left: a segment PQ cut at C and D into four lengths a,b,c,d with the cross-ratio lambda; right: the same four points as one channel of the lateral projection on the picture plane, with the mark at the current depth; a shared depth slider moves the mark on both panels together, and an identity bar shows lambda equals the four-point cross-ratio and the harmonic law 1/k+1/c=1"></canvas>
  <p class="hint">Left = the cross-ratio segment · right = the same four points as a projection channel · the identity bar reads λ = ad/bc ≡ cross-ratio, and 1/k + 1/c at the bottom</p>
  <div id="live"></div>
 
@@ -104,7 +104,7 @@ function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0
 'use strict';
 var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
 var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', MARK='#2456B0', CAM='#E8792B';
-var CW=1180, CH=560, MID=590;
+var CW=1180, CH=620, MID=590;
 var Zp=300;
 var state={ r:0.4, depth:0.42 };            // depth in [0,1] -> z = -depth/(1-depth)*Zp (so depth=0.5 -> z=-Zp)
 
@@ -163,6 +163,29 @@ function drawCrossRatio(ctx){
   var harm = Math.abs(lam+1)<0.02;
   ctx.fillStyle = harm ? GREEN : FAINT; ctx.font='bold 12px Helvetica, Arial, sans-serif';
   ctx.fillText(harm ? '\u25c9 HARMONIC  \u03bb = \u22121' : '\u25cb  \u03bb = '+lam.toFixed(3)+' (harmonic at \u03bb=\u22121)', 18, ry+66);
+  // ---- keyed reference diagram: the four spans a,b,c,d on the segment P C D Q ----
+  var kx0=18, kx1=kx0+430, ky=ry+120;                 // the reference bar
+  var kP=0, kC=0.32, kD=0.66, kQ=1;                    // fixed, well-separated key positions (P<C<D<Q)
+  function KX(t){ return kx0 + t*(kx1-kx0); }
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('reference — the four spans',kx0,ky-30);
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('a = PC   b = CQ   c = PD   d = DQ',kx0,ky-15);
+  // the bar
+  ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(KX(0),ky);ctx.lineTo(KX(1),ky);ctx.stroke();
+  // the four points
+  function kpt(t,col,label){ var x=KX(t);
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,ky-6);ctx.lineTo(x,ky+6);ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,ky,4.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';ctx.fillText(label,x,ky-12);ctx.textAlign='left'; }
+  // span brackets below: a=PC, b=CQ (spans of the "size" pair); c=PD, d=DQ (the other pairing)
+  function kspan(t0,t1,yoff,col,label){ var x0=KX(t0),x1=KX(t1),y=ky+yoff;
+    ctx.strokeStyle=col;ctx.lineWidth=1.3;ctx.beginPath();
+    ctx.moveTo(x0,ky+6);ctx.lineTo(x0,y);ctx.lineTo(x1,y);ctx.lineTo(x1,ky+6);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';ctx.fillText(label,(x0+x1)/2,y+(yoff>0?13:-4));ctx.textAlign='left'; }
+  kspan(kP,kC,20,MARK,'a');       // PC
+  kspan(kC,kQ,40,DIR,'b');        // CQ
+  kspan(kP,kD,-20,CAM,'c');       // PD
+  kspan(kD,kQ,-40,VAN,'d');       // DQ
+  kpt(kP,PIC,'P'); kpt(kC,MARK,'C = mark'); kpt(kD,DIR,'D'); kpt(kQ,VAN,'Q');
   ctx.restore();
 }
 
@@ -178,7 +201,7 @@ function drawChannel(ctx){
   // ray going into depth and its image marks projected to the picture line at baseY)
   // picture line (red) at baseY
   ctx.strokeStyle=PIC;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(MID+40,baseY);ctx.lineTo(CW-40,baseY);ctx.stroke();
-  ctx.fillStyle=PIC;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('picture plane',CW-120,baseY+18);
+  ctx.fillStyle=PIC;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('the picture plane',MID+44,baseY-10);
   // the drawn line for this channel: from P (offset = off) to V (offset = off*(1-r)) along the picture line
   var xP = axisX+off, xV = axisX+off*(1-state.r);
   function mapMark(frac){ return xP + frac*(xV - xP); }  // frac in channel coords -> x on picture line
@@ -190,25 +213,36 @@ function drawChannel(ctx){
   ctx.strokeStyle=INK;ctx.globalAlpha=0.25;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(xP,baseY);ctx.lineTo(axisX+off*(1-state.r)*0.0+ (xV), apexY);ctx.stroke();
   ctx.globalAlpha=1;
-  // marks ON the picture line
-  function tick(x,col,label,k){ ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,baseY-7);ctx.lineTo(x,baseY+7);ctx.stroke();
-    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,baseY,5,0,6.2832);ctx.fill();
-    ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText(label,x-4,baseY+24); }
-  // the depth graduation 1/n marks between P and V
-  ctx.fillStyle=FAINT;
+  // the depth graduation 1/n marks between P and V (drawn first, behind the ticks)
   for(var nn=1;nn<=4;nn++){ var f=nn/(nn+1); var xx=mapMark(f);
     ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,baseY-4);ctx.lineTo(xx,baseY+4);ctx.stroke(); }
-  tick(xP,PIC,'P');
-  tick(xV,VAN,'V');
-  var Dclamp = Math.min(xD, CW-46);
-  tick(Dclamp,DIR,'D');
-  tick(xX,MARK,'X');
-  // the moving mark emphasised with a depth ray up to a station point
-  var stationX = axisX + off*0.5, stationY = apexY;
+  // marks ON the picture line -- draw the dots/stems, then place labels with a de-collision pass so
+  // labels never overlap when points bunch up (D near V near X).
+  var Dclamp = Math.min(xD, CW-52);
+  var marks = [ {x:xP, col:PIC, label:'P'}, {x:xV, col:VAN, label:'V'}, {x:Dclamp, col:DIR, label:'D'}, {x:xX, col:MARK, label:'X'} ];
+  var mi;
+  for(mi=0;mi<marks.length;mi++){ var mk=marks[mi];
+    ctx.strokeStyle=mk.col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mk.x,baseY-7);ctx.lineTo(mk.x,baseY+7);ctx.stroke();
+    ctx.fillStyle=mk.col;ctx.beginPath();ctx.arc(mk.x,baseY,5,0,6.2832);ctx.fill(); }
+  // de-collision: sort by x, and for labels closer than MINSEP push them to alternating rows below
+  var sorted = marks.slice().sort(function(a,b){return a.x-b.x;});
+  var MINSEP=20, lastX=-1e9, row=0;
+  for(mi=0;mi<sorted.length;mi++){ var mk2=sorted[mi];
+    if(mk2.x - lastX < MINSEP){ row = (row+1)%2; } else { row = 0; }
+    var ly = baseY + 22 + row*15;
+    // a little leader from the dot down to its label when pushed to the lower row
+    if(row>0){ ctx.strokeStyle=mk2.col;ctx.globalAlpha=0.5;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(mk2.x,baseY+7);ctx.lineTo(mk2.x,ly-10);ctx.stroke();ctx.globalAlpha=1; }
+    ctx.fillStyle=mk2.col;ctx.font='bold 12px Helvetica, Arial, sans-serif';
+    ctx.textAlign='center';ctx.fillText(mk2.label,mk2.x,ly);ctx.textAlign='left';
+    lastX = mk2.x; }
+  // the moving mark emphasised with a depth stem up, label above (kept clear of the row labels below)
   ctx.strokeStyle=MARK;ctx.globalAlpha=0.5;ctx.lineWidth=1.2;
-  ctx.beginPath();ctx.moveTo(xX,baseY);ctx.lineTo(xX,baseY-40);ctx.stroke();ctx.globalAlpha=1;
-  ctx.fillStyle=MARK;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('mark at depth z='+pts.z.toFixed(0),xX-30,baseY-46);
-  if(pts.D>1.15){ ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('D at 1/r beyond V',Dclamp-30,baseY+40); }
+  ctx.beginPath();ctx.moveTo(xX,baseY-7);ctx.lineTo(xX,baseY-40);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=MARK;ctx.font='11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('mark at depth z='+pts.z.toFixed(0),xX,baseY-46);ctx.textAlign='left';
+  if(pts.D>1.15){ ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText('(D at 1/r, beyond V)',Dclamp,baseY+52);ctx.textAlign='left'; }
   // readout: the mark fraction = graduation
   ctx.fillStyle=INK;ctx.font='12px Helvetica, Arial, sans-serif';
   ctx.fillText('mark fraction P\u2192V:  \u03bb(z) = k/(k+1) = '+pts.X.toFixed(4)+'   (k = \u2212z/Zp = '+pts.k.toFixed(3)+')',MID+18,CH-70);
