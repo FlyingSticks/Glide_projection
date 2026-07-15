@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The bridge · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1240px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:28px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 16px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:170px;} .ro{font-size:12px;margin-right:4px;min-width:34px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ h2{font-size:15px;margin:22px 0 6px;}
+ p{font-size:13.5px;margin:9px 0;} .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1080px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;} .k{font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE BRIDGE</p>
+ <h1>One channel — <em>the cross-ratio page is the lateral projection, one axis at a time</em></h1>
+ <p class="sub">The cross-ratio interactive cuts a segment twice; the lateral projection graduates a depth ray with four points.
+ They are the <b>same four points</b>. Picture point <b style="color:#ED3121">P</b>, the mark <b style="color:#2456B0">C = X</b>,
+ the directing point <b style="color:#12A6A6">D</b>, the vanishing point <b style="color:#8A4FD6">Q = V</b>. Drag <b>depth</b> and
+ the mark travels on both panels at once; the segment’s cross-ratio λ = ad/bc is the channel’s depth graduation; and the
+ harmonic instant λ = −1 is exactly the armature’s law 1/k + 1/c = 1. The full rate square is two of these channels at once,
+ on perpendicular axes — this is one of them.</p>
+ <div class="bar">
+  <label for="depth">depth (sweeps the mark)</label><input type="range" id="depth" min="0.02" max="0.95" step="0.005" value="0.42"><span class="ro" id="v_depth">0.42</span>
+  <label for="rate">rate r (the channel)</label><input type="range" id="rate" min="0.15" max="0.95" step="0.01" value="0.4"><span class="ro" id="v_rate">0.40</span>
+  <button id="harm">make harmonic (λ = −1)</button>
+  <button id="coin">make coincident (λ = +1)</button>
+ </div>
+ <canvas id="scene" style="width:1180px;height:560px;" role="img" aria-label="left: a segment PQ cut at C and D into four lengths a,b,c,d with the cross-ratio lambda; right: the same four points as one channel of the lateral projection on the picture plane, with the mark at the current depth; a shared depth slider moves the mark on both panels together, and an identity bar shows lambda equals the four-point cross-ratio and the harmonic law 1/k+1/c=1"></canvas>
+ <p class="hint">Left = the cross-ratio segment · right = the same four points as a projection channel · the identity bar reads λ = ad/bc ≡ cross-ratio, and 1/k + 1/c at the bottom</p>
+ <div id="live"></div>
+
+ <h2>Why they are the same object</h2>
+ <p>Cut PQ at C and D and write the four directed lengths a = PC, b = CQ, c = PD, d = DQ. Put the four points on a channel line from
+ the picture point (fraction 0) to the vanishing point (fraction 1): the mark sits at the graduation λ(z) = k/(k+1) with count k = −z/Zp,
+ and the directing point sits at the crossing 1/r. Then the page’s <b>quotient</b> ad/bc is the four-point <b>cross-ratio</b> (P,V;X,D) —
+ the genuine projective invariant — while the page’s <b>product</b> ac/bd is only the affine shape ratio. That quotient/product split is the
+ <span class="k">projective / affine two-level structure</span> the inversion carries throughout: the cross-ratio survives every Möbius map,
+ the shape ratio only the affine ones. One channel shows it on four points on a line; the rate square shows it on two channels at once.</p>
+
+ <div class="foot">
+  <p class="one">So the resemblance you noticed between the two squares is not a coincidence of shape. The cross-ratio page is the
+  <b>one-channel restriction</b> of the lateral projection — one axis, four points — and its harmonic event is the armature’s
+  1/k + 1/c = 1 exactly. The rate square has a second dimension because it carries a <b>second</b> such channel on the perpendicular
+  axis, at a possibly different rate; that is why the square’s interior (two independent rates) cannot be read off as a product of
+  channel-wise conditions the way its boundary and diagonal can. You had built the seed of the whole two-level structure into a
+  one-dimensional cross-ratio before the projection work made it two-dimensional.</p>
+  <p class="verify">Verified in check_bridge.js (4: as depth sweeps, the mark moves monotonically P→V and tracks the makeProj
+  graduation; λ = ad/bc equals the four-point cross-ratio pointwise; the harmonic depth lands exactly on 1/k + 1/c = 1 at a real
+  depth) and check_crossratio.js (6: the page’s lengths are the armature spacings; λ is the cross-ratio and Möbius-invariant; the
+  harmonic case is 1/k + 1/c = 1; the shape ratio is affine-only, changed by inversion; conservation ad·bc = ac·bd = abcd; and the
+  quotient/product split is the projective/affine two levels). The page re-runs three checks on every drag. Honest boundary: this
+  verifies the page’s construction as written against the shipped engine, not the page’s own live output.</p>
+ </div>
+</div>
+<script id="bridge-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', MARK='#2456B0', CAM='#E8792B';
+var CW=1180, CH=560, MID=590;
+var Zp=300;
+var state={ r:0.4, depth:0.42 };            // depth in [0,1] -> z = -depth/(1-depth)*Zp (so depth=0.5 -> z=-Zp)
+
+function zOf(dp){ return dp>=0.999 ? -1e9 : -(dp/(1-dp))*Zp; }
+function lamOf(z){ return -z/(Zp - z); }    // channel graduation = k/(k+1)
+function kOf(z){ return -z/Zp; }
+
+// the four points on the [0,1] channel line
+function fourPts(){ var z=zOf(state.depth), k=kOf(z);
+  var P=0, V=1, X=k/(k+1), D=1/state.r;
+  return {P:P, V:V, X:X, D:D, k:k, z:z}; }
+function crossRatio(P,X,D,V){ return ((X-P)*(D-V))/((X-V)*(D-P)); }
+
+// ============ LEFT: the cross-ratio segment ============
+// segment PQ drawn horizontally; cuts at C=X (the mark) and D (directing point). Lengths a=PC,b=CQ,c=PD,d=DQ.
+var segX0=70, segX1=segX0+440, segY=150;
+function Lx(t){ return segX0 + t*(segX1-segX0); }   // map channel coord (can exceed 1 for D) with clamp for draw
+function drawCrossRatio(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(0,0,MID,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE CROSS-RATIO PAGE \u2014 one segment, cut twice',18,28);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('P Q the frame \u00b7 C the mark \u00b7 D the directing point \u00b7 \u03bb = ad / bc',18,46);
+  var pts=fourPts(); var Xc=pts.X, Dc=Math.min(pts.D, 1.28);   // clamp D for on-screen drawing only
+  // the segment
+  ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(Lx(0),segY);ctx.lineTo(Lx(1),segY);ctx.stroke();
+  // the four sub-length brackets a=PC (P->X), b=CQ (X->Q), c=PD (P->D), d=DQ (D->Q)
+  function bracket(t0,t1,yoff,col,label){ var x0=Lx(t0),x1=Lx(t1),y=segY+yoff;
+    ctx.strokeStyle=col;ctx.lineWidth=1.4;ctx.beginPath();
+    ctx.moveTo(x0,segY);ctx.lineTo(x0,y);ctx.lineTo(x1,y);ctx.lineTo(x1,segY);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText(label,(x0+x1)/2-4,y+(yoff>0?13:-5)); }
+  bracket(0,Xc,28,MARK,'a');            // PC
+  bracket(Xc,1,52,DIR,'b');             // CQ
+  bracket(0,Dc,-26,CAM,'c');            // PD
+  bracket(Dc,1,-50,VAN,'d');            // DQ
+  // the four labelled points
+  function pt(t,col,label,above){ var x=Lx(t);
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,segY,5,0,6.2832);ctx.fill();
+    ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText(label,x-4,segY+(above?-62:70)); }
+  ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(Lx(0),segY,5,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('P',Lx(0)-4,segY+70);
+  ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(Lx(1),segY,5,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.fillText('Q',Lx(1)-4,segY+70);
+  ctx.fillStyle=MARK;ctx.beginPath();ctx.arc(Lx(Xc),segY,5,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.fillText('C',Lx(Xc)-4,segY-62);
+  ctx.fillStyle=DIR;ctx.beginPath();ctx.arc(Lx(Dc),segY,5,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.fillText('D',Lx(Dc)-4,segY-62);
+  if(pts.D>1.28){ ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('D \u2192 (off-segment, at 1/r='+pts.D.toFixed(2)+')',Lx(1.02),segY+4); }
+  // the size/shape area readout
+  var a=pts.X, b=1-pts.X, c=pts.D, d=1-pts.D;
+  var lam=(a*d)/(b*c), shape=(a*c)/(b*d);
+  ctx.fillStyle=INK;ctx.font='12px Helvetica, Arial, sans-serif';
+  var ry=segY+118;
+  ctx.fillText('size pair (the cross-ratio):  \u03bb = ad / bc = '+lam.toFixed(4),18,ry);
+  ctx.fillText('shape pair (affine only):  ac / bd = '+shape.toFixed(4),18,ry+20);
+  ctx.fillText('conserved:  ad\u00b7bc = ac\u00b7bd = abcd = '+(a*b*c*d).toFixed(4),18,ry+40);
+  // harmonic light
+  var harm = Math.abs(lam+1)<0.02;
+  ctx.fillStyle = harm ? GREEN : FAINT; ctx.font='bold 12px Helvetica, Arial, sans-serif';
+  ctx.fillText(harm ? '\u25c9 HARMONIC  \u03bb = \u22121' : '\u25cb  \u03bb = '+lam.toFixed(3)+' (harmonic at \u03bb=\u22121)', 18, ry+66);
+  ctx.restore();
+}
+
+// ============ RIGHT: the same four points as a projection channel ============
+var pcx=MID+300, baseY=470, apexY=120, axisX=pcx;   // picture plane at baseY, depth upward
+function drawChannel(ctx){
+  ctx.save();ctx.beginPath();ctx.rect(MID,0,CW-MID,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('ONE CHANNEL OF THE LATERAL PROJECTION',MID+18,28);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('same four points \u00b7 picture point P \u00b7 mark X at depth \u00b7 directing point D \u00b7 vanishing point V',MID+18,46);
+  var pts=fourPts();
+  var off=170;                                  // transverse offset of the ray at the picture plane
+  // vertical depth axis line (the drawn line P..V lives along the transverse direction; here we show the
+  // ray going into depth and its image marks projected to the picture line at baseY)
+  // picture line (red) at baseY
+  ctx.strokeStyle=PIC;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(MID+40,baseY);ctx.lineTo(CW-40,baseY);ctx.stroke();
+  ctx.fillStyle=PIC;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('picture plane',CW-120,baseY+18);
+  // the drawn line for this channel: from P (offset = off) to V (offset = off*(1-r)) along the picture line
+  var xP = axisX+off, xV = axisX+off*(1-state.r);
+  function mapMark(frac){ return xP + frac*(xV - xP); }  // frac in channel coords -> x on picture line
+  // vanishing point V and directing point D on the picture line (D may be beyond V)
+  var xX = mapMark(pts.X), xD = mapMark(pts.D);
+  // the depth ray drawn as a converging line from picture point P up toward the station, with the mark on it
+  // We render the classic wedge: P on the picture line, going up to a vanishing convergence.
+  // draw faint depth rays from P and from the transverse partner to show convergence
+  ctx.strokeStyle=INK;ctx.globalAlpha=0.25;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(xP,baseY);ctx.lineTo(axisX+off*(1-state.r)*0.0+ (xV), apexY);ctx.stroke();
+  ctx.globalAlpha=1;
+  // marks ON the picture line
+  function tick(x,col,label,k){ ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,baseY-7);ctx.lineTo(x,baseY+7);ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,baseY,5,0,6.2832);ctx.fill();
+    ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText(label,x-4,baseY+24); }
+  // the depth graduation 1/n marks between P and V
+  ctx.fillStyle=FAINT;
+  for(var nn=1;nn<=4;nn++){ var f=nn/(nn+1); var xx=mapMark(f);
+    ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,baseY-4);ctx.lineTo(xx,baseY+4);ctx.stroke(); }
+  tick(xP,PIC,'P');
+  tick(xV,VAN,'V');
+  var Dclamp = Math.min(xD, CW-46);
+  tick(Dclamp,DIR,'D');
+  tick(xX,MARK,'X');
+  // the moving mark emphasised with a depth ray up to a station point
+  var stationX = axisX + off*0.5, stationY = apexY;
+  ctx.strokeStyle=MARK;ctx.globalAlpha=0.5;ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(xX,baseY);ctx.lineTo(xX,baseY-40);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=MARK;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('mark at depth z='+pts.z.toFixed(0),xX-30,baseY-46);
+  if(pts.D>1.15){ ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('D at 1/r beyond V',Dclamp-30,baseY+40); }
+  // readout: the mark fraction = graduation
+  ctx.fillStyle=INK;ctx.font='12px Helvetica, Arial, sans-serif';
+  ctx.fillText('mark fraction P\u2192V:  \u03bb(z) = k/(k+1) = '+pts.X.toFixed(4)+'   (k = \u2212z/Zp = '+pts.k.toFixed(3)+')',MID+18,CH-70);
+  ctx.fillText('directing coordinate:  1/r = '+pts.D.toFixed(4),MID+18,CH-50);
+  ctx.restore();
+}
+
+// ============ the identity bar across the middle ============
+function drawIdentity(ctx){
+  var pts=fourPts(); var a=pts.X,b=1-pts.X,c=pts.D,d=1-pts.D;
+  var lamPage=(a*d)/(b*c), lamCR=crossRatio(pts.P,pts.X,pts.D,pts.V);
+  var harmLaw = 1/pts.k + 1/pts.D;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  var y=CH-20;
+  var msg='\u03bb = ad/bc = '+lamPage.toFixed(4)+'   \u2261   cross-ratio (P,V;X,D) = '+lamCR.toFixed(4)+'      \u00b7      1/k + 1/c = '+harmLaw.toFixed(4);
+  ctx.fillStyle = Math.abs(lamPage-lamCR)<1e-6 ? INK : RED;
+  ctx.fillText(msg, CW/2, y);
+  ctx.textAlign='left';
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawCrossRatio(ctx); drawChannel(ctx); drawIdentity(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(MID,10);ctx.lineTo(MID,CH-40);ctx.stroke();ctx.globalAlpha=1;
+  // the "same point" connectors: faint lines linking C<->X and D<->D across the divide
+  ctx.strokeStyle=MARK;ctx.setLineDash([4,4]);ctx.globalAlpha=0.4;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(Lx(Math.min(fourPts().X,1)),segY+6);ctx.lineTo(MID,segY+40);ctx.stroke();
+  ctx.setLineDash([]);ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ============ live checks ============
+function runLive(){
+  var out=[],pts=fourPts();
+  function L(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  var a=pts.X,b=1-pts.X,c=pts.D,d=1-pts.D;
+  var lamPage=(a*d)/(b*c), lamCR=crossRatio(pts.P,pts.X,pts.D,pts.V);
+  L('the page\u2019s \u03bb = ad/bc equals the four-point cross-ratio (P,V;X,D)', Math.abs(lamPage-lamCR)<1e-9, '\u0394 '+Math.abs(lamPage-lamCR).toExponential(1));
+  L('the mark fraction is the channel graduation \u03bb(z) = k/(k+1)', Math.abs(pts.X - lamOf(pts.z))<1e-9, 'X = '+pts.X.toFixed(4));
+  var harmLaw=1/pts.k + 1/pts.D, isHarm=Math.abs(lamPage+1)<0.02;
+  L('harmonic \u03bb=\u22121 coincides with 1/k + 1/c = 1', (!isHarm) || Math.abs(harmLaw-1)<0.03, isHarm?('harmonic: 1/k+1/c='+harmLaw.toFixed(3)):('1/k+1/c = '+harmLaw.toFixed(3)+' (\u03bb\u2260\u22121 here)'));
+  var el=document.getElementById('live'),h='';
+  for(var i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ============ controls ============
+function init(){
+  function bind(id,key){var s=document.getElementById(id);
+    s.addEventListener('input',function(){state[key]=parseFloat(s.value);
+      var lab=document.getElementById('v_'+id); if(lab)lab.textContent=state[key].toFixed(2); render();});}
+  bind('depth','depth'); bind('rate','r');
+  document.getElementById('harm').addEventListener('click',function(){
+    // set depth so lambda = -1 exactly for the current rate: X = D/(2D-1), D=1/r; then k=X/(1-X); depth from k
+    var D=1/state.r, X=D/(2*D-1);
+    if(X>0 && X<1){ var k=X/(1-X); var z=-k*Zp; state.depth = z/(z-Zp); // invert z=-(dp/(1-dp))Zp
+      state.depth = (-z)/(Zp + (-z));  // dp = -z/(Zp-z)
+      document.getElementById('depth').value=state.depth;
+      document.getElementById('v_depth').textContent=state.depth.toFixed(2); }
+    render(); });
+  document.getElementById('coin').addEventListener('click',function(){
+    // coincident: mark meets directing point -> X = D = 1/r -> lambda = +1; find depth
+    var D=1/state.r; if(D<1){ var k=D/(1-D); var z=-k*Zp; state.depth=(-z)/(Zp+(-z));
+      document.getElementById('depth').value=state.depth; document.getElementById('v_depth').textContent=state.depth.toFixed(2);}
+    render(); });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
