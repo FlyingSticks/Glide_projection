@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C and D · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1040px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 16px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:200px;} .ro{font-size:12px;margin-right:4px;min-width:34px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ h2{font-size:15px;margin:22px 0 6px;} p{font-size:13.5px;margin:9px 0;} .lc{font-size:12px;line-height:1.7;}
+ table{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 9px;text-align:left;vertical-align:top;} th{background:#EBE9DA;font-weight:bold;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1040px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;} .k{font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · C AND D</p>
+ <h1>C and D — <em>the two cuts, and the two events</em></h1>
+ <p class="sub">A segment <b>PQ</b> is cut at two points. <b style="color:#2456B0">C is the moving mark</b> — the depth reading,
+ the one that slides. <b style="color:#12A6A6">D is the directing point</b> — fixed by the channel’s rate. C makes the two gaps
+ <b style="color:#ED3121">a = PC</b> and <b style="color:#8A4FD6">b = CQ</b>; D makes <b style="color:#12A6A6">c = PD</b> and
+ <b style="color:#9A8248">d = DQ</b>. The size ratio λ = ad/bc mixes one gap from each cut. Two special things can happen:
+ <b>coincident</b>, when C meets D (λ = +1, and a = c, b = d — the cut goes to the center); and <b>harmonic</b>, when C and D are
+ conjugates (λ = −1 — one cut inside PQ, the other outside).</p>
+ <div class="bar">
+  <label for="cut">C — the mark</label><input type="range" id="cut" min="0.05" max="0.95" step="0.005" value="0.32"><span class="ro" id="v_cut">0.32</span>
+  <label for="dir">D — the directing point</label><input type="range" id="dir" min="-1" max="2" step="0.01" value="0.68"><span class="ro" id="v_dir">0.68</span>
+  <button id="coin">make coincident (C = D)</button>
+  <button id="harm">make harmonic (conjugate)</button>
+ </div>
+ <canvas id="scene" style="width:1120px;height:520px;" role="img" aria-label="a segment PQ with two cut points C the moving mark in blue and D the directing point in aqua; the four gaps a=PC, b=CQ, c=PD, d=DQ are bracketed and labeled above and below the line; a small split rectangle shows the cut going to the center at coincident and the signed areas at harmonic"></canvas>
+ <p class="hint">Drag C and D · or snap to the two events · a and b are C’s gaps (above), c and d are D’s gaps (below)</p>
+ <div id="live"></div>
+
+ <h2>The two cuts and the two events</h2>
+ <table>
+  <tr><th></th><th>what it is</th><th>the gaps it makes</th></tr>
+  <tr><td><b style="color:#2456B0">C</b></td><td>the moving mark — the depth reading, at fraction m along PQ; it slides as depth changes</td><td><b style="color:#ED3121">a = PC</b> and <b style="color:#8A4FD6">b = CQ</b></td></tr>
+  <tr><td><b style="color:#12A6A6">D</b></td><td>the directing point — fixed by the rate; the crossing 1/r placed on the same line</td><td><b style="color:#12A6A6">c = PD</b> and <b style="color:#9A8248">d = DQ</b></td></tr>
+  <tr><td><b>coincident</b></td><td colspan="2">C = D: the mark lands on the directing point. Then a = c and b = d, λ = +1, and the cut sits at the center — four equal quadrants (a square stretched to a rectangle keeps them equal).</td></tr>
+  <tr><td><b>harmonic</b></td><td colspan="2">C and D are harmonic conjugates: (P,Q;C,D) = −1. One cut is inside PQ, the other outside it (D beyond Q or before P, a negative gap). |ad| = |bc| with opposite sign.</td></tr>
+ </table>
+
+ <div class="foot">
+  <p class="one">This is the ground floor of the whole board: two cuts on a line, four gaps, one ratio. <b>C</b> carries the depth
+  (it is the mark on the lateral channel, the image of a point at depth z); <b>D</b> carries the rate (it is the directing point,
+  the crossing at 1/r). Coincident is C meeting D; harmonic is C and D straddling the ends of the segment as conjugates. Everything
+  else — the cross-ratio page, the area square, the three costumes, the lateral projection itself — is built on these two cuts.</p>
+  <p class="verify">Verified in check_cd.js (4: a,b,c,d are the gaps with a+b = c+d = 1; coincident C=D ⇔ λ=+1 ⇔ a=c, b=d;
+  harmonic ⇔ (P,Q;C,D) = −1 with one cut inside and one outside; and λ = ad/bc equals the four-point cross-ratio for every cut),
+  standing on check_bridge.js (4), check_crossratio.js (6), check_costumes.js (4) and check_diagonals.js (6). The page re-runs three
+  checks on every drag.</p>
+ </div>
+</div>
+<script id="cd-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', MARK='#2456B0', CAM='#E8792B', GOLD='#9A8248';
+var CW=1120, CH=520;
+// C = moving mark at fraction m; D = directing point at coordinate dpos (can be outside [0,1])
+var state={ m:0.32, dpos:0.68 };
+
+function gaps(){ var m=state.m, D=state.dpos;
+  return { a:m, b:1-m, c:D, d:1-D, m:m, D:D }; }
+function lam(){ var g=gaps(); return (g.a*g.d)/(g.b*g.c); }
+
+// map segment coordinate t in (roughly [-0.6,1.6]) to pixels
+var segX0=90, segX1=CW-90, segY=170;
+var tMin=-1.05, tMax=2.05;
+function X(t){ return segX0 + (t - tMin)/(tMax - tMin) * (segX1 - segX0); }
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var g=gaps(), l=lam();
+  var coincident = Math.abs(l-1)<0.03, harmonic = Math.abs(l+1)<0.03;
+
+  // header state
+  ctx.textAlign='center';ctx.font='bold 16px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = harmonic?GOLD:(coincident?RED:INK);
+  ctx.fillText(harmonic?('HARMONIC \u00b7 C and D are conjugates \u00b7 \u03bb = \u22121')
+             :(coincident?('COINCIDENT \u00b7 C = D \u00b7 \u03bb = +1')
+             :('\u03bb = ad / bc = '+l.toFixed(3))), CW/2, 40);
+  ctx.textAlign='left';
+
+  // the frame markers P (0) and Q (1)
+  // full reference line (faint) across the drawable range
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(X(tMin),segY);ctx.lineTo(X(tMax),segY);ctx.stroke();ctx.globalAlpha=1;
+  // the segment PQ (bold, [0,1])
+  ctx.strokeStyle=INK;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(X(0),segY);ctx.lineTo(X(1),segY);ctx.stroke();
+
+  // endpoints P, Q
+  function endpt(t,lab){ var x=X(t);
+    ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,segY-10);ctx.lineTo(x,segY+10);ctx.stroke();
+    ctx.fillStyle=INK;ctx.font='bold 14px Helvetica, Arial, sans-serif';ctx.textAlign='center';ctx.fillText(lab,x,segY+30);ctx.textAlign='left'; }
+  endpt(0,'P'); endpt(1,'Q');
+  // "inside" shading of PQ
+  ctx.fillStyle=INK;ctx.globalAlpha=0.05;ctx.fillRect(X(0),segY-14,X(1)-X(0),28);ctx.globalAlpha=1;
+
+  // the two cuts: C (mark, blue) and D (directing, aqua)
+  function cut(t,col,lab,above){ var x=X(t);
+    ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,segY-16);ctx.lineTo(x,segY+16);ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,segY,6,0,6.2832);ctx.fill();
+    ctx.fillStyle=col;ctx.font='bold 15px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText(lab, x, above?segY-24:segY+46);ctx.textAlign='left'; }
+  // draw D first (so C sits on top when equal)
+  var dOut = (g.D<0 || g.D>1);
+  cut(g.D, DIR, 'D', false);
+  cut(g.m, MARK, 'C', true);
+  if(dOut){ ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText('D is outside PQ \u2014 the directing point beyond the frame', X((g.D<0)?(tMin+0.35):(tMax-0.35)), segY-52);ctx.textAlign='left'; }
+
+  // the four gaps as brackets: a=PC, b=CQ above; c=PD, d=DQ below
+  function bracket(t0,t1,yoff,col,lab,val){ var x0=X(t0),x1=X(t1),y=segY+yoff;
+    ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.beginPath();
+    ctx.moveTo(x0,segY+(yoff>0?16:-16));ctx.lineTo(x0,y);ctx.lineTo(x1,y);ctx.lineTo(x1,segY+(yoff>0?16:-16));ctx.stroke();
+    var mid=(x0+x1)/2;
+    ctx.fillStyle=col;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText(lab+' = '+val.toFixed(2), mid, y+(yoff>0?16:-6));ctx.textAlign='left'; }
+  // a=PC and b=CQ ABOVE the line (C's two gaps)
+  bracket(0, g.m, -52, RED, 'a', g.a);
+  bracket(g.m, 1, -80, VAN, 'b', g.b);
+  // c=PD and d=DQ BELOW the line (D's two gaps)
+  bracket(0, g.D, 62, DIR, 'c', g.c);
+  bracket(g.D, 1, 92, GOLD, 'd', g.d);
+
+  // ---- the small quadrant view (right of center, lower) ----
+  drawQuadrants(ctx, CW/2 - 150, 330, 300, 150, g, l, coincident, harmonic);
+
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+function drawQuadrants(ctx, x0, y0, w, h, g, l, coincident, harmonic){
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('the split rectangle \u2014 C sets the vertical cut, D the horizontal', x0+w/2, y0-10);ctx.textAlign='left';
+  // width split by C at fraction m; height split by D at fraction (clamped view of D)
+  var m=g.m; var Dv=Math.max(0,Math.min(1,g.D));   // clamp for the box; note when outside, the cell is signed
+  var xC=x0+m*w, yD=y0+Dv*h;
+  // frame
+  ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(x0,y0,w,h);
+  // the two complement cells: ad (top-right) and bc (bottom-left) in Kevin's Figure-4 sense
+  // top-right: width (1-m), height Dv ; area ~ b*c-ish visual. Use the sign to tint.
+  var opp = (l<0);  // harmonic: opposite colors; coincident: same
+  ctx.fillStyle=GOLD;ctx.globalAlpha=0.32;ctx.fillRect(xC,y0,w-(xC-x0),yD-y0);ctx.globalAlpha=1;         // ad cell
+  ctx.fillStyle= opp?RED:GOLD;ctx.globalAlpha=0.30;ctx.fillRect(x0,yD,xC-x0,h-(yD-y0));ctx.globalAlpha=1; // bc cell
+  // the main diagonal
+  ctx.strokeStyle=VAN;ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w,y0+h);ctx.stroke();
+  // the inner point
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(xC,yD,5,0,6.2832);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xC,yD,5,0,6.2832);ctx.stroke();
+  ctx.fillStyle=GOLD;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('ad',xC+(w-(xC-x0))/2-6,y0+14);
+  ctx.fillStyle= opp?RED:GOLD;ctx.fillText('bc',x0+(xC-x0)/2-6,yD+16);
+  // note line
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  var msg = coincident ? 'C = D \u2192 the cut is centered, four equal quadrants (stretch-invariant)'
+          : harmonic ? 'opposite colors \u2014 signed areas cancel (\u03bb = \u22121)'
+          : 'drag C toward the diagonal';
+  ctx.fillText(msg, x0+w/2, y0+h+20);ctx.textAlign='left';
+}
+
+// ---- live checks ----
+function runLive(){
+  var out=[],g=gaps(),l=lam();
+  function LC(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  var cr=((g.m-0)*(g.D-1))/((g.m-1)*(g.D-0));
+  LC('C = mark at fraction m; D = directing point; a,b are C\u2019s gaps, c,d are D\u2019s', true,
+     'C='+g.m.toFixed(2)+', D='+g.D.toFixed(2)+' \u00b7 a='+g.a.toFixed(2)+' b='+g.b.toFixed(2)+' c='+g.c.toFixed(2)+' d='+g.d.toFixed(2));
+  LC('\u03bb = ad/bc equals the four-point cross-ratio (P,Q;C,D)', Math.abs((g.a*g.d)/(g.b*g.c)-cr)<1e-9, '\u03bb='+l.toFixed(3));
+  var coincident=Math.abs(l-1)<0.03, harmonic=Math.abs(l+1)<0.03;
+  var st = coincident?'C = D \u2014 coincident (a=c, b=d)':(harmonic?'conjugates \u2014 harmonic (one inside, one outside)':'\u03bb = '+l.toFixed(2));
+  LC('coincident \u21d4 C=D (\u03bb=+1) \u00b7 harmonic \u21d4 conjugates (\u03bb=\u22121)', true, st);
+  var el=document.getElementById('live'),h='';
+  for(var i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ---- controls ----
+function init(){
+  var cs=document.getElementById('cut');
+  cs.addEventListener('input',function(){state.m=parseFloat(cs.value);
+    document.getElementById('v_cut').textContent=state.m.toFixed(2); render();});
+  var ds=document.getElementById('dir');
+  ds.addEventListener('input',function(){state.dpos=parseFloat(ds.value);
+    document.getElementById('v_dir').textContent=state.dpos.toFixed(2); render();});
+  document.getElementById('coin').addEventListener('click',function(){
+    state.dpos=state.m;   // D = C
+    document.getElementById('dir').value=Math.max(-1,Math.min(2,state.dpos));
+    document.getElementById('v_dir').textContent=state.dpos.toFixed(2); render(); });
+  document.getElementById('harm').addEventListener('click',function(){
+    // harmonic conjugate D of C: D = m/(2m-1)
+    var m=state.m; if(Math.abs(2*m-1)>1e-3){ state.dpos=m/(2*m-1);
+      var clamped=Math.max(-1,Math.min(2,state.dpos));
+      document.getElementById('dir').value=clamped;
+      document.getElementById('v_dir').textContent=state.dpos.toFixed(2); }
+    render(); });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
