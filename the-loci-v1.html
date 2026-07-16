@@ -27,31 +27,33 @@
 <body>
 <div class="wrap">
  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE TWO LOCI</p>
- <h1>The two balances — <em>one cross-ratio, an interior line and an exterior curve</em></h1>
- <p class="sub">This is where the whole thread closes. A free point <b>P</b> cuts the rectangle into four cells with
- <b>signed</b> lengths a (top), c (bottom), b (left), d (right) — a length turns negative, and its cell hatches, once P
- crosses an edge. The cross-ratio Λ = ad/cb has two self-dual values, the fixed points of the complement-swap Λ ↔ 1/Λ:
- <b style="color:#ED3121">+1</b> on the <b>interior diagonal</b> (equal areas — coincident, reachable inside) and
- <b style="color:#9A8248">−1</b> on the <b>exterior hyperbola</b> ξη = −HW/4 (areas cancel — harmonic, reached only by stepping
- outside). Move P and watch which locus you can land on from where.</p>
+ <h1>The two balances — <em>the mark, the directing point, and the two planes</em></h1>
+ <p class="sub">This is where the whole thread closes, tied back to the armature. The frame’s two opposite edges are the
+ <b style="color:#ED3121">PICTURE plane</b> (left &amp; top, the P side) and the <b style="color:#8A4FD6">VANISHING plane</b>
+ (right &amp; bottom, the Q side). The <b style="color:#2456B0">mark C</b> is a vertical cut; the <b style="color:#12A6A6">directing
+ point D</b> is a horizontal cut. Their four gaps are <b style="color:#ED3121">a = C→picture</b>, <b style="color:#8A4FD6">b =
+ C→vanishing</b>, <b style="color:#12A6A6">c = D→picture</b>, <b style="color:#9A8248">d = D→vanishing</b>, and λ = ad/bc.
+ The two cut lines cross at a point; that crossing sits on the <b>picture→vanishing diagonal</b> when λ = +1
+ (<b>coincident</b>, inside the frame) and on a <b>hyperbola outside the frame</b> when λ = −1 (<b>harmonic</b>). Move the mark
+ and the directing point and watch where their crossing can land.</p>
  <div class="bar">
-  <label for="px">Pₓ (across)</label><input type="range" id="px" min="-1.2" max="4.2" step="0.02" value="2.1"><span class="ro" id="v_px">2.10</span>
-  <label for="py">Pᵧ (up)</label><input type="range" id="py" min="-1.2" max="3.2" step="0.02" value="0.7"><span class="ro" id="v_py">0.70</span>
-  <button id="coin">snap to +1 (diagonal)</button>
-  <button id="harm">snap to −1 (hyperbola)</button>
+  <label for="pm">C — the mark (x = m)</label><input type="range" id="pm" min="-0.5" max="1.5" step="0.01" value="0.62"><span class="ro" id="v_pm">0.62</span>
+  <label for="pn">D — the directing point (y = n)</label><input type="range" id="pn" min="-0.5" max="1.5" step="0.01" value="0.30"><span class="ro" id="v_pn">0.30</span>
+  <button id="coin">snap to +1 (coincident)</button>
+  <button id="harm">snap to −1 (harmonic)</button>
   <button id="reset">reset</button>
  </div>
  <canvas id="scene" style="width:1120px;height:640px;" role="img" aria-label="a rectangle in the plane with a free point P; the +1 anti-diagonal runs through the interior from corner (W,0) to (0,H) in red; the -1 rectangular hyperbola runs outside the rectangle through the same two corners in gold; four signed cells around P hatch when P leaves the rectangle; a readout panel shows Lambda=ad/cb, the ad-cb diagonal test, the ad+cb hyperbola test, and the rank-one product"></canvas>
- <p class="hint">Move P with the two sliders · snap to either locus · the +1 line lives inside, the −1 hyperbola lives outside — that is the whole point</p>
+ <p class="hint">Move the mark C and the directing point D · their crossing is +1 on the interior diagonal, −1 on the exterior hyperbola — that is why coincident is reachable inside and harmonic only outside</p>
  <div id="live"></div>
 
- <h2>Why the two balances live where they do</h2>
+ <h2>Why coincident is inside and harmonic is outside</h2>
  <table>
   <tr><th></th><th>Λ = +1 · coincident</th><th>Λ = −1 · harmonic</th></tr>
-  <tr><td><b>locus</b></td><td>the anti-diagonal x/W + y/H = 1 — a straight line <b>through the interior</b></td><td>the rectangular hyperbola ξη = −HW/4 — a curve lying <b>wholly outside</b> the open rectangle</td></tr>
-  <tr><td><b>condition</b></td><td>ad = cb — the two complement areas are equal (Euclid I.43)</td><td>ad + cb = 0 — the two <b>signed</b> areas cancel</td></tr>
-  <tr><td><b>reachable</b></td><td>from inside — the mark C can meet the directing point D at an interior point</td><td>only by stepping outside — a length must change sign, so P (or D) must leave the frame</td></tr>
-  <tr><td><b>in the C/D sheet</b></td><td>C = D, the inner point on the diagonal, complements equal</td><td>C and D harmonic conjugates, D beyond the segment, the negative gap</td></tr>
+  <tr><td><b>where the cut lines cross</b></td><td>on the picture→vanishing diagonal (m = n) — <b>inside</b> the frame</td><td>on the hyperbola (m−½)(n−½) = −¼ — <b>outside</b> the frame</td></tr>
+  <tr><td><b>condition</b></td><td>ad = bc — the two complement areas equal (Euclid I.43)</td><td>ad + bc = 0 — the two <b>signed</b> areas cancel</td></tr>
+  <tr><td><b>the planes</b></td><td>mark and directing gaps balance symmetrically between picture and vanishing</td><td>the directing line leaves the frame past the vanishing plane — its gap d goes negative</td></tr>
+  <tr><td><b>reachable</b></td><td>from inside — the mark can meet the directing point within the frame</td><td>only by stepping outside — a gap must change sign, so a cut line must leave the frame</td></tr>
  </table>
 
  <div class="foot">
@@ -66,7 +68,7 @@
   <p class="verify">Verified in check_loci.js (5: signed lengths flip at the edges; the four areas are rank-one so ab·cd = ad·cb =
   abcd for every P; ad−cb = 0 exactly on the interior anti-diagonal and ad+cb = 0 exactly on the exterior hyperbola; the sign is a clean
   side-indicator; and a horizontal slice recovers the 1-D cross-ratio whose harmonic value sits where the slice meets the outside curve),
-  standing on check_hyperbola.js (5: the −1 locus is ξη = −HW/4 through corners (0,H),(W,0), wholly outside the open rectangle),
+  standing on check_planes.js (5: the four planes map onto the frame edges — picture and vanishing on opposite sides, the mark and directing as the two cut lines with gaps a,b,c,d; coincident is the lines crossing on the picture→vanishing diagonal, harmonic is them crossing outside; and the harmonic instant is the armature law 1/k + 1/c = 1), check_hyperbola.js (5: the −1 locus is ξη = −HW/4 through corners (0,H),(W,0), wholly outside the open rectangle),
   check_quadrants.js (4), check_cd.js (4), check_costumes.js (4), check_diagonals.js (6), check_areasquare.js (4), check_crossratio.js (6),
   and check_bridge.js (4). The page re-runs three checks on every move.</p>
  </div>
@@ -129,102 +131,122 @@ function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
   var L=lengths(), lam=Lam();
-  var adMcb=L.a*L.d-L.c*L.b, adPcb=L.a*L.d+L.c*L.b;
-  var onDiag=Math.abs(adMcb)<0.02*W*H, onHyp=Math.abs(adPcb)<0.02*W*H;
+  var adMbc=L.a*L.d-L.b*L.c, adPbc=L.a*L.d+L.b*L.c;
+  var onDiag=Math.abs(adMbc)<0.015, onHyp=Math.abs(adPbc)<0.02;
+  var m=state.m, n=state.n;
+  var Ix=SX(m), Iy=SY(n);   // intersection of the two cut lines = the point (m,n)
 
   // header
   ctx.textAlign='center';ctx.font='bold 16px Helvetica, Arial, sans-serif';
   ctx.fillStyle= onHyp?GOLD:(onDiag?RED:INK);
-  ctx.fillText(onHyp?('HARMONIC \u00b7 \u039b = \u22121 \u00b7 P on the outside hyperbola')
-             :(onDiag?('COINCIDENT \u00b7 \u039b = +1 \u00b7 P on the interior diagonal')
-             :('\u039b = ad / cb = '+lam.toFixed(3))), CW/2, 34);
+  ctx.fillText(onHyp?('HARMONIC \u00b7 \u03bb = \u22121 \u00b7 the cut lines cross OUTSIDE')
+             :(onDiag?('COINCIDENT \u00b7 \u03bb = +1 \u00b7 the cut lines cross ON the diagonal')
+             :('\u03bb = ad / bc = '+lam.toFixed(3))), CW/2, 32);
   ctx.textAlign='left';
 
-  // ---- the plane region ----
-  // draw the -1 hyperbola: xi*eta = -HW/4, centered at (W/2,H/2). Both branches.
-  ctx.strokeStyle=GOLD;ctx.lineWidth=2;ctx.globalAlpha=0.9;
-  function hypY(x){ var xi=x-W/2; if(Math.abs(xi)<1e-4) return null; var eta=(-W*H/4)/xi; return eta+H/2; }
-  var started=false;
-  ctx.beginPath();
-  for(var xx=-1.2; xx<=W/2-0.02; xx+=0.02){ var yy=hypY(xx); if(yy===null)continue; var sx=SX(xx),sy=SY(yy);
-    if(!started){ctx.moveTo(sx,sy);started=true;} else ctx.lineTo(sx,sy); }
-  ctx.stroke();
-  started=false;ctx.beginPath();
-  for(var xx2=W/2+0.02; xx2<=W+1.2; xx2+=0.02){ var yy2=hypY(xx2); if(yy2===null)continue; var sx2=SX(xx2),sy2=SY(yy2);
-    if(!started){ctx.moveTo(sx2,sy2);started=true;} else ctx.lineTo(sx2,sy2); }
-  ctx.stroke();ctx.globalAlpha=1;
+  // ---- the two loci ----
+  // -1 hyperbola: (m-1/2)(n-1/2) = -1/4  i.e. n = 1/2 + (-1/4)/(m-1/2). Both branches.
+  ctx.strokeStyle=GOLD;ctx.lineWidth=2;ctx.globalAlpha=0.85;
+  function hypN(mm){ var xi=mm-0.5; if(Math.abs(xi)<1e-4) return null; return 0.5 + (-0.25)/xi; }
+  var st=false;ctx.beginPath();
+  for(var mm=-0.55; mm<=0.5-0.01; mm+=0.01){ var nn=hypN(mm); if(nn===null||nn<-0.6||nn>1.6)continue; var sx=SX(mm),sy=SY(nn);
+    if(!st){ctx.moveTo(sx,sy);st=true;} else ctx.lineTo(sx,sy);} ctx.stroke();
+  st=false;ctx.beginPath();
+  for(var mm2=0.5+0.01; mm2<=1.55; mm2+=0.01){ var nn2=hypN(mm2); if(nn2===null||nn2<-0.6||nn2>1.6)continue; var sx2=SX(mm2),sy2=SY(nn2);
+    if(!st){ctx.moveTo(sx2,sy2);st=true;} else ctx.lineTo(sx2,sy2);} ctx.stroke();ctx.globalAlpha=1;
   ctx.fillStyle=GOLD;ctx.font='12px Helvetica, Arial, sans-serif';
-  ctx.fillText('\u039b = \u22121  hyperbola  \u03be\u03b7 = \u2212HW/4  (harmonic, outside)', SX(-1.1), SY(H+0.55));
-
-  // draw the +1 anti-diagonal: x/W + y/H = 1, from (W,0) to (0,H)
+  ctx.fillText('\u03bb = \u22121  harmonic locus (outside the frame)', SX(-0.5), SY(1.5));
+  // +1 diagonal: the picture->vanishing diagonal m=n, from (0,0) to (1,1)
   ctx.strokeStyle=RED;ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(SX(W),SY(0));ctx.lineTo(SX(0),SY(H));ctx.stroke();
-  ctx.fillStyle=RED;ctx.fillText('\u039b = +1  diagonal  (coincident, interior)', SX(0)-4, SY(H)-10);
+  ctx.beginPath();ctx.moveTo(SX(0),SY(0));ctx.lineTo(SX(1),SY(1));ctx.stroke();
+  ctx.fillStyle=RED;ctx.fillText('\u03bb = +1  coincident locus (the picture\u2192vanishing diagonal)', SX(0.04), SY(1)+16);
 
-  // the rectangle
-  ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.strokeRect(SX(0),SY(H),W*scale,H*scale);
-  // corner labels
-  ctx.fillStyle=INK;ctx.font='11px Helvetica, Arial, sans-serif';
-  ctx.fillText('(0,0)',SX(0)-30,SY(0)+4);ctx.fillText('(W,0)',SX(W)+4,SY(0)+4);
-  ctx.fillText('(0,H)',SX(0)-30,SY(H)+4);ctx.fillText('(W,H)',SX(W)+4,SY(H)+4);
+  // ---- the frame with the FOUR PLANES on its edges ----
+  var x0=SX(0), y1=SY(1), ww=scale, hh=scale;
+  // picture plane = LEFT + TOP edges (the P side); vanishing = RIGHT + BOTTOM (the Q side)
+  ctx.lineWidth=4;
+  ctx.strokeStyle=PIC;ctx.beginPath();ctx.moveTo(x0,SY(0));ctx.lineTo(x0,SY(1));ctx.stroke();       // left = picture
+  ctx.beginPath();ctx.moveTo(x0,SY(1));ctx.lineTo(SX(1),SY(1));ctx.stroke();                         // top = picture
+  ctx.strokeStyle=VAN;ctx.beginPath();ctx.moveTo(SX(1),SY(0));ctx.lineTo(SX(1),SY(1));ctx.stroke();  // right = vanishing
+  ctx.beginPath();ctx.moveTo(x0,SY(0));ctx.lineTo(SX(1),SY(0));ctx.stroke();                         // bottom = vanishing
+  ctx.lineWidth=1;
+  // plane labels
+  ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillStyle=PIC;ctx.save();ctx.translate(x0-42,SY(0.5));ctx.rotate(-Math.PI/2);ctx.fillText('PICTURE plane',0,0);ctx.restore();
+  ctx.fillStyle=PIC;ctx.fillText('PICTURE plane',SX(0.5),SY(1)-26);
+  ctx.fillStyle=VAN;ctx.save();ctx.translate(SX(1)+42,SY(0.5));ctx.rotate(Math.PI/2);ctx.fillText('VANISHING plane',0,0);ctx.restore();
+  ctx.fillStyle=VAN;ctx.fillText('VANISHING plane',SX(0.5),SY(0)+34);
+  ctx.textAlign='left';
 
-  // the four cells around P, hatched where the length is negative
-  var Px=SX(state.px), Py=SY(state.py);
-  // cell rectangles in screen coords: split at P
-  function cell(x0,y0,x1,y1,neg,col){ var xa=Math.min(x0,x1),xb=Math.max(x0,x1),ya=Math.min(y0,y1),yb=Math.max(y0,y1);
-    ctx.fillStyle=col;ctx.globalAlpha=neg?0.12:0.22;ctx.fillRect(xa,ya,xb-xa,yb-ya);ctx.globalAlpha=1;
-    if(neg){ ctx.strokeStyle=col;ctx.lineWidth=0.6;ctx.globalAlpha=0.5;
-      for(var h=xa-(yb-ya); h<xb; h+=7){ ctx.beginPath();ctx.moveTo(Math.max(xa,h),Math.max(ya, ya+(h<xa?(xa-h):0)));
-        ctx.lineTo(Math.min(xb,h+(yb-ya)),Math.min(yb, ya+(h+ (yb-ya) >xb?(xb-h):(yb-ya)) ));ctx.stroke(); }
-      ctx.globalAlpha=1; } }
-  // clip cells to a viewport so hatching stays bounded
-  ctx.save();ctx.beginPath();ctx.rect(SX(-1.3),SY(H+1.3),(W+2.6)*scale,(H+2.6)*scale);ctx.clip();
-  // top cell (a): between top edge y=H and P, full width band? Use the four-quadrant split at P vs rect corners.
-  // Represent the four signed products as the four rectangles between P and the FAR corners:
-  // a*d = (H-y)(W-x): rectangle from P to corner (W,H). c*b = y*x: P to (0,0).
-  // a*b = (H-y)x: P to (0,H). c*d = y(W-x): P to (W,0).
-  cell(Px,Py, SX(W),SY(H), (L.a<0)!==(L.d<0), GOLD);   // ad -> corner (W,H)
-  cell(Px,Py, SX(0),SY(0), (L.c<0)!==(L.b<0), RED);    // cb -> corner (0,0)
-  cell(Px,Py, SX(0),SY(H), (L.a<0)!==(L.b<0), MARK);   // ab -> corner (0,H)
-  cell(Px,Py, SX(W),SY(0), (L.c<0)!==(L.d<0), DIR);    // cd -> corner (W,0)
-  ctx.restore();
+  // ---- the MARK line (vertical, x=m) and the DIRECTING line (horizontal, y=n) ----
+  var cutInsideM = (m>=0&&m<=1), cutInsideN = (n>=0&&n<=1);
+  // extend cut lines across the drawable region
+  ctx.strokeStyle=MARK;ctx.lineWidth=2.5;ctx.setLineDash(cutInsideM?[]:[6,4]);
+  ctx.beginPath();ctx.moveTo(Ix,SY(-0.55));ctx.lineTo(Ix,SY(1.55));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=DIR;ctx.lineWidth=2.5;ctx.setLineDash(cutInsideN?[]:[6,4]);
+  ctx.beginPath();ctx.moveTo(SX(-0.55),Iy);ctx.lineTo(SX(1.55),Iy);ctx.stroke();ctx.setLineDash([]);
+  // labels for the cut lines
+  ctx.fillStyle=MARK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('C \u2014 the mark',Ix+7,SY(1.5));
+  ctx.fillStyle=DIR;ctx.fillText('D \u2014 the directing point',SX(1.52)-150,Iy-8);
 
-  // P itself
+  // the intersection point (m,n) = the free point
   ctx.fillStyle= onHyp?GOLD:(onDiag?RED:INK);
-  ctx.beginPath();ctx.arc(Px,Py,6,0,6.2832);ctx.fill();
-  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(Px,Py,6,0,6.2832);ctx.stroke();
-  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('P',Px+9,Py-7);
-  var outside = (state.px<0||state.px>W||state.py<0||state.py>H);
-  if(outside){ ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('P is outside \u2014 a length has flipped sign (hatched cell)',Px+9,Py+16); }
+  ctx.beginPath();ctx.arc(Ix,Iy,6,0,6.2832);ctx.fill();
+  ctx.strokeStyle= onDiag?RED:(onHyp?GOLD:'#fff');ctx.lineWidth=2;ctx.beginPath();ctx.arc(Ix,Iy,onDiag||onHyp?8:6,0,6.2832);ctx.stroke();
+
+  // ---- a,b,c,d on the SIDES ----
+  // a = PC = m : along the TOP edge, from picture(left) to the mark line
+  // b = CQ = 1-m : along the TOP edge, from the mark line to vanishing(right)
+  // c = PD = n : along the LEFT edge, from picture(top? ) ... picture plane is left+top; directing gaps are vertical
+  // Convention: a,b measured horizontally (mark splits width); c,d measured vertically (directing splits height).
+  ctx.font='bold 14px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  // a and b on the TOP edge
+  ctx.fillStyle=RED; ctx.fillText('a', (x0+Ix)/2, SY(1)-8);
+  ctx.fillStyle=VAN; ctx.fillText('b', (Ix+SX(1))/2, SY(1)-8);
+  // c and d on the LEFT edge
+  ctx.fillStyle=DIR; ctx.fillText('c', x0-16, (SY(1)+Iy)/2+5);
+  ctx.fillStyle=GOLD;ctx.fillText('d', x0-16, (Iy+SY(0))/2+5);
+  ctx.textAlign='left';
+  // small tick guides for the four gaps along the edges
+  ctx.lineWidth=1;ctx.globalAlpha=0.6;
+  ctx.strokeStyle=RED;ctx.beginPath();ctx.moveTo(x0,SY(1)+4);ctx.lineTo(Ix,SY(1)+4);ctx.stroke();
+  ctx.strokeStyle=VAN;ctx.beginPath();ctx.moveTo(Ix,SY(1)+8);ctx.lineTo(SX(1),SY(1)+8);ctx.stroke();
+  ctx.strokeStyle=DIR;ctx.beginPath();ctx.moveTo(x0-6,SY(1));ctx.lineTo(x0-6,Iy);ctx.stroke();
+  ctx.strokeStyle=GOLD;ctx.beginPath();ctx.moveTo(x0-10,Iy);ctx.lineTo(x0-10,SY(0));ctx.stroke();
+  ctx.globalAlpha=1;
+
+  var outside = (m<0||m>1||n<0||n>1);
+  if(outside){ ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+    ctx.fillText('a cut line is outside the frame \u2014 a gap has gone negative', Ix+10, Iy+18); }
 
   // ---- readouts (right) ----
-  drawReadouts(ctx, 760, 90, L, lam, adMcb, adPcb, onDiag, onHyp);
+  drawReadouts(ctx, 770, 96, L, lam, adMbc, adPbc, onDiag, onHyp);
 
   ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
 }
 
-function drawReadouts(ctx, x, y, L, lam, adMcb, adPcb, onDiag, onHyp){
-  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE CROSS-RATIO \u039b = ad/cb',x,y);
+function drawReadouts(ctx, x, y, L, lam, adMbc, adPbc, onDiag, onHyp){
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE CROSS-RATIO \u03bb = ad/bc',x,y);
   var yy=y+26,lh=20;
   ctx.font='12px Helvetica, Arial, sans-serif';
   function row(lab,val,col){ctx.fillStyle=col||INK;ctx.fillText(lab,x,yy);ctx.textAlign='right';ctx.fillText(val,x+320,yy);ctx.textAlign='left';yy+=lh;}
-  row('signed a (top), c (bottom):', L.a.toFixed(2)+', '+L.c.toFixed(2), FAINT);
-  row('signed b (left), d (right):', L.b.toFixed(2)+', '+L.d.toFixed(2), FAINT);
+  row('a = mark\u2192picture, b = mark\u2192vanishing:', L.a.toFixed(2)+', '+L.b.toFixed(2), FAINT);
+  row('c = dir\u2192picture, d = dir\u2192vanishing:', L.c.toFixed(2)+', '+L.d.toFixed(2), FAINT);
   yy+=4;
-  row('\u039b = ad / cb:', lam.toFixed(3), onHyp?GOLD:(onDiag?RED:INK));
+  row('\u03bb = ad / bc:', lam.toFixed(3), onHyp?GOLD:(onDiag?RED:INK));
   yy+=10;
   ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillStyle=RED;ctx.fillText('+1 test \u2014 the diagonal (interior):',x,yy);yy+=lh;
   ctx.font='12px Helvetica, Arial, sans-serif';
-  row('ad \u2212 cb  (0 on the diagonal):', adMcb.toFixed(3), onDiag?GREEN:INK);
+  row('ad \u2212 bc  (0 on the diagonal):', adMbc.toFixed(3), onDiag?GREEN:INK);
   ctx.fillStyle=onDiag?GREEN:FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText(onDiag?'\u25c9 on the diagonal \u2014 equal areas, \u039b=+1':'\u25cb off the diagonal',x,yy);yy+=lh+6;
   ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillStyle=GOLD;ctx.fillText('\u22121 test \u2014 the hyperbola (exterior):',x,yy);yy+=lh;
   ctx.font='12px Helvetica, Arial, sans-serif';
-  row('ad + cb  (0 on the hyperbola):', adPcb.toFixed(3), onHyp?GREEN:INK);
+  row('ad + bc  (0 on the hyperbola):', adPbc.toFixed(3), onHyp?GREEN:INK);
   ctx.fillStyle=onHyp?GREEN:FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText(onHyp?'\u25c9 on the hyperbola \u2014 areas cancel, \u039b=\u22121':'\u25cb off the hyperbola',x,yy);yy+=lh+6;
   ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillStyle=INK;ctx.fillText('product \u2014 holds everywhere:',x,yy);yy+=lh;
   ctx.font='12px Helvetica, Arial, sans-serif';
   var abcd=L.a*L.b*L.c*L.d;
-  row('ab\u00b7cd = ad\u00b7cb = abcd:', abcd.toFixed(3), FAINT);
+  row('ab\u00b7cd = ad\u00b7bc = abcd:', abcd.toFixed(3), FAINT);
   ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('the rank-one invariant \u2014 blind to sign',x,yy);
 }
 
@@ -233,13 +255,13 @@ function runLive(){
   var out=[],L=lengths(),lam=Lam();
   function LC(t,ok,v){out.push({t:t,ok:ok,v:v});}
   var abcd=L.a*L.b*L.c*L.d;
-  LC('rank-one product ab\u00b7cd = ad\u00b7cb = abcd for this P', Math.abs((L.a*L.b*L.c*L.d)-abcd)<1e-9 && Math.abs((L.a*L.d)*(L.c*L.b)-abcd)<1e-9, 'abcd='+abcd.toFixed(3));
-  var adMcb=L.a*L.d-L.c*L.b;
-  var onAnti=Math.abs(state.px/W+state.py/H-1)<0.02;
-  LC('+1 \u21d4 on the interior anti-diagonal (ad=cb)', (Math.abs(adMcb)<0.03)===onAnti || Math.abs(adMcb)>=0.03, 'ad\u2212cb='+adMcb.toFixed(3));
-  var adPcb=L.a*L.d+L.c*L.b;
-  var onHypCurve=Math.abs((state.px-W/2)*(state.py-H/2)-(-W*H/4))<0.03;
-  LC('\u22121 \u21d4 on the exterior hyperbola (ad+cb=0)', (Math.abs(adPcb)<0.05)===onHypCurve || Math.abs(adPcb)>=0.05, 'ad+cb='+adPcb.toFixed(3));
+  LC('rank-one product ab\u00b7cd = ad\u00b7bc = abcd for this configuration', Math.abs((L.a*L.d)*(L.b*L.c)-abcd)<1e-9, 'abcd='+abcd.toFixed(3));
+  var adMbc=L.a*L.d-L.b*L.c;
+  var onDiagLine=Math.abs(state.m-state.n)<0.02;
+  LC('+1 \u21d4 the mark & directing lines cross ON the picture\u2192vanishing diagonal (m=n)', (Math.abs(adMbc)<0.03)===onDiagLine || Math.abs(adMbc)>=0.03, 'ad\u2212bc='+adMbc.toFixed(3));
+  var adPbc=L.a*L.d+L.b*L.c;
+  var onHypCurve=Math.abs((state.m-0.5)*(state.n-0.5)-(-0.25))<0.03;
+  LC('\u22121 \u21d4 they cross on the hyperbola OUTSIDE the frame (ad+bc=0)', (Math.abs(adPbc)<0.05)===onHypCurve || Math.abs(adPbc)>=0.05, 'ad+bc='+adPbc.toFixed(3));
   var el=document.getElementById('live'),h='';
   for(var i=0;i<out.length;i++){var o=out[i];
     h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
@@ -252,21 +274,20 @@ function init(){
   function bind(id,key){var s=document.getElementById(id);
     s.addEventListener('input',function(){state[key]=parseFloat(s.value);
       var lab=document.getElementById('v_'+id);if(lab)lab.textContent=state[key].toFixed(2);render();});}
-  bind('px','px'); bind('py','py');
+  bind('pm','m'); bind('pn','n');
   document.getElementById('coin').addEventListener('click',function(){
-    // snap to the interior diagonal, keeping x, solving y = H(1 - x/W)
-    var x=state.px; if(x<0.1)x=0.6; if(x>W-0.1)x=W-0.6; state.px=x; state.py=H*(1-x/W);
-    document.getElementById('px').value=state.px;document.getElementById('py').value=state.py;
-    document.getElementById('v_px').textContent=state.px.toFixed(2);document.getElementById('v_py').textContent=state.py.toFixed(2);render();});
+    // snap to the diagonal m=n, keeping the mark m, setting directing n=m
+    state.n=state.m;
+    document.getElementById('pn').value=state.n;document.getElementById('v_pn').textContent=state.n.toFixed(2);render();});
   document.getElementById('harm').addEventListener('click',function(){
-    // snap to the hyperbola: pick a xi, solve eta. Choose left branch outside the rectangle.
-    var xi=-0.6; var eta=(-W*H/4)/xi; state.px=xi+W/2; state.py=eta+H/2;
-    document.getElementById('px').value=state.px;document.getElementById('py').value=state.py;
-    document.getElementById('v_px').textContent=state.px.toFixed(2);document.getElementById('v_py').textContent=state.py.toFixed(2);render();});
+    // snap to the harmonic locus: keep mark m (inside), set directing n = m/(2m-1) (outside)
+    var m=state.m; if(Math.abs(2*m-1)<0.05) m=0.3; state.m=m; state.n=m/(2*m-1);
+    document.getElementById('pm').value=state.m;document.getElementById('v_pm').textContent=state.m.toFixed(2);
+    document.getElementById('pn').value=Math.max(-0.55,Math.min(1.55,state.n));document.getElementById('v_pn').textContent=state.n.toFixed(2);render();});
   document.getElementById('reset').addEventListener('click',function(){
-    state.px=2.1;state.py=0.7;
-    document.getElementById('px').value=2.1;document.getElementById('py').value=0.7;
-    document.getElementById('v_px').textContent='2.10';document.getElementById('v_py').textContent='0.70';render();});
+    state.m=0.62;state.n=0.30;
+    document.getElementById('pm').value=0.62;document.getElementById('pn').value=0.30;
+    document.getElementById('v_pm').textContent='0.62';document.getElementById('v_pn').textContent='0.30';render();});
   render();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
