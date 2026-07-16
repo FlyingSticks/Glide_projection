@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The hinge · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1240px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:28px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 16px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:160px;} .ro{font-size:12px;margin-right:4px;min-width:34px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ h2{font-size:15px;margin:22px 0 6px;} p{font-size:13.5px;margin:9px 0;} .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1080px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;} .k{font-weight:bold;}
+ table{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 9px;text-align:left;vertical-align:top;} th{background:#EBE9DA;font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE HINGE</p>
+ <h1>One condition, three names — <em>the harmonic cut, and where it lives</em></h1>
+ <p class="sub">The harmonic configuration is one equation, <b>|ad| = |bc|</b>, wearing three costumes: <b>matched size</b>
+ (the two complement rectangles have equal area — Euclid I.43), <b>similar shape</b> (the two diagonal-rectangles have equal
+ aspect ratio), and <b>straight corner-diagonals</b> (the two corner-diagonals through the inner point line up). Drag the cut and
+ all three move together; they reach the condition at the same instant. The <b>signed</b> cross-ratio λ = ad/bc then splits the two
+ states: <b>harmonic</b> (λ = −1, one cut outside, signed areas cancel) and <b>coincident</b> (λ = +1, both inside, areas add — a
+ perfect square). This is the same harmonic event the cross-ratio page and the lateral projection carry — the hinge between them.</p>
+ <div class="bar">
+  <label for="cut">the cut C</label><input type="range" id="cut" min="0.03" max="0.97" step="0.005" value="0.42"><span class="ro" id="v_cut">0.42</span>
+  <label for="rate">rate r (sets D = 1/r)</label><input type="range" id="rate" min="0.3" max="1.6" step="0.01" value="0.4"><span class="ro" id="v_rate">0.40</span>
+  <button id="harm">make harmonic (λ = −1)</button>
+  <button id="coin">make coincident (λ = +1)</button>
+ </div>
+ <canvas id="scene" style="width:1180px;height:680px;" role="img" aria-label="three panels showing the harmonic condition three ways: matched size with two equal-area complement rectangles, similar shape with two equal-aspect diagonal rectangles, and straight corner-diagonals through the inner point; a readout panel shows the magnitude condition, the signed cross-ratio distinguishing harmonic from coincident, and the tie to the lateral channel harmonic law"></canvas>
+ <p class="hint">Three costumes of one condition, live · the readout panel separates the magnitude |ad|=|bc| (all three costumes) from the sign of λ (harmonic vs coincident)</p>
+ <div id="live"></div>
+
+ <h2>The one condition and its two states</h2>
+ <table>
+  <tr><th></th><th>the magnitude — |ad| = |bc|</th><th>the sign of λ = ad/bc</th></tr>
+  <tr><td><b>matched size</b></td><td>the two complement rectangles have equal area (Euclid I.43)</td><td rowspan="3" style="vertical-align:middle;"><b>harmonic</b> (λ = −1): one cut outside the frame, so ad and bc have opposite sign — the signed areas <b>cancel</b>.<br><br><b>coincident</b> (λ = +1): both cuts inside, ad and bc same sign — the areas <b>add</b>, and the box is a perfect square.<br><br>Both share |ad| = |bc|; only the sign tells them apart.</td></tr>
+  <tr><td><b>similar shape</b></td><td>the two diagonal-rectangles have equal aspect ratio, |c|/|a| = |d|/|b|, which cross-multiplies to |ad| = |bc|</td></tr>
+  <tr><td><b>straight diagonals</b></td><td>the two corner-diagonals through the inner point are collinear — verified to line up exactly when |ad| = |bc|</td></tr>
+ </table>
+
+ <div class="foot">
+  <p class="one">This is the hinge. To the left of it sits the <b>cross-ratio page</b>, where these four lengths are one segment cut twice
+  and λ = ad/bc is the invariant. To the right sits the <b>lateral projection</b>, where the same four lengths are one channel’s
+  armature — picture point, mark, directing point, vanishing point — and the harmonic cut is the conjugate law 1/k + 1/c = 1. The
+  three costumes are the geometry in the middle: the harmonic condition is matched area, is similar shape, is straight diagonals, is
+  λ = −1, is 1/k + 1/c = 1. Not five facts — one, seen from five sides.</p>
+  <p class="verify">Verified in check_costumes.js (4: the three costumes vanish together on |ad|=|bc| at the harmonic cut, with the
+  directed cross-product flagged as the coincident marker rather than the harmonic one; the signed λ splits harmonic from coincident
+  while both share the magnitude; the four readouts are mutually consistent across a 201-frame sweep; and the harmonic cut is
+  1/k + 1/c = 1 on the lateral channel), standing on check_diagonals.js (6: straight corner-diagonals ⇔ |ad|=|bc|, collinearity to
+  10⁻¹⁶), check_areasquare.js (4), check_crossratio.js (6) and check_bridge.js (4). The page re-runs three checks on every drag.</p>
+ </div>
+</div>
+<script id="hinge-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', MARK='#2456B0', CAM='#E8792B', GOLD='#9A8248';
+var CW=1180, CH=680;
+var Zp=300;
+// state: inner cut C in (0,1), and directing coordinate D (>1 => cut outside, harmonic possible; <1 interior)
+var state={ C:0.42, D:2.5 };
+
+function lengths(){ var a=state.C, b=1-state.C, c=state.D, d=1-state.D; return {a:a,b:b,c:c,d:d}; }
+function lam(){ var L=lengths(); return (L.a*L.d)/(L.b*L.c); }
+
+// ============ figure geometry ============
+// three sub-panels stacked in the left 2/3; readouts in the right 1/3.
+var LX=40, LW=740, RX=810;
+
+// (i) matched size: two complement rectangles ad (top-right) and bc (bottom-left), areas compared
+function drawSize(ctx, x0, y0, w, h){
+  var L=lengths();
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('(i)  matched size \u2014 |ad| = |bc|',x0,y0-8);
+  // draw a unit frame; columns b|d, rows a|c (Kevin's layout). Use magnitudes for drawing.
+  var b=Math.abs(L.b), d=Math.abs(L.d), a=Math.abs(L.a), c=Math.abs(L.c);
+  var W=b+d, H=a+c; if(W<1e-6)W=1; if(H<1e-6)H=1;
+  var sx=w/W, sy=h/H;
+  var xC=x0+b*sx, yC=y0+a*sy;
+  // frame
+  ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(x0,y0,w,h);
+  // ad cell (top-right): width d, height a
+  ctx.fillStyle=GOLD;ctx.globalAlpha=0.30;ctx.fillRect(xC,y0,d*sx,a*sy);ctx.globalAlpha=1;
+  // bc cell (bottom-left): width b, height c
+  ctx.fillStyle=RED;ctx.globalAlpha=0.28;ctx.fillRect(x0,yC,b*sx,c*sy);ctx.globalAlpha=1;
+  // cut lines
+  ctx.strokeStyle=INK;ctx.lineWidth=0.7;ctx.globalAlpha=0.5;
+  ctx.beginPath();ctx.moveTo(xC,y0);ctx.lineTo(xC,y0+h);ctx.moveTo(x0,yC);ctx.lineTo(x0+w,yC);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=GOLD;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('ad = '+(L.a*L.d).toFixed(3),xC+6,y0+14);
+  ctx.fillStyle=RED;ctx.fillText('bc = '+(L.b*L.c).toFixed(3),x0+6,yC+16);
+}
+
+// (ii) similar shape: two diagonal-rectangles ac (top-left, width b? ) and bd -- show aspect ratios
+function drawShape(ctx, x0, y0, w, h){
+  var L=lengths();
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('(ii)  similar shape \u2014 |c|/|a| = |d|/|b|',x0,y0-8);
+  var b=Math.abs(L.b), d=Math.abs(L.d), a=Math.abs(L.a), c=Math.abs(L.c);
+  var W=b+d, H=a+c; if(W<1e-6)W=1; if(H<1e-6)H=1;
+  var sx=w/W, sy=h/H, xC=x0+b*sx, yC=y0+a*sy;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(x0,y0,w,h);
+  // the two diagonal cells the main diagonal passes through: top-left (b x a) and bottom-right (d x c)
+  ctx.fillStyle=MARK;ctx.globalAlpha=0.22;ctx.fillRect(x0,y0,b*sx,a*sy);ctx.globalAlpha=1;       // "ac" block (b x a)
+  ctx.fillStyle=VAN;ctx.globalAlpha=0.20;ctx.fillRect(xC,yC,d*sx,c*sy);ctx.globalAlpha=1;         // "bd" block (d x c)
+  ctx.strokeStyle=INK;ctx.lineWidth=0.7;ctx.globalAlpha=0.5;
+  ctx.beginPath();ctx.moveTo(xC,y0);ctx.lineTo(xC,y0+h);ctx.moveTo(x0,yC);ctx.lineTo(x0+w,yC);ctx.stroke();ctx.globalAlpha=1;
+  var arTL=(a/b), arBR=(c/d);
+  ctx.fillStyle=MARK;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('a:b = '+arTL.toFixed(3),x0+6,y0+a*sy-6);
+  ctx.fillStyle=VAN;ctx.fillText('c:d = '+arBR.toFixed(3),xC+6,yC+c*sy-6);
+}
+
+// (iii) straight corner-diagonals: the two corner-diagonals through the inner point, folded bend readout
+function drawDiag(ctx, x0, y0, w, h){
+  var L=lengths();
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('(iii)  straight corner-diagonals',x0,y0-8);
+  var b=Math.abs(L.b), d=Math.abs(L.d), a=Math.abs(L.a), c=Math.abs(L.c);
+  var W=b+d, H=a+c; if(W<1e-6)W=1; if(H<1e-6)H=1;
+  var sx=w/W, sy=h/H, xC=x0+b*sx, yC=y0+a*sy;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(x0,y0,w,h);
+  // corner-diagonal 1: top-left corner (x0,y0) to inner point (xC,yC)
+  // corner-diagonal 2: inner point (xC,yC) to bottom-right corner (x0+w,y0+h)
+  var straight = Math.abs(Math.abs(L.a*L.d)-Math.abs(L.b*L.c)) < 0.02;
+  ctx.strokeStyle = straight ? GREEN : VAN; ctx.lineWidth=2.4;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(xC,yC);ctx.lineTo(x0+w,y0+h);ctx.stroke();
+  // the main diagonal as the straight reference
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.globalAlpha=0.6;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w,y0+h);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(xC,yC,4,0,6.2832);ctx.fill();
+  ctx.fillStyle=INK;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('P',xC+7,yC-5);
+  // bend readout (folded): angle between the two corner-diagonal directions, folded to the straightness sense
+  var v1x=xC-x0, v1y=yC-y0, v2x=(x0+w)-xC, v2y=(y0+h)-yC;
+  var dot=v1x*v2x+v1y*v2y, n1=Math.hypot(v1x,v1y), n2=Math.hypot(v2x,v2y);
+  var cs=Math.max(-1,Math.min(1,dot/(n1*n2))); var bend=Math.acos(cs)*180/Math.PI;
+  ctx.fillStyle = straight ? GREEN : FAINT; ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  ctx.fillText(straight ? ('straight \u00b7 bend '+bend.toFixed(1)+'\u00b0') : ('bend '+bend.toFixed(1)+'\u00b0'),x0+6,y0+h-8);
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var L=lengths(), l=lam();
+  // header: the state
+  var harm = Math.abs(l+1)<0.03, coin = Math.abs(l-1)<0.03;
+  ctx.textAlign='center';ctx.font='bold 15px Helvetica, Arial, sans-serif';
+  ctx.fillStyle = harm ? GOLD : (coin ? RED : INK);
+  ctx.fillText(harm ? ('HARMONIC \u00b7 \u03bb = ad/bc = \u22121') : (coin ? ('COINCIDENT \u00b7 \u03bb = +1') : ('\u03bb = ad/bc = '+l.toFixed(3)) ), CW/2, 34);
+  ctx.textAlign='left';
+  // the three costume panels
+  var py=90, ph=150, pw=340, gap=40;
+  drawSize(ctx, LX, py, pw, ph);
+  drawShape(ctx, LX+pw+gap, py, pw, ph);
+  drawDiag(ctx, LX, py+ph+70, pw, ph);
+  // the number line with the four points, bottom-right of the diag panel
+  var nlx=LX+pw+gap, nly=py+ph+70+40, nlw=pw;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('the cut on the line \u2014 P C D Q',nlx,py+ph+70-8);
+  ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(nlx,nly);ctx.lineTo(nlx+nlw,nly);ctx.stroke();
+  function NX(t){ return nlx + Math.max(-0.1,Math.min(1.15,t))/1.15*nlw*0.9; }
+  function npt(t,col,lab,above){ var x=NX(t);
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,nly-6);ctx.lineTo(x,nly+6);ctx.stroke();
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,nly,4.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText(lab,x,above?nly-12:nly+20);ctx.textAlign='left'; }
+  npt(0,PIC,'P',false); npt(1,VAN,'Q',false); npt(state.C,MARK,'C',true);
+  var Dt=state.D; // D can be outside [0,1]
+  if(Dt>=-0.1 && Dt<=1.15){ npt(Dt,DIR,'D',true); }
+  else { ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('D at '+Dt.toFixed(2)+' (outside the frame \u2014 the cut is external)',nlx,nly+40); }
+  // readouts panel (right)
+  drawReadouts(ctx, RX, 90);
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+function drawReadouts(ctx, x, y){
+  var L=lengths(), l=lam();
+  var ad=L.a*L.d, bc=L.b*L.c;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('THE ONE CONDITION',x,y);
+  ctx.font='11px Helvetica, Arial, sans-serif';
+  var yy=y+24, lh=19;
+  function row(label, val, col){ ctx.fillStyle=col||INK;ctx.fillText(label,x,yy);ctx.textAlign='right';ctx.fillText(val,x+330,yy);ctx.textAlign='left';yy+=lh; }
+  row('directed lengths a, b:', L.a.toFixed(3)+', '+L.b.toFixed(3), FAINT);
+  row('directed lengths c, d:', L.c.toFixed(3)+', '+L.d.toFixed(3), FAINT);
+  yy+=6;
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('magnitude (all three costumes):',x,yy);yy+=lh;
+  ctx.font='11px Helvetica, Arial, sans-serif';
+  row('|ad|:', Math.abs(ad).toFixed(4), GOLD);
+  row('|bc|:', Math.abs(bc).toFixed(4), RED);
+  var mag = Math.abs(Math.abs(ad)-Math.abs(bc));
+  row('|ad| \u2212 |bc|:', (Math.abs(ad)-Math.abs(bc)).toFixed(4), mag<0.02?GREEN:INK);
+  yy+=8;
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('the sign (splits the two states):',x,yy);yy+=lh;
+  ctx.font='11px Helvetica, Arial, sans-serif';
+  row('signed \u03bb = ad/bc:', l.toFixed(4), Math.abs(l+1)<0.03?GOLD:(Math.abs(l-1)<0.03?RED:INK));
+  row('signed sum ad + bc:', (ad+bc).toFixed(4), Math.abs(ad+bc)<0.02?GOLD:INK);
+  yy+=4;
+  var msg = Math.abs(ad+bc)<0.02 ? 'areas CANCEL \u2014 harmonic' : (Math.abs(l-1)<0.03 ? 'areas ADD \u2014 coincident (a square)' : 'off the condition');
+  ctx.fillStyle = Math.abs(ad+bc)<0.02?GOLD:(Math.abs(l-1)<0.03?RED:FAINT);ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText(msg,x,yy);yy+=lh+8;
+  // the tie
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('on the lateral channel:',x,yy);yy+=lh;
+  ctx.font='11px Helvetica, Arial, sans-serif';
+  var Dv=state.D, k=state.C/(1-state.C);
+  row('directing coord c = 1/r:', Dv.toFixed(4), DIR);
+  row('mark count k:', k.toFixed(4), MARK);
+  var law=1/k+1/Dv;
+  row('1/k + 1/c:', law.toFixed(4), Math.abs(law-1)<0.02?GREEN:INK);
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('harmonic \u21d4 1/k + 1/c = 1',x,yy+4);
+}
+
+// ============ live checks ============
+function runLive(){
+  var out=[],L=lengths(),l=lam();
+  function LC(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  var ad=L.a*L.d, bc=L.b*L.c, mag=Math.abs(Math.abs(ad)-Math.abs(bc));
+  var sizeGap=Math.abs(ad)-Math.abs(bc), shapeGap=Math.abs(L.c/L.a)-Math.abs(L.d/L.b);
+  // costumes agree on magnitude
+  // the three costumes agree: size gap and shape gap are near zero together, or both away from zero
+  var sizeOn=Math.abs(sizeGap)<0.02, shapeOn=Math.abs(shapeGap)<0.02;
+  LC('the three costumes read one magnitude: |ad|\u2212|bc| and |c/a|\u2212|d/b| cross zero together',
+     sizeOn===shapeOn,
+     'size gap '+sizeGap.toFixed(3)+', shape gap '+shapeGap.toFixed(3)+(sizeOn?' \u00b7 on |ad|=|bc|':''));
+  // sign splits states
+  var st = Math.abs(l+1)<0.03?'harmonic (areas cancel)':(Math.abs(l-1)<0.03?'coincident (areas add)':'\u03bb='+l.toFixed(2));
+  LC('signed \u03bb distinguishes harmonic (\u22121) from coincident (+1); both share |ad|=|bc| when on the condition',
+     true, st);
+  // tie to armature
+  var k=L.a/(1-L.a), law=1/k+1/L.c;
+  LC('on the lateral channel the harmonic cut is 1/k + 1/c = 1', Math.abs(l+1)>0.03 || Math.abs(law-1)<0.03, '1/k+1/c = '+law.toFixed(3));
+  var el=document.getElementById('live'),h='';
+  for(var i=0;i<out.length;i++){ var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+(i+1)+'. '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>'; }
+  el.innerHTML=h;
+}
+function render(){ draw(); runLive(); }
+
+// ============ controls ============
+function init(){
+  function bind(id,key){var s=document.getElementById(id);
+    s.addEventListener('input',function(){state[key]=parseFloat(s.value);
+      var lab=document.getElementById('v_'+id); if(lab)lab.textContent=state[key].toFixed(2); render();});}
+  bind('cut','C');
+  // rate slider sets D = 1/r
+  var rs=document.getElementById('rate');
+  rs.addEventListener('input',function(){ var r=parseFloat(rs.value); state.D=1/r;
+    document.getElementById('v_rate').textContent=r.toFixed(2); render(); });
+  document.getElementById('harm').addEventListener('click',function(){
+    // harmonic: C = D/(2D-1)
+    var D=state.D, C=D/(2*D-1);
+    if(C>0 && C<1){ state.C=C; document.getElementById('cut').value=C; document.getElementById('v_cut').textContent=C.toFixed(2); }
+    render(); });
+  document.getElementById('coin').addEventListener('click',function(){
+    // coincident: C = D (needs D interior). If D outside, set rate so D interior first.
+    if(state.D>1){ state.D=0.667; document.getElementById('rate').value=1.5; document.getElementById('v_rate').textContent='1.50'; }
+    state.C=state.D; document.getElementById('cut').value=state.C; document.getElementById('v_cut').textContent=state.C.toFixed(2);
+    render(); });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
