@@ -32,7 +32,7 @@
  the one that slides. <b style="color:#12A6A6">D is the directing point</b> — fixed by the channel’s rate. C makes the two gaps
  <b style="color:#ED3121">a = PC</b> and <b style="color:#8A4FD6">b = CQ</b>; D makes <b style="color:#12A6A6">c = PD</b> and
  <b style="color:#9A8248">d = DQ</b>. The size ratio λ = ad/bc mixes one gap from each cut. Two special things can happen:
- <b>coincident</b>, when C meets D (λ = +1, and a = c, b = d — the cut goes to the center); and <b>harmonic</b>, when C and D are
+ <b>coincident</b>, when C meets D (λ = +1, and a = c, b = d — the inner point lands on the diagonal, its complements equal); and <b>harmonic</b>, when C and D are
  conjugates (λ = −1 — one cut inside PQ, the other outside).</p>
  <div class="bar">
   <label for="cut">C — the mark</label><input type="range" id="cut" min="0.05" max="0.95" step="0.005" value="0.32"><span class="ro" id="v_cut">0.32</span>
@@ -40,7 +40,7 @@
   <button id="coin">make coincident (C = D)</button>
   <button id="harm">make harmonic (conjugate)</button>
  </div>
- <canvas id="scene" style="width:1120px;height:520px;" role="img" aria-label="a segment PQ with two cut points C the moving mark in blue and D the directing point in aqua; the four gaps a=PC, b=CQ, c=PD, d=DQ are bracketed and labeled above and below the line; a small split rectangle shows the cut going to the center at coincident and the signed areas at harmonic"></canvas>
+ <canvas id="scene" style="width:1120px;height:520px;" role="img" aria-label="a segment PQ with two cut points C the moving mark in blue and D the directing point in aqua; the four gaps a=PC, b=CQ, c=PD, d=DQ are bracketed and labeled above and below the line; a small split rectangle shows the inner point on the diagonal with equal complements at coincident and the signed areas at harmonic"></canvas>
  <p class="hint">Drag C and D · or snap to the two events · a and b are C’s gaps (above), c and d are D’s gaps (below)</p>
  <div id="live"></div>
 
@@ -49,7 +49,7 @@
   <tr><th></th><th>what it is</th><th>the gaps it makes</th></tr>
   <tr><td><b style="color:#2456B0">C</b></td><td>the moving mark — the depth reading, at fraction m along PQ; it slides as depth changes</td><td><b style="color:#ED3121">a = PC</b> and <b style="color:#8A4FD6">b = CQ</b></td></tr>
   <tr><td><b style="color:#12A6A6">D</b></td><td>the directing point — fixed by the rate; the crossing 1/r placed on the same line</td><td><b style="color:#12A6A6">c = PD</b> and <b style="color:#9A8248">d = DQ</b></td></tr>
-  <tr><td><b>coincident</b></td><td colspan="2">C = D: the mark lands on the directing point. Then a = c and b = d, λ = +1, and the cut sits at the center — four equal quadrants (a square stretched to a rectangle keeps them equal).</td></tr>
+  <tr><td><b>coincident</b></td><td colspan="2">C = D: the mark lands on the directing point. Then a = c and b = d, λ = +1, and in the split rectangle the inner point sits <b>on the diagonal</b> — so the two complement cells are equal (Euclid I.43). It is on the diagonal at position (m, m), <b>not</b> at the center; the four cells are equal only in the special case m = ½.</td></tr>
   <tr><td><b>harmonic</b></td><td colspan="2">C and D are harmonic conjugates: (P,Q;C,D) = −1. One cut is inside PQ, the other outside it (D beyond Q or before P, a negative gap). |ad| = |bc| with opposite sign.</td></tr>
  </table>
 
@@ -182,29 +182,39 @@ function draw(){
 function drawQuadrants(ctx, x0, y0, w, h, g, l, coincident, harmonic){
   ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.textAlign='center';
   ctx.fillText('the split rectangle \u2014 C sets the vertical cut, D the horizontal', x0+w/2, y0-10);ctx.textAlign='left';
-  // width split by C at fraction m; height split by D at fraction (clamped view of D)
-  var m=g.m; var Dv=Math.max(0,Math.min(1,g.D));   // clamp for the box; note when outside, the cell is signed
+  var m=g.m; var Dv=Math.max(0,Math.min(1,g.D));   // clamp D into the box for the drawing
   var xC=x0+m*w, yD=y0+Dv*h;
-  // frame
+  // the four cells (unit-area fractions): TL, TR, BL, BR
+  var TL=m*Dv, TR=(1-m)*Dv, BL=m*(1-Dv), BR=(1-m)*(1-Dv);
+  var onDiag = Math.abs(m-Dv) < 0.015;             // complements equal <=> on the diagonal
+  // tint: the two OFF-diagonal complements (TR top-right, BL bottom-left) share a color when equal
+  ctx.fillStyle=GOLD;ctx.globalAlpha=0.34;ctx.fillRect(xC,y0,w-(xC-x0),yD-y0);ctx.globalAlpha=1;          // TR = "ad"
+  ctx.fillStyle=GOLD;ctx.globalAlpha=0.34;ctx.fillRect(x0,yD,xC-x0,h-(yD-y0));ctx.globalAlpha=1;          // BL = "bc"
+  // the two ON-diagonal cells (TL, BR) in a different tint so the contrast is visible
+  ctx.fillStyle=MARK;ctx.globalAlpha=0.14;ctx.fillRect(x0,y0,xC-x0,yD-y0);ctx.globalAlpha=1;              // TL
+  ctx.fillStyle=MARK;ctx.globalAlpha=0.14;ctx.fillRect(xC,yD,w-(xC-x0),h-(yD-y0));ctx.globalAlpha=1;      // BR
+  // frame + cut lines
   ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.strokeRect(x0,y0,w,h);
-  // the two complement cells: ad (top-right) and bc (bottom-left) in Kevin's Figure-4 sense
-  // top-right: width (1-m), height Dv ; area ~ b*c-ish visual. Use the sign to tint.
-  var opp = (l<0);  // harmonic: opposite colors; coincident: same
-  ctx.fillStyle=GOLD;ctx.globalAlpha=0.32;ctx.fillRect(xC,y0,w-(xC-x0),yD-y0);ctx.globalAlpha=1;         // ad cell
-  ctx.fillStyle= opp?RED:GOLD;ctx.globalAlpha=0.30;ctx.fillRect(x0,yD,xC-x0,h-(yD-y0));ctx.globalAlpha=1; // bc cell
-  // the main diagonal
+  ctx.strokeStyle=INK;ctx.lineWidth=0.6;ctx.globalAlpha=0.4;
+  ctx.beginPath();ctx.moveTo(xC,y0);ctx.lineTo(xC,y0+h);ctx.moveTo(x0,yD);ctx.lineTo(x0+w,yD);ctx.stroke();ctx.globalAlpha=1;
+  // the main diagonal (straight reference)
   ctx.strokeStyle=VAN;ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w,y0+h);ctx.stroke();
-  // the inner point
+  // the inner point, ringed green when it sits on the diagonal (complements equal)
   ctx.fillStyle=INK;ctx.beginPath();ctx.arc(xC,yD,5,0,6.2832);ctx.fill();
-  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xC,yD,5,0,6.2832);ctx.stroke();
-  ctx.fillStyle=GOLD;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('ad',xC+(w-(xC-x0))/2-6,y0+14);
-  ctx.fillStyle= opp?RED:GOLD;ctx.fillText('bc',x0+(xC-x0)/2-6,yD+16);
-  // note line
-  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
-  var msg = coincident ? 'C = D \u2192 the cut is centered, four equal quadrants (stretch-invariant)'
-          : harmonic ? 'opposite colors \u2014 signed areas cancel (\u03bb = \u22121)'
-          : 'drag C toward the diagonal';
-  ctx.fillText(msg, x0+w/2, y0+h+20);ctx.textAlign='left';
+  ctx.strokeStyle = onDiag ? GREEN : '#fff';ctx.lineWidth = onDiag?2.5:1.5;ctx.beginPath();ctx.arc(xC,yD,onDiag?7:5,0,6.2832);ctx.stroke();
+  // cell area labels (the two complements gold, the other pair faint)
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=GOLD;ctx.fillText('ad='+TR.toFixed(2), xC+(w-(xC-x0))/2-12, y0+13);
+  ctx.fillStyle=GOLD;ctx.fillText('bc='+BL.toFixed(2), x0+(xC-x0)/2-12, y0+h-8);
+  ctx.fillStyle=FAINT;ctx.fillText(TL.toFixed(2), x0+(xC-x0)/2-8, y0+13);
+  ctx.fillStyle=FAINT;ctx.fillText(BR.toFixed(2), xC+(w-(xC-x0))/2-8, y0+h-8);
+  // truthful caption
+  ctx.textAlign='center';ctx.font='11px Helvetica, Arial, sans-serif';
+  if(onDiag){ ctx.fillStyle=GREEN;
+    ctx.fillText('on the diagonal \u2014 the two complements are equal: ad = bc = '+TR.toFixed(2)+'  (the other pair, '+TL.toFixed(2)+' and '+BR.toFixed(2)+', is not)', x0+w/2, y0+h+20); }
+  else { ctx.fillStyle=FAINT;
+    ctx.fillText('off the diagonal \u2014 the two complements differ ('+TR.toFixed(2)+' vs '+BL.toFixed(2)+'); drag until the point meets the diagonal', x0+w/2, y0+h+20); }
+  ctx.textAlign='left';
 }
 
 // ---- live checks ----
