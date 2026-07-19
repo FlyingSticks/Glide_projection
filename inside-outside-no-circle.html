@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside and outside, without a circle</title>
+<style>
+  :root{
+    --cream:#faf6ef; --card:#fffdf9; --edge:#e8e1d3;
+    --plum:#43203f; --purple:#6a2c91; --crimson:#c0322b; --gold:#b08948;
+    --grey:#8a8578;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--cream);color:var(--plum);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    -webkit-text-size-adjust:100%;padding:30px 16px 58px;line-height:1.5}
+  .wrap{max-width:740px;margin:0 auto}
+  h1{font-style:italic;font-weight:600;font-size:clamp(26px,4.5vw,40px);line-height:1.08;
+    margin:0 0 .34em;letter-spacing:.2px}
+  .lede{font-size:clamp(15px,2.1vw,18px);color:#4a3346;max-width:60ch;margin:0 0 6px}
+  .lede em{color:var(--purple);font-style:italic}
+  .card{background:var(--card);border:1px solid var(--edge);border-radius:14px;
+    box-shadow:0 10px 30px -24px rgba(67,32,63,.5);padding:14px 12px 18px;margin-top:20px}
+  svg{display:block;width:100%;height:auto;overflow:hidden;touch-action:none}
+  text{font-family:inherit}
+  .lbl{font-style:italic;font-size:20px;fill:var(--plum)}
+  .tag{font-family:system-ui,-apple-system,sans-serif;font-size:13.5px;fill:var(--grey);font-style:normal}
+  .ctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 6px 0}
+  button{font-family:inherit;font-size:15px;color:#fff;background:var(--plum);border:none;
+    border-radius:9px;padding:8px 15px;cursor:pointer;transition:background .15s;min-width:120px}
+  button:hover{background:#5c2f57}
+  button.ghost{background:transparent;color:var(--plum);border:1px solid var(--purple);min-width:96px}
+  button.ghost:hover{background:rgba(106,44,145,.07)}
+  button:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+  .read{flex:1 1 auto;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+    font-size:14px;color:#3a2836;min-width:220px}
+  .read b{color:var(--crimson)} .read i{color:var(--gold);font-style:normal;font-weight:600}
+  .note{font-size:16px;color:#4a3346;max-width:64ch;margin:20px 4px 0}
+  .note em{color:var(--purple);font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Inside and outside, without a circle</h1>
+  <p class="lede">One projection from O carries the whole unbounded outside into a bounded inside — the reciprocal <em>t&nbsp;↦&nbsp;1/t</em>, drawn with a straightedge. No circle: the fixed point 1 is all that's left of it.</p>
+
+  <div class="card">
+    <svg id="art" viewBox="0 0 720 360" role="img" aria-label="A center of projection O sends the number line's outside ray to a bounded inside unit segment by the reciprocal map. Drag the outside point or its inside image.">
+      <defs>
+        <marker id="arw" markerWidth="11" markerHeight="9" refX="8.5" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L8.5,3 L0,6 Z" fill="#43203f"></path>
+        </marker>
+      </defs>
+      <g id="fan"></g>
+      <g id="stat"></g>
+      <g id="dyn"></g>
+    </svg>
+    <div class="ctl">
+      <button id="sweep" type="button" aria-pressed="false">▶ Sweep</button>
+      <button id="reset" class="ghost" type="button">Reset</button>
+      <span class="read" id="read"></span>
+    </div>
+  </div>
+
+  <p class="note">The circle's swap was <em>d&nbsp;↦&nbsp;R²/d</em>; this is the same reciprocal with R&nbsp;=&nbsp;1 and no circle. Projection does the work, and its invariant is the cross-ratio, which needs no length. Drag the outside point toward infinity and its image sinks to the floor; the two meet only at the fixed point 1 — where the inside unit touches the number line. Where the first panel kept the circle and dropped the projection, this keeps the projection and drops the circle.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function el(t,a,p){var e=document.createElementNS(NS,t);if(a)for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+  function line(x1,y1,x2,y2,a,p){var o=a||{};o.x1=x1;o.y1=y1;o.x2=x2;o.y2=y2;return el('line',o,p);}
+
+  var svg=document.getElementById('art'),
+      fan=document.getElementById('fan'), stat=document.getElementById('stat'), dyn=document.getElementById('dyn'),
+      read=document.getElementById('read');
+
+  // ---- map: O at math (0,0); number line at y=1; inside screen at x=1 ----
+  var OX=70, OY=305, SX=72, SY=225;
+  var X=function(x){return OX+x*SX;}, Y=function(y){return OY-y*SY;};
+  var TMIN=1, TMAX=8.4, NMARK=8;
+
+  // ======== STATIC ========
+  // number line (the outside), arrow to infinity
+  line(X(-0.15),Y(1),X(9.1),Y(1),{stroke:'#43203f','stroke-width':2,'marker-end':'url(#arw)'},stat);
+  // integer marks + labels
+  for(var t=0;t<=NMARK;t++){
+    line(X(t),Y(1)-6,X(t),Y(1)+6,{stroke:'#43203f','stroke-width':1.6},stat);
+    var lab=el('text',{x:X(t),y:Y(1)-13,'class':'lbl','text-anchor':'middle','font-size':17},stat);
+    lab.textContent=t;
+  }
+  el('text',{x:X(8.7),y:Y(1)-13,'class':'lbl','text-anchor':'middle','font-size':19},stat).textContent='\u221e';
+  el('text',{x:X(5),y:Y(1)-34,'class':'tag','text-anchor':'middle',fill:'#c0322b'},stat).textContent='outside \u00b7 the ray [1, \u221e)';
+
+  // fan of rays from O to each integer mark (the projection pencil)
+  for(var k=1;k<=NMARK;k++){
+    line(X(0),Y(0),X(k),Y(1),{stroke:'#6a2c91','stroke-width':1.2,'stroke-opacity':0.26},fan);
+  }
+
+  // inside screen : vertical unit segment at x=1, from floor (y=0) up to mark 1 (y=1)
+  line(X(1),Y(0),X(1),Y(1),{stroke:'#43203f','stroke-width':3.2,'stroke-linecap':'round'},stat);
+  // image ticks for integers (1/2, 1/3, ...) — the crowding
+  for(var m=2;m<=NMARK;m++){
+    line(X(1)-6,Y(1/m),X(1)+6,Y(1/m),{stroke:'#43203f','stroke-width':1.3,'stroke-opacity':0.55},stat);
+  }
+  el('text',{x:X(1)+11,y:Y(0.5)+5,'class':'lbl','text-anchor':'start','font-size':16,fill:'#b08948'},stat).textContent='\u00bd';
+  el('text',{x:X(1)+11,y:Y(1/3)+5,'class':'lbl','text-anchor':'start','font-size':16,fill:'#b08948'},stat).textContent='\u2153';
+  // inside label (below the screen, near the floor)
+  el('text',{x:X(1)+13,y:Y(0.10),'class':'tag','text-anchor':'start',fill:'#b08948'},stat).textContent='inside \u00b7 the unit [0, 1]';
+
+  // O and the floor point
+  el('circle',{cx:X(0),cy:Y(0),r:5,fill:'#43203f'},stat);
+  el('text',{x:X(0)-4,y:Y(0)+22,'class':'lbl','text-anchor':'middle'},stat).textContent='O';
+  el('text',{x:X(0)+2,y:Y(0)+40,'class':'tag','text-anchor':'middle'},stat).textContent='centre of projection';
+  // fixed-point note near (1,1)
+  el('text',{x:X(1)+8,y:Y(1)+20,'class':'tag','text-anchor':'start',fill:'#6a2c91'},stat).textContent='fixed point 1';
+
+  // ======== DYNAMIC ========
+  var rayPQ = line(0,0,0,0,{stroke:'#6a2c91','stroke-width':2.6,'stroke-linecap':'round'},dyn);
+  var Qdot  = el('circle',{r:7,fill:'#b08948'},dyn);           // inside image
+  var Pdot  = el('circle',{r:7.5,fill:'#c0322b'},dyn);         // outside point
+  var Plbl  = el('text',{'class':'lbl','text-anchor':'middle',fill:'#c0322b','font-size':18},dyn);
+  var Qlbl  = el('text',{'class':'lbl','text-anchor':'end',fill:'#b08948','font-size':17},dyn);
+  var Phandle = el('circle',{r:19,fill:'transparent',style:'cursor:grab'},dyn);
+  var Qhandle = el('circle',{r:19,fill:'transparent',style:'cursor:grab'},dyn);
+
+  var t=3;
+  function paint(){
+    var h=1/t;
+    Pdot.setAttribute('cx',X(t)); Pdot.setAttribute('cy',Y(1));
+    Qdot.setAttribute('cx',X(1)); Qdot.setAttribute('cy',Y(h));
+    rayPQ.setAttribute('x1',X(0)); rayPQ.setAttribute('y1',Y(0));
+    rayPQ.setAttribute('x2',X(t)); rayPQ.setAttribute('y2',Y(1));
+    Plbl.setAttribute('x',X(t)); Plbl.setAttribute('y',Y(1)+30); Plbl.textContent='t = '+t.toFixed(2);
+    Qlbl.setAttribute('x',X(1)-11); Qlbl.setAttribute('y',Y(h)+5); Qlbl.textContent='1/t = '+h.toFixed(3);
+    Phandle.setAttribute('cx',X(t)); Phandle.setAttribute('cy',Y(1));
+    Qhandle.setAttribute('cx',X(1)); Qhandle.setAttribute('cy',Y(h));
+    read.innerHTML='outside <b>t = '+t.toFixed(2)+'</b>\u2003inside <i>1/t = '+h.toFixed(3)+
+      '</i>\u2003product t\u00b7(1/t) = 1\u2003\u2003t\u21921\u21d21 (fixed) \u00b7 t\u2192\u221e\u21d20';
+  }
+
+  // ---- drag (pointer + capture; getScreenCTM inverse for iPad) ----
+  function toMath(evt){
+    var pt=svg.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY;
+    var p=pt.matrixTransform(svg.getScreenCTM().inverse());
+    return {x:(p.x-OX)/SX, y:(OY-p.y)/SY};
+  }
+  function clampT(v){ return v<TMIN?TMIN:(v>TMAX?TMAX:v); }
+  function bindDrag(handle, fromEvt){
+    var on=false; handle.style.cursor='grab';
+    handle.addEventListener('pointerdown',function(e){on=true;handle.style.cursor='grabbing';handle.setPointerCapture(e.pointerId);stopSweep();t=fromEvt(e);paint();e.preventDefault();});
+    handle.addEventListener('pointermove',function(e){if(on){t=fromEvt(e);paint();}});
+    function end(){on=false;handle.style.cursor='grab';}
+    handle.addEventListener('pointerup',end); handle.addEventListener('pointercancel',end);
+  }
+  bindDrag(Phandle, function(e){ return clampT(toMath(e).x); });                       // drag along the number line
+  bindDrag(Qhandle, function(e){ var h=toMath(e).y; if(h<1/TMAX)h=1/TMAX; if(h>1)h=1; return 1/h; }); // drag along the screen
+
+  // ---- sweep ----
+  var anim=null, dir=1;
+  function stopSweep(){ if(anim){cancelAnimationFrame(anim);anim=null;} var b=document.getElementById('sweep'); b.textContent='▶ Sweep'; b.setAttribute('aria-pressed','false'); }
+  function step(){ t+=dir*0.045; if(t>=TMAX){t=TMAX;dir=-1;} else if(t<=1.15){t=1.15;dir=1;} paint(); anim=requestAnimationFrame(step); }
+  document.getElementById('sweep').addEventListener('click',function(){
+    if(anim){stopSweep();return;}
+    if(t>=TMAX)dir=-1; else if(t<=1.15)dir=1;
+    this.textContent='❚❚ Pause'; this.setAttribute('aria-pressed','true'); anim=requestAnimationFrame(step);
+  });
+  document.getElementById('reset').addEventListener('click',function(){ stopSweep(); t=3; paint(); });
+
+  paint();
+})();
+</script>
+</body>
+</html>

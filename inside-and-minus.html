@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Does inside require minus?</title>
+<style>
+  :root{
+    --paper:#f4f1e8; --card:#fcfbf7; --edge:#e6e1d4;
+    --plum:#6b2a5b; --plum-soft:#9b5c93;
+    --ink:#1c1a19; --grey:#8a857e;
+    --red:#c0392b; --blue:#2c5aa8; --green:#2f9e52;
+    --lav:rgba(150,85,145,0.16);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    -webkit-text-size-adjust:100%; padding:30px 16px 60px; line-height:1.5;
+  }
+  .wrap{max-width:740px;margin:0 auto}
+  h1{font-style:italic;font-weight:600;color:var(--plum);
+    font-size:clamp(27px,4.6vw,42px);line-height:1.08;margin:0 0 .34em;letter-spacing:.2px}
+  .lede{font-size:clamp(15px,2.1vw,18.5px);color:#3a3632;max-width:60ch;margin:0 0 8px}
+  .lede b{color:var(--plum);font-style:italic;font-weight:600}
+  .card{background:var(--card);border:1px solid var(--edge);border-radius:14px;
+    box-shadow:0 10px 30px -24px rgba(60,30,55,.55);padding:16px 16px 18px;margin-top:22px}
+  .eyebrow{font-family:system-ui,-apple-system,sans-serif;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--plum-soft);margin:0 0 3px}
+  h2{font-style:italic;font-weight:600;color:var(--plum);font-size:clamp(18px,2.6vw,22px);
+    margin:0 0 10px;line-height:1.15}
+  svg{display:block;width:100%;height:auto;overflow:hidden;touch-action:none}
+  text{font-family:inherit}
+  .lbl{font-style:italic;font-size:21px}
+  .tag{font-family:system-ui,-apple-system,sans-serif;font-size:14px;fill:var(--grey);font-style:normal}
+  .num{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-style:normal;font-weight:600}
+  .ctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  button{font-family:inherit;font-size:15px;color:#fff;background:var(--plum);border:none;
+    border-radius:9px;padding:8px 15px;cursor:pointer;transition:background .15s}
+  button:hover{background:#571f49}
+  button:focus-visible{outline:2.5px solid var(--green);outline-offset:2px}
+  .read{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:14px;color:#33302c;
+    margin-top:2px}
+  .verdict{font-size:15.5px;color:#413c37;margin:12px 2px 0;max-width:64ch}
+  .verdict em{color:var(--plum);font-style:italic}
+  .plus{color:var(--red)} .minus{color:var(--blue)}
+  .close{font-size:16.5px;color:#3a3632;max-width:64ch;margin:26px 2px 0}
+  .close em{color:var(--plum);font-style:italic}
+  .hint{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--grey);margin:8px 2px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Does <span style="font-style:italic">inside</span> require minus?</h1>
+  <p class="lede"><b>No.</b> Minus is what inside <em>becomes</em> when its two sides are twins, or when you choose to measure it as a signed field. Left alone, inside runs on order and multiplication — and never reaches for a sign. Drag the points and watch the fork.</p>
+
+  <!-- PANEL 1 -->
+  <div class="card">
+    <p class="eyebrow">the dividing inside</p>
+    <h2>A point splits a line — the two sides are twins</h2>
+    <svg id="p1" viewBox="0 0 680 180" aria-label="A point P draggable along a line through origin M, showing its signed coordinate and its mirror twin."></svg>
+    <div class="ctl">
+      <button id="flip1" type="button">Flip across M</button>
+      <span class="read" id="read1"></span>
+    </div>
+    <p class="verdict">Reflect across M and the left ray lands <em>exactly</em> on the right — same length, opposite label. The sides are congruent; nothing intrinsic tells them apart. Only a chosen direction does, and that choice <em>is</em> the minus. Here "which side" and "plus or minus" are one fact.</p>
+    <p class="hint">Drag P. The mirror twin (hollow) tracks it. Watch the sign flip as P crosses M.</p>
+  </div>
+
+  <!-- PANEL 2 -->
+  <div class="card">
+    <p class="eyebrow">the enclosing inside</p>
+    <h2>A circle — inside and outside are not twins</h2>
+    <svg id="p2" viewBox="0 0 680 300" aria-label="A circle with center M; a draggable point P on the line and its inversion image P prime, with all distances positive."></svg>
+    <div class="ctl"><span class="read" id="read2"></span></div>
+    <p class="verdict"><em>Bounded ≠ unbounded</em> — the two sides differ on their own, and no reflection swaps them (nothing carries a finite region onto an infinite one). The inside↔outside map is <span class="num">d ↦ R²/d</span>: every quantity positive, pure multiplication. No minus is ever reached for.</p>
+    <p class="hint">Drag P inside toward M and its image flees outward; drag it out and the image comes in. The product stays R².</p>
+  </div>
+
+  <!-- PANEL 3 -->
+  <div class="card">
+    <p class="eyebrow">where they marry — by choice</p>
+    <h2>The neutral surface — inside made signed</h2>
+    <svg id="p3" viewBox="0 0 680 200" aria-label="A surface with two regions; a toggle turns an unsigned pair of regions into a signed field that is positive on one side, zero on the surface, negative on the other."></svg>
+    <div class="ctl">
+      <button id="toggle3" type="button">Measure as signed field</button>
+      <span class="read" id="read3"></span>
+    </div>
+    <p class="verdict">Off, you have two regions and no minus — inside in its bare form. On, you <em>choose</em> to grade them as one scalar: the surface becomes zero, the regions become <span class="plus">+</span> and <span class="minus">−</span>, and crossing flips the sign. Inside didn't ask for the minus. You did.</p>
+    <p class="hint">Toggle the field on, then drag the probe across the surface.</p>
+  </div>
+
+  <p class="close">So the dependency runs backwards from how it's usually asked: to <em>have</em> a minus you already need a distinguished zero and a chosen positive side — an oriented inside. Minus presupposes inside; bare inside presupposes only order. Left to itself — a bounded interior, betweenness, the reciprocal on the circle — inside gets by without a sign.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function el(t,a,p){var e=document.createElementNS(NS,t);if(a)for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+  function line(x1,y1,x2,y2,a,p){var o=a||{};o.x1=x1;o.y1=y1;o.x2=x2;o.y2=y2;return el('line',o,p);}
+  function addArrow(svg,id,color){
+    var d=el('defs',{},svg);
+    var m=el('marker',{id:id,markerWidth:10,markerHeight:8,refX:7,refY:3,orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'},d);
+    el('path',{d:'M0,0 L7,3 L0,6 Z',fill:color},m);
+  }
+  function svgXY(svg,evt){var pt=svg.createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;return pt.matrixTransform(svg.getScreenCTM().inverse());}
+  function drag(svg,handle,onMove){
+    var on=false; handle.style.cursor='grab';
+    handle.addEventListener('pointerdown',function(e){on=true;handle.style.cursor='grabbing';handle.setPointerCapture(e.pointerId);onMove(svgXY(svg,e));e.preventDefault();});
+    handle.addEventListener('pointermove',function(e){if(on)onMove(svgXY(svg,e));});
+    function end(){on=false;handle.style.cursor='grab';}
+    handle.addEventListener('pointerup',end); handle.addEventListener('pointercancel',end);
+  }
+  function fmt(x){var s=x>=0?'+':'\u2212';return s+Math.abs(x).toFixed(2);}
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ===================== PANEL 1 : point on a line ===================== */
+  (function(){
+    var svg=document.getElementById('p1'), read=document.getElementById('read1');
+    var Y=95, SC=60, OX=340;
+    var MX=function(x){return OX+x*SC;};
+    addArrow(svg,'a1','#8a857e');
+    // ray tints (drawn under the axis)
+    line(MX(0),Y,MX(5),Y,{stroke:'#c0392b','stroke-width':11,'stroke-opacity':0.22,'stroke-linecap':'round'},svg);
+    line(MX(0),Y,MX(-5),Y,{stroke:'#2c5aa8','stroke-width':11,'stroke-opacity':0.22,'stroke-linecap':'round'},svg);
+    line(MX(-5),Y,MX(5),Y,{stroke:'#1c1a19','stroke-width':2,'marker-start':'url(#a1)','marker-end':'url(#a1)'},svg);
+    // side labels
+    var rp=el('text',{x:MX(4.4),y:Y-30,'class':'tag',fill:'#c0392b','text-anchor':'middle'},svg); rp.textContent='+ side';
+    var lp=el('text',{x:MX(-4.4),y:Y-30,'class':'tag',fill:'#2c5aa8','text-anchor':'middle'},svg); lp.textContent='\u2212 side';
+    // M
+    el('circle',{cx:MX(0),cy:Y,r:4.5,fill:'#1c1a19'},svg);
+    var mlb=el('text',{x:MX(0),y:Y+26,'class':'lbl','text-anchor':'middle'},svg); mlb.textContent='M';
+    var z=el('text',{x:MX(0),y:Y+45,'class':'tag','text-anchor':'middle'},svg); z.textContent='0';
+    // twin (hollow) + its label
+    var twin=el('circle',{cy:Y,r:6.5,fill:'#fcfbf7','stroke-width':2},svg);
+    var twinL=el('text',{y:Y+24,'class':'num','font-size':16,'text-anchor':'middle','fill-opacity':0.6},svg);
+    // P + label
+    var P=el('circle',{cy:Y,r:7,},svg);
+    var PL=el('text',{y:Y-16,'class':'num','font-size':18,'text-anchor':'middle'},svg);
+    var handle=el('circle',{cy:Y,r:20,fill:'transparent',style:'cursor:grab'},svg);
+
+    var x=2.4;
+    function paint(){
+      var col=x>=0?'#c0392b':'#2c5aa8', ocol=x>=0?'#2c5aa8':'#c0392b';
+      P.setAttribute('cx',MX(x)); P.setAttribute('fill',col);
+      PL.setAttribute('x',MX(x)); PL.setAttribute('fill',col); PL.textContent='P = '+fmt(x);
+      twin.setAttribute('cx',MX(-x)); twin.setAttribute('stroke',ocol);
+      twinL.setAttribute('x',MX(-x)); twinL.setAttribute('fill',ocol); twinL.textContent=fmt(-x);
+      handle.setAttribute('cx',MX(x));
+      read.innerHTML='P = <b style="color:'+col+'">'+fmt(x)+'</b>\u2003mirror = <b style="color:'+ocol+'">'+fmt(-x)+'</b>\u2003|MP| = '+Math.abs(x).toFixed(2)+' on both sides';
+    }
+    drag(svg,handle,function(p){ var mx=(p.x-OX)/SC; if(mx<-4.8)mx=-4.8; if(mx>4.8)mx=4.8; x=mx; paint(); });
+    document.getElementById('flip1').addEventListener('click',function(){
+      var target=-x;
+      if(reduce){ x=target; paint(); return; }
+      var start=x, t0=null;
+      function step(ts){ if(!t0)t0=ts; var k=Math.min(1,(ts-t0)/320); x=start+(target-start)*(k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2); paint(); if(k<1)requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+    paint();
+  })();
+
+  /* ===================== PANEL 2 : the circle ===================== */
+  (function(){
+    var svg=document.getElementById('p2'), read=document.getElementById('read2');
+    var Y=155, SC=52, OX=340, R=2.2, R2=R*R;
+    var MX=function(x){return OX+x*SC;};
+    addArrow(svg,'a2','#8a857e');
+    // circle (bounded interior)
+    el('circle',{cx:MX(0),cy:Y,r:R*SC,fill:'rgba(150,85,145,0.16)',stroke:'#6b2a5b','stroke-width':2.2},svg);
+    // baseline
+    line(MX(-6),Y,MX(6),Y,{stroke:'#1c1a19','stroke-width':2,'marker-start':'url(#a2)','marker-end':'url(#a2)'},svg);
+    // region labels
+    var il=el('text',{x:MX(0),y:Y-R*SC-12,'class':'tag',fill:'#6b2a5b','text-anchor':'middle'},svg); il.textContent='inside \u00b7 bounded (\u03c0R\u00b2)';
+    var ol=el('text',{x:MX(-4.1),y:Y-R*SC-2,'class':'tag','text-anchor':'middle'},svg); ol.textContent='outside \u00b7 unbounded (\u221e)';
+    // M
+    el('circle',{cx:MX(0),cy:Y,r:4.5,fill:'#1c1a19'},svg);
+    el('text',{x:MX(0),y:Y+24,'class':'lbl','text-anchor':'middle'},svg).textContent='M';
+    // image P' (hollow ink) + label, plus an infinity flag
+    var img=el('circle',{cy:Y,r:6.5,fill:'#fcfbf7',stroke:'#1c1a19','stroke-width':2},svg);
+    var imgL=el('text',{y:Y-14,'class':'lbl','text-anchor':'middle'},svg); imgL.textContent="P\u2032";
+    var inf=el('text',{y:Y-14,'class':'lbl',fill:'#1c1a19','text-anchor':'start','opacity':0},svg); inf.textContent="P\u2032 \u2192 \u221e";
+    // P (plum) + label
+    var P=el('circle',{cy:Y,r:7,fill:'#6b2a5b'},svg);
+    var PL=el('text',{y:Y+42,'class':'lbl',fill:'#6b2a5b','text-anchor':'middle'},svg); PL.textContent='P';
+    var handle=el('circle',{cy:Y,r:20,fill:'transparent',style:'cursor:grab'},svg);
+
+    var x=1.3;
+    function paint(){
+      var d=Math.abs(x), xi=R2/x, di=Math.abs(xi);
+      P.setAttribute('cx',MX(x)); PL.setAttribute('x',MX(x));
+      handle.setAttribute('cx',MX(x));
+      var clamp=Math.max(-6,Math.min(6,xi)), off=Math.abs(xi)>6;
+      if(off){ img.setAttribute('opacity',0); imgL.setAttribute('opacity',0); inf.setAttribute('opacity',1);
+               inf.setAttribute('x', xi>0?MX(5.6):MX(-6)+4); }
+      else { img.setAttribute('opacity',1); imgL.setAttribute('opacity',1); inf.setAttribute('opacity',0);
+             img.setAttribute('cx',MX(clamp)); imgL.setAttribute('x',MX(clamp)); }
+      var where = d<R? 'inside' : (d>R? 'outside':'on the circle');
+      read.innerHTML='P is <b>'+where+'</b>\u2003d = '+d.toFixed(2)+'\u2003R\u00b2/d = '+(di>99?'\u221e':di.toFixed(2))+'\u2003d\u00b7(R\u00b2/d) = <b>'+R2.toFixed(2)+'</b> (all positive)';
+    }
+    drag(svg,handle,function(p){ var mx=(p.x-OX)/SC; if(mx<-5.8)mx=-5.8; if(mx>5.8)mx=5.8;
+      if(mx>=0&&mx<0.18)mx=0.18; if(mx<0&&mx>-0.18)mx=-0.18; x=mx; paint(); });
+    paint();
+  })();
+
+  /* ===================== PANEL 3 : neutral surface ===================== */
+  (function(){
+    var svg=document.getElementById('p3'), read=document.getElementById('read3'), btn=document.getElementById('toggle3');
+    var Y=100, SC=60, OX=340;
+    var MX=function(x){return OX+x*SC;};
+    // gradient
+    var defs=el('defs',{},svg);
+    var g=el('linearGradient',{id:'nsg',x1:'0',y1:'0',x2:'1',y2:'0'},defs);
+    el('stop',{offset:'0%','stop-color':'#2c5aa8','stop-opacity':'0.5'},g);
+    el('stop',{offset:'50%','stop-color':'#fcfbf7','stop-opacity':'0.15'},g);
+    el('stop',{offset:'100%','stop-color':'#c0392b','stop-opacity':'0.5'},g);
+    var bandY=Y-46, bandH=92;
+    // UNSIGNED group : two neutral regions
+    var ug=el('g',{},svg);
+    el('rect',{x:MX(-5),y:bandY,width:(MX(0)-MX(-5)),height:bandH,fill:'rgba(150,85,145,0.13)'},ug);
+    el('rect',{x:MX(0),y:bandY,width:(MX(5)-MX(0)),height:bandH,fill:'rgba(120,120,120,0.12)'},ug);
+    var uA=el('text',{x:MX(-2.5),y:Y-56,'class':'tag','text-anchor':'middle'},ug); uA.textContent='region A';
+    var uB=el('text',{x:MX(2.5),y:Y-56,'class':'tag','text-anchor':'middle'},ug); uB.textContent='region B';
+    // SIGNED group : graded field
+    var sg=el('g',{opacity:0},svg);
+    el('rect',{x:MX(-5),y:bandY,width:(MX(5)-MX(-5)),height:bandH,fill:'url(#nsg)'},sg);
+    el('text',{x:MX(-3.6),y:Y-56,'class':'tag',fill:'#2c5aa8','text-anchor':'middle'},sg).textContent='\u2212 field';
+    el('text',{x:MX(3.6),y:Y-56,'class':'tag',fill:'#c0392b','text-anchor':'middle'},sg).textContent='+ field';
+    // surface line + axis
+    var surf=el('line',{x1:MX(0),y1:bandY-10,x2:MX(0),y2:bandY+bandH+10,stroke:'#6b2a5b','stroke-width':2.4},svg);
+    var surfL=el('text',{x:MX(0),y:bandY-16,'class':'tag',fill:'#6b2a5b','text-anchor':'middle'},svg); surfL.textContent='neutral surface';
+    addArrow(svg,'a3','#8a857e');
+    line(MX(-5),Y,MX(5),Y,{stroke:'#1c1a19','stroke-width':2,'marker-start':'url(#a3)','marker-end':'url(#a3)'},svg);
+    // probe
+    var P=el('circle',{cy:Y,r:7,fill:'#6b2a5b'},svg);
+    var PL=el('text',{y:Y+40,'class':'num','font-size':17,'text-anchor':'middle',fill:'#6b2a5b'},svg);
+    var handle=el('circle',{cy:Y,r:20,fill:'transparent',style:'cursor:grab'},svg);
+
+    var x=2, signed=false;
+    function paint(){
+      P.setAttribute('cx',MX(x)); handle.setAttribute('cx',MX(x));
+      if(signed){
+        sg.setAttribute('opacity',1); ug.setAttribute('opacity',0);
+        surfL.textContent='neutral surface (\u03c6 = 0)';
+        var col=x>=0?'#c0392b':'#2c5aa8';
+        P.setAttribute('fill',col); PL.setAttribute('x',MX(x)); PL.setAttribute('fill',col);
+        PL.textContent='\u03c6 = '+fmt(x);
+        read.innerHTML='signed field on\u2003\u03c6 = <b style="color:'+col+'">'+fmt(x)+'</b>\u2003(zero at the surface)';
+      } else {
+        sg.setAttribute('opacity',0); ug.setAttribute('opacity',1);
+        surfL.textContent='surface';
+        P.setAttribute('fill','#6b2a5b'); PL.setAttribute('x',MX(x)); PL.setAttribute('fill','#6b2a5b');
+        PL.textContent = x>=0?'region B':'region A';
+        read.innerHTML='signed field off\u2003\u2014 P is in <b>'+(x>=0?'region B':'region A')+'</b> (no sign, no minus)';
+      }
+    }
+    drag(svg,handle,function(p){ var mx=(p.x-OX)/SC; if(mx<-4.8)mx=-4.8; if(mx>4.8)mx=4.8; x=mx; paint(); });
+    btn.addEventListener('click',function(){ signed=!signed; btn.textContent = signed?'Turn signed field off':'Measure as signed field'; paint(); });
+    paint();
+  })();
+})();
+</script>
+</body>
+</html>
