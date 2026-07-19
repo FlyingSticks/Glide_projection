@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q and S as reciprocal images — the invariant R²</title>
+<style>
+  :root{
+    --paper:#f4f1e8;
+    --card:#fcfbf7;
+    --edge:#e6e1d4;
+    --plum:#6b2a5b;
+    --plum-soft:#9b5c93;
+    --green:#2f9e52;
+    --red:#c0392b;
+    --blue:#2c5aa8;
+    --ink:#1c1a19;
+    --grey:#8a857e;
+    --lav: rgba(150,85,145,0.16);
+    --cyan:#2bb0c4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    -webkit-text-size-adjust:100%;
+    padding:28px 16px 56px;
+    line-height:1.5;
+  }
+  .wrap{max-width:1046px;margin:0 auto}
+  h1{
+    font-style:italic;font-weight:600;color:var(--plum);
+    font-size:clamp(26px,4.4vw,40px);line-height:1.1;margin:0 0 .35em;
+    letter-spacing:.2px;
+  }
+  .lede{
+    font-size:clamp(15px,2.1vw,18.5px);color:#3a3632;max-width:60ch;margin:0 0 22px;
+  }
+  .card{
+    background:var(--card);border:1px solid var(--edge);border-radius:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,.02),0 10px 30px -22px rgba(60,30,55,.5);
+    padding:14px 14px 20px;
+  }
+  svg{display:block;width:100%;height:auto;overflow:hidden;touch-action:none}
+  text{font-family:inherit}
+  .lbl{font-style:italic;font-size:26px;fill:var(--ink)}
+  .tag{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;fill:var(--grey);font-style:normal}
+  .areaLbl{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600}
+
+  /* controls */
+  .controls{margin-top:14px;display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  button{
+    font-family:inherit;font-size:16px;color:#fff;background:var(--plum);
+    border:none;border-radius:9px;padding:9px 16px;cursor:pointer;min-width:132px;
+    transition:background .15s ease;
+  }
+  button:hover{background:#571f49}
+  button.ghost{background:transparent;color:var(--plum);border:1px solid var(--plum-soft);min-width:96px}
+  button.ghost:hover{background:rgba(107,42,91,.06)}
+  button:focus-visible,input:focus-visible{outline:2.5px solid var(--green);outline-offset:2px}
+  .sld{flex:1 1 260px;display:flex;flex-direction:column;gap:3px;min-width:220px}
+  .sld input[type=range]{width:100%;accent-color:var(--plum);height:26px}
+  .ends{display:flex;justify-content:space-between;font-family:system-ui,sans-serif;
+    font-size:12.5px;color:var(--grey)}
+  .chk{font-family:system-ui,sans-serif;font-size:14.5px;color:#4a4640;display:flex;align-items:center;gap:8px;cursor:pointer}
+  .chk input{width:17px;height:17px;accent-color:var(--cyan)}
+
+  /* readout */
+  .ledger{
+    margin-top:16px;padding:13px 15px;border:1px solid var(--edge);border-radius:11px;
+    background:#fbfaf5;font-family:"SF Mono",ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+    font-size:15px;color:#33302c;
+  }
+  .ledger .line{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline}
+  .ledger .line + .line{margin-top:9px;padding-top:9px;border-top:1px dashed var(--edge)}
+  .k{color:var(--grey)}
+  .v{font-weight:600;color:var(--ink)}
+  .inv{color:var(--plum);font-weight:600}
+  .chip{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:baseline;transform:translateY(1px);margin-right:2px}
+  .chip.sq{background:var(--lav);border:1.5px dashed var(--green)}
+  .chip.rect{background:var(--lav);border:1.5px solid var(--plum-soft)}
+  .eq{color:var(--green);font-weight:700}
+  .caption{
+    margin:22px 2px 0;font-size:16.5px;color:#413c37;max-width:66ch;
+  }
+  .caption em{color:var(--plum)}
+  .note{
+    margin:11px 2px 0;font-family:system-ui,sans-serif;font-size:13.5px;color:var(--grey);
+    max-width:70ch;line-height:1.5;
+  }
+  @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Q and S as reciprocal images</h1>
+  <p class="lede">The square on the radius never moves. Rotate&nbsp;R about&nbsp;M and the rectangle SM&thinsp;·&thinsp;QM changes shape without ever changing area — because it stays equal to R².</p>
+
+  <div class="card">
+    <svg id="art" viewBox="0 0 1046 590" role="img" aria-label="Interactive diagram of the reciprocal pair Q and S with a fixed square of area R squared and a rectangle of equal area that changes shape as the radius rotates about M.">
+      <defs>
+        <marker id="arw" markerWidth="11" markerHeight="9" refX="8.5" refY="3" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L8.5,3 L0,6 Z" fill="#1c1a19"></path>
+        </marker>
+      </defs>
+      <!-- layers filled by script -->
+      <g id="gStatic"></g>
+      <g id="gDyn"></g>
+      <g id="gPts"></g>
+    </svg>
+
+    <div class="controls">
+      <div class="row">
+        <button id="play" aria-pressed="false">▶ Rotate R</button>
+        <div class="sld">
+          <input id="theta" type="range" min="92" max="178" step="0.01" value="109.47" aria-label="Angle of the radius, degrees">
+          <div class="ends"><span>Q → centre, S → ∞</span><span>Q → anchor A, S meets it</span></div>
+        </div>
+        <button id="reset" class="ghost">Reset</button>
+      </div>
+      <div class="row" style="gap:8px 20px">
+        <label class="chk"><input id="tri" type="checkbox" checked> Show ±Q triangles — aqua STM (tangent) &amp; yellow SE(+Q) (apex)</label>
+        <label class="chk"><input id="diag" type="checkbox" checked> Show diagonal</label>
+        <label class="chk"><input id="thales" type="checkbox"> Thales circle on MS</label>
+      </div>
+    </div>
+
+    <div class="ledger" aria-live="polite">
+      <div class="line">
+        <span><span class="k">MQ</span> = <span class="v" id="oMQ">1.00</span></span>
+        <span><span class="k">MS</span> = <span class="v" id="oMS">9.00</span></span>
+        <span><span class="k">MQ · MS</span> = <span class="inv" id="oProd">9.00</span> <span class="k">= R²</span></span>
+        <span class="inv">— invariant under rotation</span>
+      </div>
+      <div class="line">
+        <span><span class="chip sq"></span><span class="k">square&nbsp;R²</span> = <span class="v" id="oSq">9.00</span></span>
+        <span><span class="chip rect"></span><span class="k">rectangle&nbsp;SM·QM</span> = <span class="v" id="oRect">9.00</span></span>
+        <span class="eq" id="oEq">equal ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">Slide Q toward the centre and S flies off to <em>infinity</em>; slide Q out to an anchor and S comes in to meet it — <em>A and C hold fixed</em>.</p>
+  <p class="note">Shown, not asserted: MQ&thinsp;·&thinsp;MS = R² at every angle. The right angle at T is free (tangent ⊥ radius); dropping the perpendicular to Q makes MT the leg of right triangle MTS, and the leg theorem hands you MT² = MQ·MS — that is, R² = MQ·MS. The lavender rectangle is that product; the lavender square is R². They never come apart.</p>
+  <p class="note"><b>The ±Q pair.</b> Aqua STM is the tangent triangle: right angle at T, the perpendicular dropping to <b>−Q</b> (leg&nbsp;MT&nbsp;=&nbsp;R). Yellow SE(+Q) is the apex triangle: E is the fixed top of the circle, the right angle sits at E, and the altitude EM&nbsp;=&nbsp;R meets the axis at M — giving <b>+Q</b>, the mirror of −Q across M. Both read one relation, R²&nbsp;=&nbsp;MS·|QM|; drag T, or drag +Q, and the pair moves together. The gray diagonal spans the composite box (S to C, square above, rectangle below) — and because MS·|QM|&nbsp;=&nbsp;R² it always crosses the axis exactly at M.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var svg = document.getElementById('art');
+  var gS = document.getElementById('gStatic');
+  var gD = document.getElementById('gDyn');
+  var gP = document.getElementById('gPts');
+  var NS = "http://www.w3.org/2000/svg";
+
+  // ---- coordinate map (math: x right, y up; M at origin) ----
+  var R = 3;
+  var s = 58, ox = 726, oy = 310;
+  var X = function(x){ return ox + x*s; };
+  var Y = function(y){ return oy - y*s; };
+  var xMinClamp = -11.5;               // beyond this, S is drawn as "→ −∞"
+
+  function el(tag, attrs, parent){
+    var e = document.createElementNS(NS, tag);
+    if(attrs) for(var k in attrs) e.setAttribute(k, attrs[k]);
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+  function line(x1,y1,x2,y2,attrs,parent){
+    var a = attrs||{}; a.x1=x1; a.y1=y1; a.x2=x2; a.y2=y2;
+    return el('line', a, parent);
+  }
+  function unit(v){ var m = Math.hypot(v[0],v[1])||1; return [v[0]/m, v[1]/m]; }
+  function sub(a,b){ return [a[0]-b[0], a[1]-b[1]]; }
+  function showEl(n,on){ n.style.display = on ? '' : 'none'; }
+  // right-angle tick at math point P, along unit dirs d1,d2, side length L (math units)
+  function raPath(P,d1,d2,L){
+    var a=[P[0]+d1[0]*L, P[1]+d1[1]*L];
+    var b=[a[0]+d2[0]*L, a[1]+d2[1]*L];
+    var c=[P[0]+d2[0]*L, P[1]+d2[1]*L];
+    return 'M '+X(P[0])+' '+Y(P[1])+' L '+X(a[0])+' '+Y(a[1])+' L '+X(b[0])+' '+Y(b[1])+' L '+X(c[0])+' '+Y(c[1]);
+  }
+
+  // ================= STATIC LAYER =================
+  // axis
+  line(X(-11.9), oy, X(4.8), oy, {'stroke':'#1c1a19','stroke-width':2,'marker-start':'url(#arw)','marker-end':'url(#arw)'}, gS);
+  // infinity glyph at far left
+  var inf = el('text',{'x':X(-11.4),'y':oy-11,'class':'tag','text-anchor':'start'}, gS); inf.textContent='∞';
+
+  // mirror semicircle (fixed) : left(-3,0) over top to right(3,0)
+  el('path',{'d':'M '+X(-3)+' '+Y(0)+' A '+(R*s)+' '+(R*s)+' 0 0 1 '+X(3)+' '+Y(0),
+             'fill':'none','stroke':'#6b2a5b','stroke-width':2.4}, gS);
+  var mc = el('text',{'x':X(0),'y':Y(3)-16,'class':'tag','text-anchor':'middle'}, gS);
+  mc.textContent='the mirror-circle through A and C';
+
+  // FIXED square on the radius : math [0,0]-[3,3]
+  el('rect',{'x':X(0),'y':Y(3),'width':R*s,'height':R*s,'fill':'rgba(150,85,145,0.16)',
+             'stroke':'#2f9e52','stroke-width':2,'stroke-dasharray':'7 5'}, gS);
+  var sqL = el('text',{'x':X(1.5),'y':Y(1.5)-2,'class':'lbl','text-anchor':'middle','fill':'#2f9e52','font-style':'normal','font-weight':'600'}, gS);
+  sqL.textContent='R²';
+  var sqV = el('text',{'x':X(1.5),'y':Y(1.5)+22,'class':'tag','text-anchor':'middle','fill':'#2f9e52'}, gS);
+  sqV.textContent='area = 9';
+
+  // anchors A (-3,0) and C (3,0): concentric target markers
+  function anchor(x, name, dx){
+    el('circle',{'cx':X(x),'cy':oy,'r':8.5,'fill':'none','stroke':'#1c1a19','stroke-width':1.7}, gS);
+    el('circle',{'cx':X(x),'cy':oy,'r':3.4,'fill':'#1c1a19'}, gS);
+    var f = el('text',{'x':X(x)+dx,'y':oy-30,'class':'tag','text-anchor':'middle'}, gS); f.textContent='fixed';
+    var n = el('text',{'x':X(x)+dx,'y':oy-13,'class':'lbl','text-anchor':'middle'}, gS); n.textContent=name;
+  }
+  anchor(-3,'A',-12);
+  anchor( 3,'C', 14);
+
+  // M point + label
+  el('circle',{'cx':X(0),'cy':oy,'r':4,'fill':'#1c1a19'}, gS);
+  var mL = el('text',{'x':X(0)+8,'y':oy+22,'class':'lbl','text-anchor':'start'}, gS); mL.textContent='M';
+
+  // ================= DYNAMIC LAYER =================
+  // (created once, updated in render)
+  var thalesC = el('circle',{'fill':'none','stroke':'#2bb0c4','stroke-width':1.6,'stroke-dasharray':'4 5','opacity':'0','stroke-opacity':'0.85'}, gD);
+  var rect    = el('rect',{'fill':'rgba(150,85,145,0.16)','stroke':'#9b5c93','stroke-width':2}, gD);
+  var reachR  = line(0,0,0,0,{'stroke':'#c0392b','stroke-width':5,'stroke-linecap':'round','opacity':0.9}, gD);
+  var reachB  = line(0,0,0,0,{'stroke':'#2c5aa8','stroke-width':5,'stroke-linecap':'round','opacity':0.95}, gD);
+  var perp    = line(0,0,0,0,{'stroke':'#4a4640','stroke-width':1.6,'stroke-dasharray':'5 5'}, gD);
+  var tangent = line(0,0,0,0,{'stroke':'#6b2a5b','stroke-width':2.2}, gD);
+  var radius  = line(0,0,0,0,{'stroke':'#2f9e52','stroke-width':3.4,'stroke-linecap':'round'}, gD);
+  var raT     = el('path',{'fill':'none','stroke':'#1c1a19','stroke-width':1.5}, gD);
+  var raQ     = el('path',{'fill':'none','stroke':'#1c1a19','stroke-width':1.5}, gD);
+  var rectLbl = el('text',{'class':'areaLbl','fill':'#6b2a5b','font-size':16,'text-anchor':'middle'}, gD);
+
+  // points + labels (top layer, above fills)
+  var rLbl  = el('text',{'class':'lbl','fill':'#2f9e52','font-style':'italic','text-anchor':'middle'}, gP); rLbl.textContent='R';
+  var Tdot  = el('circle',{'r':4.5,'fill':'#1c1a19'}, gP);
+  var TLbl  = el('text',{'class':'lbl','text-anchor':'middle'}, gP); TLbl.textContent='T';
+  var Qdot  = el('circle',{'r':4.5,'fill':'#1c1a19'}, gP);
+  var QLbl  = el('text',{'class':'lbl','text-anchor':'middle'}, gP); QLbl.textContent='Q';
+  var Sdot  = el('circle',{'r':5,'fill':'#c0392b'}, gP);
+  var SLbl  = el('text',{'class':'lbl','fill':'#c0392b','text-anchor':'middle'}, gP); SLbl.textContent='S';
+  var Sinf  = el('text',{'class':'lbl','fill':'#c0392b','text-anchor':'start','opacity':'0'}, gP); Sinf.textContent='S →';
+  // grab handle on T (large, transparent) for dragging
+  var handle= el('circle',{'r':22,'fill':'transparent','style':'cursor:grab'}, gP);
+
+  // ----- PAIR OF TRIANGLES + DIAGONAL -----
+  // fills + diagonal sit UNDER the main construction (own group, before gDyn)
+  var gFill = el('g', {}, null); svg.insertBefore(gFill, gD);
+  var triA     = el('polygon',{'fill':'rgba(43,176,196,0.14)','stroke':'none'}, gFill); // aqua STM
+  var triB     = el('polygon',{'fill':'rgba(221,160,23,0.15)','stroke':'none'}, gFill); // yellow SE(+Q)
+  var diagLine = el('line',{'stroke':'#8f887f','stroke-width':1.8,'stroke-dasharray':'2 6','stroke-linecap':'round'}, gFill);
+  // crisp edges / points on top (gPts)
+  var edgeSE = line(0,0,0,0,{'stroke':'#dda017','stroke-width':2}, gP);        // S–E
+  var edgeEQ = line(0,0,0,0,{'stroke':'#dda017','stroke-width':2}, gP);        // E–(+Q)
+  var altEM  = line(0,0,0,0,{'stroke':'#dda017','stroke-width':2.6,'stroke-linecap':'round'}, gP); // altitude EM = R
+  var raE    = el('path',{'fill':'none','stroke':'#1c1a19','stroke-width':1.5}, gP);
+  var Edot   = el('circle',{'r':4.5,'fill':'#1c1a19'}, gP);
+  var ELbl   = el('text',{'class':'lbl','text-anchor':'middle'}, gP); ELbl.textContent='E';
+  var pQdot  = el('circle',{'r':4.5,'fill':'#1c1a19'}, gP);
+  var pQLbl  = el('text',{'class':'lbl','text-anchor':'middle'}, gP); pQLbl.textContent='+Q';
+  var dEnd1  = el('circle',{'r':3.6,'fill':'#8f887f'}, gP);
+  var dEnd2  = el('circle',{'r':3.6,'fill':'#8f887f'}, gP);
+  var pQhandle = el('circle',{'r':20,'fill':'transparent','style':'cursor:grab'}, gP);
+
+  // ---------- readout refs ----------
+  var oMQ=document.getElementById('oMQ'), oMS=document.getElementById('oMS'),
+      oProd=document.getElementById('oProd'), oSq=document.getElementById('oSq'),
+      oRect=document.getElementById('oRect');
+
+  // =================  RENDER  =================
+  function render(deg){
+    var t = deg*Math.PI/180;
+    var c = Math.cos(t);
+    var Tp = [R*c, R*Math.sin(t)];
+    var Qx = R*c;                 // Q = [Qx, 0]
+    var Sx = R/c;                 // S = [Sx, 0]  (negative here)
+    var MQ = Math.abs(Qx), MS = Math.abs(Sx);
+    var area = MS*MQ;
+
+    // radius M->T
+    radius.setAttribute('x1',X(0)); radius.setAttribute('y1',Y(0));
+    radius.setAttribute('x2',X(Tp[0])); radius.setAttribute('y2',Y(Tp[1]));
+    var rn = unit([-Tp[1], Tp[0]]);          // normal to the radius
+    rLbl.setAttribute('x', X(Tp[0]/2 + rn[0]*0.34));
+    rLbl.setAttribute('y', Y(Tp[1]/2 + rn[1]*0.34)+6);
+
+    // tangent T->S  (clips at frame if S far off)
+    tangent.setAttribute('x1',X(Tp[0])); tangent.setAttribute('y1',Y(Tp[1]));
+    tangent.setAttribute('x2',X(Sx));    tangent.setAttribute('y2',Y(0));
+
+    // perpendicular T->Q (vertical)
+    perp.setAttribute('x1',X(Tp[0])); perp.setAttribute('y1',Y(Tp[1]));
+    perp.setAttribute('x2',X(Tp[0])); perp.setAttribute('y2',Y(0));
+
+    // right-angle ticks
+    raT.setAttribute('d', raPath(Tp, unit(sub([0,0],Tp)), unit(sub([Sx,0],Tp)), 0.30));
+    raQ.setAttribute('d', raPath([Qx,0], [0,1], [1,0], 0.28));
+
+    // reach bars on the axis
+    reachR.setAttribute('x1',X(Sx)); reachR.setAttribute('y1',Y(0));
+    reachR.setAttribute('x2',X(0));  reachR.setAttribute('y2',Y(0));
+    reachB.setAttribute('x1',X(0));  reachB.setAttribute('y1',Y(0));
+    reachB.setAttribute('x2',X(Qx)); reachB.setAttribute('y2',Y(0));
+
+    // morphing rectangle  [Sx,0] .. [0,-MQ]
+    rect.setAttribute('x', X(Sx));
+    rect.setAttribute('y', Y(0));
+    rect.setAttribute('width',  MS*s);
+    rect.setAttribute('height', MQ*s);
+    // area label: inside if tall enough, else just below
+    var hpx = MQ*s;
+    var ly = hpx > 34 ? oy + Math.min(hpx*0.6, hpx-10) : oy + hpx + 20;
+    rectLbl.setAttribute('x', X(-1.6));
+    rectLbl.setAttribute('y', ly);
+    rectLbl.textContent = 'SM · QM = ' + area.toFixed(2);
+
+    // Thales circle on MS (center Sx/2, radius MS/2)
+    if(thales.checked){
+      thalesC.setAttribute('cx', X(Sx/2));
+      thalesC.setAttribute('cy', Y(0));
+      thalesC.setAttribute('r',  (MS/2)*s);
+      thalesC.setAttribute('opacity','1');
+    } else {
+      thalesC.setAttribute('opacity','0');
+    }
+
+    // points
+    Tdot.setAttribute('cx',X(Tp[0])); Tdot.setAttribute('cy',Y(Tp[1]));
+    TLbl.setAttribute('x',X(Tp[0])-2); TLbl.setAttribute('y',Y(Tp[1])-13);
+    handle.setAttribute('cx',X(Tp[0])); handle.setAttribute('cy',Y(Tp[1]));
+
+    Qdot.setAttribute('cx',X(Qx)); Qdot.setAttribute('cy',Y(0));
+    QLbl.setAttribute('x',X(Qx)); QLbl.setAttribute('y',oy-15);
+
+    if(Sx < xMinClamp){                 // S off-screen: show arrow marker
+      Sdot.setAttribute('opacity','0'); SLbl.setAttribute('opacity','0');
+      Sinf.setAttribute('opacity','1');
+      Sinf.setAttribute('x', X(-11.9)+16); Sinf.setAttribute('y', oy-14);
+    } else {
+      Sdot.setAttribute('opacity','1'); SLbl.setAttribute('opacity','1');
+      Sinf.setAttribute('opacity','0');
+      Sdot.setAttribute('cx',X(Sx)); Sdot.setAttribute('cy',Y(0));
+      SLbl.setAttribute('x',X(Sx)); SLbl.setAttribute('y',oy-15);
+    }
+
+    // ---- pair of triangles + apex E + diagonal ----
+    var q = MQ, pQx = q;                 // +Q sits at +|QM|, the mirror of -Q across M
+    triA.setAttribute('points', X(Sx)+','+Y(0)+' '+X(Tp[0])+','+Y(Tp[1])+' '+X(0)+','+Y(0));
+    triB.setAttribute('points', X(Sx)+','+Y(0)+' '+X(0)+','+Y(R)+' '+X(pQx)+','+Y(0));
+    edgeSE.setAttribute('x1',X(Sx)); edgeSE.setAttribute('y1',Y(0));
+    edgeSE.setAttribute('x2',X(0));  edgeSE.setAttribute('y2',Y(R));
+    edgeEQ.setAttribute('x1',X(0));  edgeEQ.setAttribute('y1',Y(R));
+    edgeEQ.setAttribute('x2',X(pQx));edgeEQ.setAttribute('y2',Y(0));
+    altEM.setAttribute('x1',X(0)); altEM.setAttribute('y1',Y(R));
+    altEM.setAttribute('x2',X(0)); altEM.setAttribute('y2',Y(0));
+    raE.setAttribute('d', raPath([0,R], unit(sub([Sx,0],[0,R])), unit(sub([pQx,0],[0,R])), 0.30));
+    Edot.setAttribute('cx',X(0)); Edot.setAttribute('cy',Y(R));
+    ELbl.setAttribute('x',X(0)-13); ELbl.setAttribute('y',Y(R)-4);
+    pQdot.setAttribute('cx',X(pQx)); pQdot.setAttribute('cy',Y(0));
+    pQLbl.setAttribute('x',X(pQx)); pQLbl.setAttribute('y',oy+26);
+    pQhandle.setAttribute('cx',X(pQx)); pQhandle.setAttribute('cy',Y(0));
+    // gray diagonal: bounding box S..C, top R .. bottom -q; crosses axis at M
+    diagLine.setAttribute('x1',X(Sx)); diagLine.setAttribute('y1',Y(R));
+    diagLine.setAttribute('x2',X(3));  diagLine.setAttribute('y2',Y(-q));
+    dEnd1.setAttribute('cx',X(Sx)); dEnd1.setAttribute('cy',Y(R));
+    dEnd2.setAttribute('cx',X(3));  dEnd2.setAttribute('cy',Y(-q));
+
+    var onT = tri.checked, onD = diagCb.checked;
+    showEl(triA,onT); showEl(triB,onT); showEl(edgeSE,onT); showEl(edgeEQ,onT);
+    showEl(altEM,onT); showEl(raE,onT); showEl(Edot,onT); showEl(ELbl,onT);
+    showEl(pQdot,onT); showEl(pQLbl,onT); showEl(pQhandle,onT);
+    QLbl.textContent = onT ? '−Q' : 'Q';
+    showEl(diagLine,onD); showEl(dEnd1,onD); showEl(dEnd2,onD);
+
+    // ledger
+    oMQ.textContent = MQ.toFixed(2);
+    oMS.textContent = (MS>999 ? MS.toFixed(0) : MS.toFixed(2));
+    oProd.textContent = area.toFixed(2);
+    oSq.textContent = (R*R).toFixed(2);
+    oRect.textContent = area.toFixed(2);
+  }
+
+  // =================  CONTROLS  =================
+  var slider = document.getElementById('theta');
+  var thales = document.getElementById('thales');
+  var tri = document.getElementById('tri');
+  var diagCb = document.getElementById('diag');
+  var playBtn = document.getElementById('play');
+  var resetBtn = document.getElementById('reset');
+  var START = 109.47;
+
+  slider.addEventListener('input', function(){ stop(); render(parseFloat(slider.value)); });
+  [thales, tri, diagCb].forEach(function(cb){ cb.addEventListener('change', function(){ render(parseFloat(slider.value)); }); });
+  resetBtn.addEventListener('click', function(){ stop(); slider.value=START; render(START); });
+
+  // play / pause  (ping-pong within a comfortable range)
+  var anim=null, dir=1, LO=100, HI=173;
+  function stop(){ if(anim){ cancelAnimationFrame(anim); anim=null; playBtn.textContent='▶ Rotate R'; playBtn.setAttribute('aria-pressed','false'); } }
+  function step(){
+    var v = parseFloat(slider.value) + dir*0.32;
+    if(v>=HI){ v=HI; dir=-1; } else if(v<=LO){ v=LO; dir=1; }
+    slider.value=v; render(v); anim=requestAnimationFrame(step);
+  }
+  playBtn.addEventListener('click', function(){
+    if(anim){ stop(); return; }
+    var v=parseFloat(slider.value); if(v>=HI) dir=-1; else if(v<=LO) dir=1;
+    playBtn.textContent='❚❚ Pause'; playBtn.setAttribute('aria-pressed','true');
+    anim=requestAnimationFrame(step);
+  });
+
+  // drag T around the circle
+  function clientToMath(evt){
+    var pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    return [ (p.x - ox)/s, (oy - p.y)/s ];
+  }
+  var dragging=false;
+  function pointerAngle(evt){
+    var m = clientToMath(evt);
+    var deg = Math.atan2(m[1], m[0]) * 180/Math.PI;   // upper-left => 90..180
+    if(deg < 0) deg += 360;
+    if(deg < 92) deg = 92; if(deg > 178) deg = 178;
+    return deg;
+  }
+  handle.addEventListener('pointerdown', function(evt){
+    stop(); dragging=true; handle.setAttribute('style','cursor:grabbing');
+    handle.setPointerCapture(evt.pointerId);
+    var d=pointerAngle(evt); slider.value=d; render(d); evt.preventDefault();
+  });
+  handle.addEventListener('pointermove', function(evt){
+    if(!dragging) return; var d=pointerAngle(evt); slider.value=d; render(d);
+  });
+  function endDrag(evt){ dragging=false; handle.setAttribute('style','cursor:grab'); }
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+
+  // drag +Q along the axis (drives the pair: sets |QM|, hence MS = R²/|QM|)
+  var draggingQ=false;
+  function degFromQ(evt){
+    var m = clientToMath(evt); var qx = m[0];
+    if(qx<0.105) qx=0.105; if(qx>2.998) qx=2.998;   // keeps θ within [92°,178°]
+    var d = Math.acos(-qx/R)*180/Math.PI;
+    if(d<92) d=92; if(d>178) d=178;
+    return d;
+  }
+  pQhandle.addEventListener('pointerdown', function(evt){
+    stop(); draggingQ=true; pQhandle.setAttribute('style','cursor:grabbing');
+    pQhandle.setPointerCapture(evt.pointerId);
+    var d=degFromQ(evt); slider.value=d; render(d); evt.preventDefault();
+  });
+  pQhandle.addEventListener('pointermove', function(evt){
+    if(!draggingQ) return; var d=degFromQ(evt); slider.value=d; render(d);
+  });
+  function endQ(){ draggingQ=false; pQhandle.setAttribute('style','cursor:grab'); }
+  pQhandle.addEventListener('pointerup', endQ);
+  pQhandle.addEventListener('pointercancel', endQ);
+
+  // first paint
+  render(START);
+})();
+</script>
+</body>
+</html>
