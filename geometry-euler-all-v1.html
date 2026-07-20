@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Geometry Tower and the Congruence Field — one Euler diagram</title>
+<style>
+  :root{
+    --film:#e6ebf0; --vellum:#f7f9fb; --ink:#182430; --ink-soft:#54626f;
+    --rule:#d4dce4; --brass:#a9781f;
+    --p:#eef2f6; --a:#e0e9f1; --m:#ccdbeb; --e:#b6cbe1; --field:#f3e7d3;
+    --serif:"Palatino Linotype","Iowan Old Style",Palatino,"URW Palladio L",Georgia,serif;
+    --sans:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:"SF Mono",Menlo,Consolas,ui-monospace,monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--film); color:var(--ink); font-family:var(--sans); line-height:1.5; padding:40px 20px;}
+  .plate{max-width:760px; margin:0 auto; background:var(--vellum); border:1px solid var(--rule); border-radius:4px;
+    padding:44px 40px 40px; box-shadow:0 1px 0 rgba(24,36,48,.04),0 24px 48px -32px rgba(24,36,48,.35);}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--brass); margin:0 0 10px;}
+  h1{font-family:var(--serif); font-weight:600; font-size:28px; line-height:1.14; margin:0 0 8px; letter-spacing:.01em;}
+  .lede{font-size:15px; color:var(--ink-soft); margin:0 0 4px; max-width:58ch}
+  figure{margin:26px 0 6px} svg{width:100%; height:auto; display:block}
+  .cap{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); text-align:center; margin:8px auto 0; max-width:64ch; line-height:1.55;}
+  h2{font-family:var(--serif); font-size:19px; font-weight:600; margin:34px 0 12px; padding-bottom:7px; border-bottom:1px solid var(--rule);}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  thead th{text-align:left; font-family:var(--mono); font-weight:400; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); padding:0 12px 8px 0; vertical-align:bottom; border-bottom:1px solid var(--ink);}
+  tbody td{padding:11px 12px 11px 0; border-bottom:1px solid var(--rule); vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  .geo{font-family:var(--serif); font-size:14.5px; white-space:nowrap}
+  .geo small{display:block; font-family:var(--sans); font-size:11px; color:var(--ink-soft); font-weight:400}
+  .map,.dof{font-family:var(--mono); font-size:12px} .dof{text-align:center}
+  .brass{color:var(--brass)} .foot-note{font-size:12px; color:var(--ink-soft); margin:10px 0 0}
+  .idea{background:#eef2f6; border:1px solid var(--rule); border-left:3px solid var(--brass); border-radius:3px; padding:18px 20px; margin-top:14px;}
+  .idea p{margin:0 0 10px; font-size:14px} .idea p:last-child{margin-bottom:0} .idea b{font-weight:600}
+  .idea .step{font-family:var(--serif); color:var(--brass); font-style:italic}
+  .notes{margin-top:30px; padding-top:18px; border-top:1px solid var(--rule)}
+  .notes p{font-size:12.5px; color:var(--ink-soft); margin:0 0 12px; padding-left:22px; position:relative}
+  .notes p:last-child{margin-bottom:0}
+  .notes .mk{position:absolute; left:0; font-family:var(--mono); color:var(--brass)}
+  code{font-family:var(--mono); font-size:.92em; color:var(--ink)}
+  @media (max-width:560px){.plate{padding:32px 22px} h1{font-size:23px} table{font-size:12.5px} .geo{white-space:normal}}
+</style>
+</head>
+<body>
+<main class="plate">
+  <p class="eyebrow">Klein's Erlangen program · and the ground beyond it</p>
+  <h1>The tower and the field — one Euler diagram</h1>
+  <p class="lede">The four classical geometries nest as groups. The double-slit congruence chart is not a fifth ring:
+  neither contains the other. They <b>overlap</b> — and the overlap is exactly the seam.</p>
+
+  <figure>
+    <svg viewBox="0 0 640 540" role="img"
+         aria-label="Four nested rectangles (Perspective contains Affine contains Metric contains Euclidean) with a fifth warm region, the congruence field, overlapping the Perspective and Affine bands from the right; the overlap strip is the seam holding the pinhole, pushbroom, and orthographic markers, and the field beyond the rings is the split two-slit region.">
+      <!-- the tower -->
+      <rect x="28"  y="40"  width="380" height="440" rx="14" fill="#eef2f6" stroke="#5b6b7a" stroke-width="1.4"/>
+      <text x="200" y="62"  text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="15" fill="#182430">PERSPECTIVE · <tspan font-style="italic">projective</tspan></text>
+      <text x="200" y="77"  text-anchor="middle" font-family="Menlo,monospace" font-size="10" fill="#54626f">PGL(3) · 8 dof · <tspan fill="#a9781f">cross-ratio</tspan></text>
+
+      <rect x="64"  y="84"  width="308" height="352" rx="12" fill="#e0e9f1" stroke="#4a5c6c" stroke-width="1.4"/>
+      <text x="200" y="106" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="14.5" fill="#182430">AFFINE</text>
+      <text x="200" y="120" text-anchor="middle" font-family="Menlo,monospace" font-size="10" fill="#54626f">Aff(2) · 6 dof · simple ratio</text>
+
+      <rect x="100" y="128" width="236" height="264" rx="10" fill="#ccdbeb" stroke="#3a4c5d" stroke-width="1.4"/>
+      <text x="200" y="150" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="14.5" fill="#182430">METRIC · <tspan font-style="italic">similarity</tspan></text>
+      <text x="200" y="164" text-anchor="middle" font-family="Menlo,monospace" font-size="10" fill="#54626f">Sim(2) · 4 dof · angle, shape</text>
+
+      <rect x="136" y="172" width="164" height="176" rx="8"  fill="#b6cbe1" stroke="#2c3e50" stroke-width="1.4"/>
+      <text x="218" y="252" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="14.5" fill="#182430">EUCLIDEAN</text>
+      <text x="218" y="267" text-anchor="middle" font-family="Menlo,monospace" font-size="10" fill="#54626f">E(2) · 3 dof · distance</text>
+
+      <!-- the field: overlapping region, not a ring -->
+      <rect x="344" y="150" width="272" height="250" rx="20" fill="#f3e7d3" fill-opacity="0.72" stroke="#a9781f" stroke-width="1.6"/>
+      <text x="492" y="176" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="14.5" fill="#182430">THE CONGRUENCE FIELD</text>
+      <text x="492" y="191" text-anchor="middle" font-family="Menlo,monospace" font-size="10" fill="#54626f">double-slit chart (rᵤ, rᵥ) · not a group</text>
+      <text x="512" y="300" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#8a6414">split · glide ≠ cross-slit</text>
+      <text x="512" y="315" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#8a6414">off the ladder — lines bend</text>
+      <text x="512" y="336" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#54626f">keeps: two channel cross-ratios ·</text>
+      <text x="512" y="349" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#54626f">gauge product 1</text>
+
+      <!-- the seam: the overlap strip -->
+      <rect x="344" y="150" width="64" height="250" fill="#a9781f" fill-opacity="0.12"/>
+      <text x="376" y="393" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#8a6414" transform="rotate(-90 376 393)"></text>
+      <text x="376" y="170" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#8a6414">SEAM</text>
+
+      <!-- markers -->
+      <circle cx="392" cy="212" r="4.5" fill="#182430"/>
+      <text x="392" y="200" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#182430">pinhole</text>
+      <circle cx="372" cy="272" r="4.5" fill="#182430"/>
+      <text x="372" y="260" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#182430">pushbroom</text>
+      <circle cx="358" cy="332" r="4.5" fill="#182430"/>
+      <text x="360" y="320" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#182430">orthographic</text>
+      <circle cx="520" cy="262" r="4.5" fill="#a9781f"/>
+      <text x="520" y="250" text-anchor="middle" font-family="Menlo,monospace" font-size="9.5" fill="#8a6414">two-slit (rᵤ ≠ rᵥ)</text>
+    </svg>
+    <figcaption class="cap">The ladder and the chart meet in a seam: field ∩ collineations = {pinhole, pushbroom, orthographic}.
+    Neither contains the other — the chart's diagonal realizes only a pencil of pinholes (not all of PGL(3)),
+    and the split field preserves no lines (so it lies outside every ring). Pushbroom sits astride the
+    affine/projective boundary; orthographic reaches into the affine band; the pinhole sits in the projective band proper.</figcaption>
+  </figure>
+
+  <h2>What each region fixes — and what the field releases</h2>
+  <table>
+    <thead>
+      <tr><th>Region</th><th>Map x ↦</th><th>dof</th><th>Reading outward: what changes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="geo">Congruence field<small>double-slit</small></td>
+        <td class="map">per-axis Möbius in depth; rates split (rᵤ ≠ rᵥ)</td>
+        <td class="dof">2-par. chart<br>· not a group</td>
+        <td>leaves the collineations — some lines bend, the group structure is gone; <b>keeps</b> the two channel cross-ratios, held separately, and the gauge reciprocity (glide × camera factor = 1)</td>
+      </tr>
+      <tr>
+        <td class="geo">Perspective<small>projective</small></td>
+        <td class="map">Hx,  H ∈ GL(3) / scale</td>
+        <td class="dof">8</td>
+        <td><span class="brass">cross-ratio</span>; incidence, collinearity, concurrency, tangency</td>
+      </tr>
+      <tr>
+        <td class="geo">Affine</td>
+        <td class="map">Ax + b,  A ∈ GL(2)</td>
+        <td class="dof">6</td>
+        <td>the line at infinity held fixed → parallelism, midpoints, area ratios, simple ratio</td>
+      </tr>
+      <tr>
+        <td class="geo">Metric<small>similarity</small></td>
+        <td class="map">sRx + b,  RᵀR = I, s &gt; 0</td>
+        <td class="dof">4</td>
+        <td>the circular points held fixed → angles, length ratios, shape, circles as a class</td>
+      </tr>
+      <tr>
+        <td class="geo">Euclidean</td>
+        <td class="map">Rx + b,  RᵀR = I</td>
+        <td class="dof">3</td>
+        <td>absolute length and area — the scale is nailed down</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="foot-note">The inner four keep everything above them. The field keeps only the congruence structure — which is exactly what the inner four were quietly standing on.</p>
+
+  <h2>One idea underneath — now with the outward step</h2>
+  <div class="idea">
+    <p><span class="step">Split the two channel rates</span> — release the requirement that the picture map be a collineation at all —
+    and you step off the ladder into the <b>congruence field</b>: no group, but the congruence and its drawn armature remain,
+    and each channel still carries its own cross-ratio. Fuse the rates back (rᵤ = rᵥ, or send one to 0) and the ladder reappears — that fusing locus is the seam.</p>
+    <p>From there, every inner level is <b>the projective plane plus a distinguished figure held fixed</b>:</p>
+    <p><span class="step">Fix a line</span> — the line at infinity <code>ℓ∞</code> — and you get <b>affine</b> geometry; the cross-ratio with the point at infinity collapses to the simple ratio.</p>
+    <p><span class="step">Fix two conjugate points on it</span> — the circular points <code>I, J = (1 : ±i : 0)</code> — and you get <b>metric</b> geometry: the angle between lines of slopes m₁, m₂ is <code>θ = (1/2i) · log cr(m₁, m₂; i, −i)</code> (Laguerre), and a circle is a conic through <code>I</code> and <code>J</code>.</p>
+    <p><span class="step">Fix the scale</span> and you get <b>Euclidean</b> geometry.</p>
+    <p>So the whole picture is one structure with progressively more pinned down — and the <span class="brass">cross-ratio</span>,
+    which survives even in the field (one per channel), is what everything inward is built from.</p>
+  </div>
+
+  <div class="notes">
+    <p><span class="mk">†</span> <b>On "metric."</b> The similarity level — angles and length ratios recoverable, absolute scale free (Hartley &amp; Zisserman's stratification).</p>
+    <p><span class="mk">‡</span> <b>Why Euler, not Venn — corrected count.</b> The strict chain <code>E ⊂ Sim ⊂ Aff ⊂ Proj</code> realizes five of a four-set Venn's sixteen cells (the exterior and the four bands); <b>eleven</b> are empty. The field adds three more realized cells: field-only, field ∩ Proj, and field ∩ Aff.</p>
+    <p><span class="mk">§</span> <b>Dimension.</b> In <code>ℝⁿ</code> the counts 3·4·6·8 become isometry n(n+1)/2, +1 for similarity, affine n(n+1), projective (n+1)² − 1.</p>
+    <p><span class="mk">¶</span> <b>Provenance and verification.</b> This plate is the union of <i>geometry-euler-diagram</i> (the four inner rings, with the two corrections above applied) and <i>the-congruence-map</i> (the field, the seam, the three markers). Machine-verified in check_euler_all.js (5/5): the dof ladder; the eleven-cell count; Laguerre's formula exact to 10⁻¹⁶; the overlap boundary — trace straight on the seam (10⁻¹⁴), bent in the field — re-bound to the shipped engine; and the field's surviving gauge reciprocity (product 1 to 10⁻¹⁶).</p>
+  </div>
+</main>
+</body>
+</html>
