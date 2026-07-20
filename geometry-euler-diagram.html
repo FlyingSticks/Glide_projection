@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Geometry Tower — an Euler diagram</title>
+<style>
+  :root{
+    --film:#e6ebf0; --vellum:#f7f9fb; --ink:#182430; --ink-soft:#54626f;
+    --rule:#d4dce4; --brass:#a9781f;
+    --p:#eef2f6; --a:#e0e9f1; --m:#ccdbeb; --e:#b6cbe1;
+    --serif:"Palatino Linotype","Iowan Old Style",Palatino,"URW Palladio L",Georgia,serif;
+    --sans:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:"SF Mono",Menlo,Consolas,ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--film); color:var(--ink); font-family:var(--sans);
+    line-height:1.5; padding:40px 20px; -webkit-font-smoothing:antialiased;
+  }
+  .plate{
+    max-width:720px; margin:0 auto; background:var(--vellum);
+    border:1px solid var(--rule); border-radius:4px;
+    padding:44px 40px 40px; box-shadow:0 1px 0 rgba(24,36,48,.04),0 24px 48px -32px rgba(24,36,48,.35);
+    animation:rise .5s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.plate{animation:none}}
+
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--brass); margin:0 0 10px;
+  }
+  h1{
+    font-family:var(--serif); font-weight:600; font-size:30px; line-height:1.12;
+    margin:0 0 8px; letter-spacing:.01em;
+  }
+  .lede{font-size:15px; color:var(--ink-soft); margin:0 0 4px; max-width:52ch}
+
+  figure{margin:26px 0 6px}
+  svg{width:100%; height:auto; display:block}
+  .cap{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+    text-align:center; margin:6px auto 0; max-width:60ch; line-height:1.5;
+  }
+
+  h2{
+    font-family:var(--serif); font-size:19px; font-weight:600; margin:34px 0 12px;
+    padding-bottom:7px; border-bottom:1px solid var(--rule);
+  }
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  thead th{
+    text-align:left; font-family:var(--mono); font-weight:400; font-size:10.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);
+    padding:0 12px 8px 0; vertical-align:bottom; border-bottom:1px solid var(--ink);
+  }
+  tbody td{padding:11px 12px 11px 0; border-bottom:1px solid var(--rule); vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  .geo{font-family:var(--serif); font-size:14.5px; white-space:nowrap}
+  .geo small{display:block; font-family:var(--sans); font-size:11px; color:var(--ink-soft); font-weight:400}
+  .map,.dof{font-family:var(--mono); font-size:12px; white-space:nowrap}
+  .dof{text-align:center}
+  .brass{color:var(--brass)}
+  .foot-note{font-size:12px; color:var(--ink-soft); margin:10px 0 0}
+
+  .idea{
+    background:#eef2f6; border:1px solid var(--rule); border-left:3px solid var(--brass);
+    border-radius:3px; padding:18px 20px; margin-top:14px;
+  }
+  .idea p{margin:0 0 10px; font-size:14px}
+  .idea p:last-child{margin-bottom:0}
+  .idea b{font-weight:600}
+  .idea .step{font-family:var(--serif); color:var(--brass); font-style:italic}
+
+  .notes{margin-top:30px; padding-top:18px; border-top:1px solid var(--rule)}
+  .notes p{font-size:12.5px; color:var(--ink-soft); margin:0 0 12px; padding-left:22px; position:relative}
+  .notes p:last-child{margin-bottom:0}
+  .notes .mk{position:absolute; left:0; font-family:var(--mono); color:var(--brass)}
+  code{font-family:var(--mono); font-size:.92em; color:var(--ink)}
+
+  @media (max-width:560px){
+    .plate{padding:32px 22px}
+    h1{font-size:25px}
+    table{font-size:12.5px}
+    .map{font-size:11px}
+    .geo{white-space:normal}
+    .map,.dof{white-space:normal}
+  }
+</style>
+</head>
+<body>
+<main class="plate">
+  <p class="eyebrow">Klein’s Erlangen program · the plane</p>
+  <h1>Euclidean&nbsp;&sub;&nbsp;Metric&nbsp;&sub;&nbsp;Affine&nbsp;&sub;&nbsp;Perspective</h1>
+  <p class="lede">Four geometries, one nested family of transformation groups. Each inner group is a subgroup of the next; the further out you go, the fewer things stay fixed.</p>
+
+  <figure>
+    <svg viewBox="0 0 560 480" role="img"
+         aria-label="Four nested rectangles: Perspective contains Affine contains Metric contains Euclidean.">
+      <!-- Perspective / Projective -->
+      <rect x="40"  y="30"  width="480" height="420" rx="14" fill="#eef2f6" stroke="#5b6b7a" stroke-width="1.4"/>
+      <text x="280" y="51"  text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="15.5" fill="#182430" letter-spacing=".02em">PERSPECTIVE · <tspan font-style="italic">projective</tspan></text>
+      <text x="280" y="66"  text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#54626f">PGL(3) · 8 dof · <tspan fill="#a9781f">cross-ratio</tspan></text>
+
+      <!-- Affine -->
+      <rect x="90"  y="75"  width="380" height="330" rx="12" fill="#e0e9f1" stroke="#4a5c6c" stroke-width="1.4"/>
+      <text x="280" y="96"  text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="15" fill="#182430" letter-spacing=".02em">AFFINE</text>
+      <text x="280" y="111" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#54626f">Aff(2) · 6 dof · parallelism, simple ratio</text>
+
+      <!-- Metric / Similarity -->
+      <rect x="140" y="120" width="280" height="240" rx="10" fill="#ccdbeb" stroke="#3a4c5d" stroke-width="1.4"/>
+      <text x="280" y="141" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="15" fill="#182430" letter-spacing=".02em">METRIC · <tspan font-style="italic">similarity</tspan></text>
+      <text x="280" y="156" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#54626f">Sim(2) · 4 dof · angle, shape</text>
+
+      <!-- Euclidean -->
+      <rect x="190" y="165" width="180" height="150" rx="8"  fill="#b6cbe1" stroke="#2c3e50" stroke-width="1.4"/>
+      <text x="280" y="230" text-anchor="middle" font-family="Palatino Linotype,Palatino,Georgia,serif" font-size="15.5" fill="#182430" letter-spacing=".02em">EUCLIDEAN</text>
+      <text x="280" y="246" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#54626f">E(2) · 3 dof</text>
+      <text x="280" y="260" text-anchor="middle" font-family="Menlo,monospace" font-size="10.5" fill="#54626f">distance · congruence</text>
+    </svg>
+    <figcaption class="cap">Reading inward, invariants accumulate; reading outward, transformations do. Theorems run the other way — anything true in perspective is true in all four.</figcaption>
+  </figure>
+
+  <h2>What each level fixes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Geometry</th>
+        <th>Map&nbsp;&nbsp;x&nbsp;&#8614;</th>
+        <th>dof</th>
+        <th>Gains over the geometry above it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="geo">Perspective<small>projective</small></td>
+        <td class="map">Hx,&nbsp;&nbsp;H&nbsp;&isin;&nbsp;GL(3)&nbsp;/&nbsp;scale</td>
+        <td class="dof">8</td>
+        <td><span class="brass">cross-ratio</span>; incidence, collinearity, concurrency, tangency, order of contact</td>
+      </tr>
+      <tr>
+        <td class="geo">Affine</td>
+        <td class="map">Ax&nbsp;+&nbsp;b,&nbsp;&nbsp;A&nbsp;&isin;&nbsp;GL(2)</td>
+        <td class="dof">6</td>
+        <td>the line at infinity (held fixed) → parallelism, midpoints, ratio of areas, simple ratio of collinear points</td>
+      </tr>
+      <tr>
+        <td class="geo">Metric<small>similarity</small></td>
+        <td class="map">sRx&nbsp;+&nbsp;b,&nbsp;&nbsp;R&#7488;R&nbsp;=&nbsp;I,&nbsp;s&gt;0</td>
+        <td class="dof">4</td>
+        <td>the circular points (held fixed) → angles, length ratios, shape, circles as a class</td>
+      </tr>
+      <tr>
+        <td class="geo">Euclidean</td>
+        <td class="map">Rx&nbsp;+&nbsp;b,&nbsp;&nbsp;R&#7488;R&nbsp;=&nbsp;I</td>
+        <td class="dof">3</td>
+        <td>absolute length and area — the scale is nailed down; figures are congruent, not merely similar</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="foot-note">Each row also keeps everything above it. Going the other way — outward — those same items are exactly what breaks.</p>
+
+  <h2>One idea underneath</h2>
+  <div class="idea">
+    <p>From the outside in, every level is <b>the projective plane plus a distinguished figure held fixed</b>:</p>
+    <p><span class="step">Fix a line</span> — the line at infinity <code>&#8467;&#8734;</code> — and you get <b>affine</b> geometry. “Parallel” now means “meeting on <code>&#8467;&#8734;</code>,” and the cross-ratio of three finite points with the point at infinity collapses to their simple ratio.</p>
+    <p><span class="step">Fix two conjugate points on it</span> — the circular points <code>I, J = (1 : &plusmn;i : 0)</code> — and you get <b>metric</b> geometry. Angle becomes a cross-ratio taken against the isotropic lines to <code>I</code> and <code>J</code> (Laguerre), and a circle is simply a conic through <code>I</code> and <code>J</code>.</p>
+    <p><span class="step">Fix the scale</span> and you get <b>Euclidean</b> geometry.</p>
+    <p>So the whole tower is one geometry with progressively more structure pinned down — and the <span class="brass">cross-ratio</span>, invariant of the outermost group, is what every inner ratio and angle is ultimately built from.</p>
+  </div>
+
+  <div class="notes">
+    <p><span class="mk">†</span> <b>On “metric.”</b> Here it denotes the <em>similarity</em> level — angles and length ratios recoverable, absolute scale free — following the stratification common in computer vision (Hartley &amp; Zisserman). Some classical texts reserve “metric geometry” for the full Euclidean metric; in that reading the middle two levels merge into three.</p>
+    <p><span class="mk">‡</span> <b>Why Euler, not Venn.</b> A strict inclusion chain <code>E &sub; Sim &sub; Aff &sub; Proj</code> draws as four nested curves — an Euler diagram. A Venn diagram would insist on all sixteen regions, fifteen of them empty.</p>
+    <p><span class="mk">§</span> <b>Dimension.</b> Shown for the plane; the same tower holds in <code>&#8477;&#8319;</code>, with the counts <code>3&middot;4&middot;6&middot;8</code> becoming <code>isometry n(n+1)/2</code>, <code>+1</code> for similarity, <code>affine n(n+1)</code>, and <code>projective (n+1)&sup2;&minus;1</code>.</p>
+  </div>
+</main>
+</body>
+</html>

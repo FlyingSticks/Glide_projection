@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The congruence map · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1080px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ .wrap h1{font-size:27px;margin:0 0 10px;font-weight:bold;} .wrap h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1000px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:9px 12px;margin:0 0 14px;gap:6px;}
+ .bar span.lab{font-size:12px;color:#8E8C80;margin-right:4px;}
+ .bar button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:inherit;font-size:12px;padding:6px 10px;cursor:pointer;}
+ .bar button.on{background:#151310;color:#EBE9DA;}
+ .bar button:focus{outline:2px solid #151310;outline-offset:2px;}
+ .board{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+ .mapcol{flex:1 1 520px;min-width:320px;}
+ .sidecol{flex:1 1 360px;min-width:300px;}
+ canvas{display:block;background:#BEBCB0;border:1.5px solid #151310;touch-action:none;width:100%;height:auto;}
+ #map{cursor:crosshair;}
+ #map:focus{outline:2px solid #151310;outline-offset:2px;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 0;}
+ .read{background:#EBE9DA;border:1.5px solid #151310;padding:12px 14px;margin:0 0 12px;}
+ .read .rc{font-size:12.5px;line-height:1.5;margin:0 0 7px;}
+ .read .rc:last-child{margin-bottom:0;}
+ .read .k{color:#8E8C80;}
+ .pill{display:inline-block;font-size:12.5px;font-weight:bold;border:1.5px solid #151310;padding:4px 9px;}
+ .pill.fused{background:#46973D;color:#0c1a09;}
+ .pill.split{background:#E8792B;color:#1c0f04;}
+ .insetlab{font-size:11px;color:#8E8C80;margin:10px 0 4px;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:18px;}
+ .foot p{font-size:13px;line-height:1.5;max-width:1000px;margin:0 0 10px;}
+ .foot .verify{font-size:11.5px;color:#8E8C80;margin:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE CONGRUENCE MAP</p>
+ <h1>The congruence map — <em>where the ladder is a seam</em></h1>
+ <p class="sub">The unit square is the space of double-slit congruences, coordinate <b>(rᵤ, rᵥ)</b>. On the
+ <b style="color:#ED3121">diagonal</b> and the two <b style="color:#12A6A6">banished</b> <b style="color:#2456B0">edges</b> the two readings
+ <b>fuse</b> — the glide (edges) and the cross-slit camera (rays) draw the same lines — and that fused locus is exactly the top of the
+ Erlangen ladder. Everywhere else the congruence is genuinely two-slit, the camera image leaves the homography group, and the readings
+ <b>split</b>. Drag the crosshair (or use the presets); the panel classifies the point and the inset draws one sample ray under both readings.</p>
+
+ <div class="bar">
+  <span class="lab">presets</span>
+  <button data-ru="1" data-rv="1">perspective</button>
+  <button data-ru="1" data-rv="0">pushbroom</button>
+  <button data-ru="0" data-rv="0">orthographic</button>
+  <button data-ru="0.5" data-rv="0.5">isotropic</button>
+  <button data-ru="0.3333" data-rv="1">vanishing-axis ⇄ cross-slit</button>
+  <button data-ru="0.45" data-rv="0.75">general pair</button>
+ </div>
+
+ <div class="board">
+  <div class="mapcol">
+   <canvas id="map" width="560" height="560" tabindex="0" role="img"
+     aria-label="The (ru,rv) unit square. The diagonal ru=rv is the pinhole/perspective locus (projective rung); the left edge ru=0 and bottom edge rv=0 are pushbroom loci; the origin is orthographic (affine rung). These form the fused seam. The two triangles off the diagonal are the split region of genuine two-slit congruences."></canvas>
+   <p class="hint">drag on the square to set (rᵤ, rᵥ) · arrow keys nudge · the seam is drawn with the shipped ε = 0.02 tolerance</p>
+  </div>
+  <div class="sidecol">
+   <div class="read" id="read"></div>
+   <p class="insetlab">ONE SAMPLE RAY, BOTH READINGS — footprint fixed, depth ζ swept 0 → −140</p>
+   <canvas id="inset" width="360" height="210" role="img"
+     aria-label="A single congruence ray drawn two ways: the glide projector as a straight graduated line in ink, and the cross-slit camera trace in orange. They coincide on the seam and bow apart in the field."></canvas>
+  </div>
+ </div>
+
+ <div class="foot">
+  <p>The seam is the top of the ladder made visible: the diagonal <b>rᵤ = rᵥ</b> is the pinhole — a homography, the <b>projective</b> rung;
+  the <b>origin</b> is orthographic, an affinity, the <b>affine</b> rung; the two banished edges are the <b>pushbroom</b>, one foot on each.
+  Off the seam the congruence is genuinely two-slit: its camera image is no longer a plane self-map, and that is precisely the ground the
+  Erlangen classification cannot see — which is exactly where glide and cross-slit split. The <b>metric</b> and <b>Euclidean</b> rungs do not
+  appear on this chart; they are the calibrated overlay, a further choice of the circular points and of scale, layered on top of this purely
+  projective picture.</p>
+  <p class="verify">Every point is classified with the shipped img₁ / img₂ / degen / ctype (DZ = 200, ε = 0.02); the split measure is splitDevMesh
+  taken over the sample ray. So the chart agrees with the inversion viewer point for point — 0 on the seam, positive in the field.</p>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+// ---- palette (the board) ----
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80';
+var PIC='#ED3121',VAN='#8A4FD6',DU='#12A6A6',DV='#2456B0',CAM='#E8792B',GREEN='#46973D';
+
+// ---- shipped functions, ported verbatim ----
+var DZ=200, eps=0.02;
+function img1(ru,rv,X,Y,zt){ var l=-zt/DZ; return [X*(1-l*ru), Y*(1-l*rv)]; }
+function img2(ru,rv,X,Y,zt){ return [X*DZ/(DZ+ru*zt), Y*DZ/(DZ+rv*zt)]; }
+function degen(ru,rv){ return ru<eps || rv<eps || Math.abs(ru-rv)<eps; }
+function ctype(ru,rv){ var u0=ru<eps,v0=rv<eps;
+  if(u0&&v0) return 'parallel bundle';
+  if(u0||v0) return 'slit + \u221E';
+  if(Math.abs(ru-rv)<eps) return 'pencil at \u2212DZ/r';
+  return 'hyperbolic congruence (two focal lines)'; }
+function rung(ru,rv){ var u0=ru<eps,v0=rv<eps;
+  if(u0&&v0) return 'orthographic \u00B7 affine rung';
+  if(u0||v0) return 'pushbroom \u00B7 perspective\u2227affine seam';
+  if(Math.abs(ru-rv)<eps) return 'pinhole \u00B7 projective rung';
+  return 'two-slit \u00B7 off the ladder (above PGL\u2083)'; }
+
+// split measure over one sample ray (splitDevMesh, single footprint)
+var FX=70, FY=46, NS=64;
+function splitRay(ru,rv){
+  var V=[FX*(1-ru), FY*(1-rv)], Dx=V[0]-FX, Dy=V[1]-FY, L=Math.hypot(Dx,Dy), g=0,k;
+  for(k=0;k<=NS;k++){ var zt=-140*k/NS, c=img2(ru,rv,FX,FY,zt);
+    if(L<1e-9) g=Math.max(g, Math.hypot(c[0]-FX,c[1]-FY));
+    else g=Math.max(g, Math.abs((c[0]-FX)*Dy-(c[1]-FY)*Dx)/L); }
+  return g;
+}
+
+// ---- state ----
+var state={ru:0.3333, rv:1};
+
+// ================= the map =================
+var CW=560, CH=560, ML=70, MR=34, MT=34, MB=70, S=CW-ML-MR; // 456 square
+function px(ru){ return ML + ru*S; }
+function py(rv){ return (MT+S) - rv*S; }
+function inv(xy){ return [ Math.max(0,Math.min(1,(xy[0]-ML)/S)), Math.max(0,Math.min(1,((MT+S)-xy[1])/S)) ]; }
+
+function setupCanvas(cv,w,h){ var dpr=window.devicePixelRatio||1;
+  cv.width=w*dpr; cv.height=h*dpr; var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return ctx; }
+
+function drawMap(){
+  var cv=document.getElementById('map'), ctx=setupCanvas(cv,CW,CH), i;
+  ctx.fillStyle=PANEL; ctx.fillRect(0,0,CW,CH);
+
+  // plot frame
+  ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.strokeRect(ML,MT,S,S);
+
+  // field hatch (the whole interior reads as the split field; seam lines sit on top)
+  ctx.save(); ctx.beginPath(); ctx.rect(ML,MT,S,S); ctx.clip();
+  ctx.strokeStyle=INK; ctx.lineWidth=1; ctx.globalAlpha=0.05;
+  for(i=-S; i<S; i+=11){ ctx.beginPath(); ctx.moveTo(ML+i,MT+S); ctx.lineTo(ML+i+S,MT); ctx.stroke(); }
+  ctx.restore(); ctx.globalAlpha=1;
+
+  // seam — banished edges (a slit at infinity), coloured by which slit
+  ctx.lineWidth=3.5; ctx.lineCap='round';
+  ctx.strokeStyle=DU; ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(px(0),py(1)); ctx.stroke(); // ru=0 : u-slit at inf
+  ctx.strokeStyle=DV; ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(px(1),py(0)); ctx.stroke(); // rv=0 : v-slit at inf
+  // seam — diagonal (pinhole / perspective)
+  ctx.strokeStyle=PIC; ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(px(1),py(1)); ctx.stroke();
+
+  // rotated seam label
+  ctx.save(); var mx=px(0.60), my=py(0.60); ctx.translate(mx,my); ctx.rotate(-Math.PI/4);
+  ctx.fillStyle=INK; ctx.font='italic 12px Helvetica, Arial, sans-serif'; ctx.textAlign='center';
+  ctx.fillText('fused seam \u00B7 glide = cross-slit', 0, -8); ctx.restore();
+
+  // field label (lower-right triangle)
+  ctx.fillStyle=INK; ctx.textAlign='center'; ctx.font='bold 12px Helvetica, Arial, sans-serif';
+  ctx.fillText('FIELD \u2014 two-slit', px(0.72), py(0.30));
+  ctx.font='11px Helvetica, Arial, sans-serif'; ctx.fillStyle=FAINT;
+  ctx.fillText('glide \u2260 cross-slit (split)', px(0.72), py(0.30)+15);
+  // mirror note (upper-left triangle)
+  ctx.save(); ctx.translate(px(0.26),py(0.80)); ctx.fillStyle=FAINT; ctx.font='italic 10px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.fillText('mirror pair:', 0,0); ctx.fillText('u- vs v-slit nearer', 0,12); ctx.restore();
+
+  // rung markers
+  function ring(ru,rv,col){ ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(px(ru),py(rv),7,0,6.2832); ctx.stroke(); }
+  function dot(ru,rv,col,r){ ctx.fillStyle=col; ctx.beginPath(); ctx.arc(px(ru),py(rv),r||3.5,0,6.2832); ctx.fill(); }
+  // origin = orthographic / affine
+  ctx.fillStyle=GREEN; ctx.save(); ctx.translate(px(0),py(0)); ctx.rotate(Math.PI/4);
+  ctx.fillRect(-6,-6,12,12); ctx.restore();
+  // corner (1,1) perspective, (1,0)&(0,1) pushbroom corners
+  dot(1,1,PIC,4); dot(1,0,DV,4); dot(0,1,DU,4);
+
+  // preset dots + labels
+  var pins=[['perspective',1,1,'rt'],['pushbroom',1,0,'rb'],['orthographic',0,0,'lb'],
+            ['isotropic',0.5,0.5,'c'],['vanishing-axis',0.3333,1,'ct'],['general',0.45,0.75,'r']];
+  ctx.font='10.5px Helvetica, Arial, sans-serif';
+  for(i=0;i<pins.length;i++){ var p=pins[i], X=px(p[1]), Y=py(p[2]);
+    ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(X,Y,2.6,0,6.2832); ctx.fill();
+    ctx.fillStyle=FAINT;
+    if(p[3]==='rt'){ctx.textAlign='right';ctx.fillText(p[0],X-8,Y+4);}
+    else if(p[3]==='rb'){ctx.textAlign='right';ctx.fillText(p[0],X-8,Y-6);}
+    else if(p[3]==='lb'){ctx.textAlign='left';ctx.fillText(p[0],X+10,Y+13);}
+    else if(p[3]==='ct'){ctx.textAlign='center';ctx.fillText(p[0],X,Y-9);}
+    else if(p[3]==='c'){ctx.textAlign='left';ctx.fillText(p[0],X+8,Y-6);}
+    else {ctx.textAlign='left';ctx.fillText(p[0],X+8,Y+4);}
+  }
+
+  // axes labels
+  ctx.fillStyle=INK; ctx.font='13px Helvetica, Arial, sans-serif'; ctx.textAlign='center';
+  ctx.fillText('r\u1D64  \u2192', ML+S/2, MT+S+40);
+  ctx.save(); ctx.translate(ML-42, MT+S/2); ctx.rotate(-Math.PI/2); ctx.fillText('r\u1D65  \u2192', 0,0); ctx.restore();
+  ctx.fillStyle=FAINT; ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.textAlign='center'; ctx.fillText('0', px(0), MT+S+16); ctx.fillText('1', px(1), MT+S+16);
+  ctx.fillText('banished (\u2225)', px(0)+2, MT+S+56); ctx.fillText('merged (van. pt)', px(1)-6, MT+S+56);
+  ctx.textAlign='right'; ctx.fillText('0', ML-8, py(0)+3); ctx.fillText('1', ML-8, py(1)+3);
+
+  // crosshair
+  var cX=px(state.ru), cY=py(state.rv);
+  ctx.strokeStyle=INK; ctx.lineWidth=1; ctx.globalAlpha=0.5;
+  ctx.beginPath(); ctx.moveTo(cX-13,cY); ctx.lineTo(cX+13,cY); ctx.moveTo(cX,cY-13); ctx.lineTo(cX,cY+13); ctx.stroke();
+  ctx.globalAlpha=1;
+  var fused=!( state.ru>=eps && state.rv>=eps && Math.abs(state.ru-state.rv)>=eps );
+  ctx.strokeStyle=fused?GREEN:CAM; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(cX,cY,8,0,6.2832); ctx.stroke();
+  ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(cX,cY,2.5,0,6.2832); ctx.fill();
+}
+
+// ================= the inset =================
+function drawInset(){
+  var cv=document.getElementById('inset'), IW=360, IH=210, ctx=setupCanvas(cv,IW,IH), k;
+  ctx.fillStyle=SURFACE; ctx.fillRect(0,0,IW,IH);
+  ctx.strokeStyle=INK; ctx.lineWidth=1.5; ctx.strokeRect(0.75,0.75,IW-1.5,IH-1.5);
+
+  var ru=state.ru, rv=state.rv;
+  var A=[FX,FY], Vp=[FX*(1-ru), FY*(1-rv)];
+  var cam=[]; for(k=0;k<=NS;k++){ var zt=-140*k/NS; cam.push(img2(ru,rv,FX,FY,zt)); }
+
+  // fit bounds over A, Vp, cam
+  var mn=[1e9,1e9], mx=[-1e9,-1e9];
+  function grow(p){ if(p[0]<mn[0])mn[0]=p[0]; if(p[1]<mn[1])mn[1]=p[1]; if(p[0]>mx[0])mx[0]=p[0]; if(p[1]>mx[1])mx[1]=p[1]; }
+  grow(A); grow(Vp); for(k=0;k<cam.length;k++) grow(cam[k]);
+  var pad=26, w=(mx[0]-mn[0])||1, h=(mx[1]-mn[1])||1;
+  var sc=Math.min((IW-2*pad)/w, (IH-2*pad-14)/h);
+  var ox=(IW - w*sc)/2 - mn[0]*sc, oy=(IH - h*sc + 14)/2 - mn[1]*sc;
+  function T(p){ return [ ox + p[0]*sc, IH - (oy + p[1]*sc) ]; } // flip y so +Y is up
+
+  var degenLine = Math.hypot(Vp[0]-A[0], Vp[1]-A[1]) < 1e-9;
+
+  // glide projector line (straight) + graduation ticks
+  if(!degenLine){
+    var Ta=T(A), Tv=T(Vp);
+    ctx.strokeStyle=INK; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(Ta[0],Ta[1]); ctx.lineTo(Tv[0],Tv[1]); ctx.stroke();
+    ctx.fillStyle=INK;
+    for(k=0;k<=5;k++){ var lam=k*0.16, gp=[A[0]+lam*(Vp[0]-A[0]), A[1]+lam*(Vp[1]-A[1])], Tg=T(gp);
+      ctx.beginPath(); ctx.arc(Tg[0],Tg[1],2.2,0,6.2832); ctx.fill(); }
+  }
+
+  // cross-slit trace (curve)
+  ctx.strokeStyle=CAM; ctx.lineWidth=2; ctx.beginPath();
+  for(k=0;k<cam.length;k++){ var Tc=T(cam[k]); if(k===0) ctx.moveTo(Tc[0],Tc[1]); else ctx.lineTo(Tc[0],Tc[1]); }
+  ctx.stroke();
+
+  // footprint (shared, ζ=0)
+  var Tf=T(A); ctx.fillStyle=PIC; ctx.beginPath(); ctx.arc(Tf[0],Tf[1],4,0,6.2832); ctx.fill();
+
+  // legend + verdict
+  var g=splitRay(ru,rv), fused=!( ru>=eps && rv>=eps && Math.abs(ru-rv)>=eps );
+  ctx.textAlign='left'; ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=INK; ctx.fillText('\u2014 glide (edges)', 12, 18);
+  ctx.fillStyle=CAM;  ctx.fillText('\u2014 cross-slit (rays)', 118, 18);
+  ctx.fillStyle=fused?GREEN:CAM; ctx.font='bold 11px Helvetica, Arial, sans-serif'; ctx.textAlign='right';
+  ctx.fillText(degenLine ? 'no depth graduation' : (fused ? 'coincident' : 'gap '+g.toFixed(1)+' px'), IW-12, 18);
+}
+
+// ================= readout =================
+function drawRead(){
+  var ru=state.ru, rv=state.rv;
+  var fused=!( ru>=eps && rv>=eps && Math.abs(ru-rv)>=eps );
+  var g=splitRay(ru,rv);
+  var el=document.getElementById('read');
+  el.innerHTML =
+    '<p class="rc"><span class="k">(r\u1D64, r\u1D65) =</span> ('+ru.toFixed(2)+', '+rv.toFixed(2)+')</p>'+
+    '<p class="rc"><span class="k">type \u2014</span> '+ctype(ru,rv)+'</p>'+
+    '<p class="rc"><span class="pill '+(fused?'fused':'split')+'">'+(fused?'FUSED \u00B7 glide = cross-slit':'SPLIT \u00B7 glide \u2260 cross-slit')+'</span></p>'+
+    '<p class="rc"><span class="k">ladder \u2014</span> '+rung(ru,rv)+'</p>'+
+    '<p class="rc"><span class="k">gauge \u2014</span> along a ray: glide \u00D7(1+r\u03B6/DZ), camera \u00F7(1+r\u03B6/DZ) \u00B7 product 1</p>'+
+    '<p class="rc"><span class="k">split measure \u2014</span> max \u27C2 gap on the sample ray: '+g.toFixed(1)+' px</p>';
+}
+
+function render(){ drawMap(); drawInset(); drawRead(); syncButtons(); }
+
+// ================= interaction =================
+function syncButtons(){
+  var bs=document.querySelectorAll('.bar button'), i;
+  for(i=0;i<bs.length;i++){ var b=bs[i], ru=parseFloat(b.getAttribute('data-ru')), rv=parseFloat(b.getAttribute('data-rv'));
+    if(Math.abs(ru-state.ru)<0.005 && Math.abs(rv-state.rv)<0.005) b.classList.add('on'); else b.classList.remove('on'); }
+}
+function init(){
+  var cv=document.getElementById('map'), drag=false;
+  function local(e){ var rc=cv.getBoundingClientRect(); return [ (e.clientX-rc.left)*CW/rc.width, (e.clientY-rc.top)*CH/rc.height ]; }
+  function set(e){ var uv=inv(local(e)); state.ru=uv[0]; state.rv=uv[1]; render(); }
+  cv.addEventListener('pointerdown',function(e){ drag=true; cv.setPointerCapture(e.pointerId); set(e); });
+  cv.addEventListener('pointermove',function(e){ if(drag) set(e); });
+  cv.addEventListener('pointerup',function(){ drag=false; });
+  cv.addEventListener('keydown',function(e){ var d=e.shiftKey?0.05:0.01, k=e.key, u=false;
+    if(k==='ArrowRight'){state.ru=Math.min(1,state.ru+d);u=true;} else if(k==='ArrowLeft'){state.ru=Math.max(0,state.ru-d);u=true;}
+    else if(k==='ArrowUp'){state.rv=Math.min(1,state.rv+d);u=true;} else if(k==='ArrowDown'){state.rv=Math.max(0,state.rv-d);u=true;}
+    if(u){ e.preventDefault(); render(); } });
+  var bs=document.querySelectorAll('.bar button'), i;
+  for(i=0;i<bs.length;i++){ bs[i].addEventListener('click',function(){
+    state.ru=parseFloat(this.getAttribute('data-ru')); state.rv=parseFloat(this.getAttribute('data-rv')); render(); }); }
+  window.addEventListener('resize', render);
+  render();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+</body>
+</html>
