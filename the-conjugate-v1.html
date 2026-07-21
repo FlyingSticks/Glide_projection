@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The conjugate construction · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1200px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1060px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:150px;} .ro{font-size:12px;margin-right:2px;min-width:38px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ .lc{font-size:12px;line-height:1.7;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1060px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE CONJUGATE CONSTRUCTION</p>
+ <h1>The conjugate construction — <em>reading 2 from reading 1, by straightedge alone</em></h1>
+ <p class="sub">The identity cr(img₁, img₂; +X, −X) = −1 is a drafting operation. Fix the base pair —
+ <b style="color:#ED3121">+X, the footprint</b>, and <b style="color:#8A4FD6">−X, its mirror</b> — and take the
+ <b style="color:#2456B0">mark img₁</b> wherever the depth has slid it. Choose <b style="color:#9A8248">any</b> scaffold point E off
+ the line and any F on EM; draw the cat’s-cradle (G = AF∩EB, H = BF∩EA); the gold line GH strikes the base at
+ <b style="color:#E8792B">D — and D is the camera image img₂</b>, exactly, no measurement, no division. Swing the scaffold: E and F
+ wander, every auxiliary line moves, D does not. Run it on img₂ and it hands back the mark — one operation, both directions,
+ because the conjugation is an involution.</p>
+ <canvas id="scene" style="width:1140px;height:560px;" role="img" aria-label="a base line carrying the footprint +X in red, its mirror minus X in purple, and the blue mark img one; a gold scaffold of auxiliary lines from a point E through F to intersection points G and H; the gold line GH strikes the base at the orange constructed point D which coincides with the engine's camera image; an inset shows the two-dimensional picture plane with both axes' constructions assembling the camera point"></canvas>
+ <p class="hint">slide the rate and depth to move the mark · swing the scaffold to see choice-independence · drive the mark to the origin and watch img₂ leave for ∞ (the slit) · controls below</p>
+ <div class="bar">
+  <label for="r">rate r</label><input type="range" id="r" min="0" max="1" step="0.01" value="0.45"><span class="ro" id="v_r">0.45</span>
+  <label for="zt">depth ζ</label><input type="range" id="zt" min="-199" max="-10" step="1" value="-90"><span class="ro" id="v_zt">-90.00</span>
+  <label for="e">scaffold E</label><input type="range" id="e" min="-1.3" max="1.3" step="0.01" value="0.35"><span class="ro" id="v_e">0.35</span>
+  <label for="f">scaffold F</label><input type="range" id="f" min="0.2" max="0.8" step="0.01" value="0.45"><span class="ro" id="v_f">0.45</span>
+ </div>
+ <div class="bar">
+  <button id="swing">swing the scaffold</button>
+  <button id="slit">to the slit (mark → 0)</button>
+  <button id="reset">reset</button>
+ </div>
+ <div id="live"></div>
+
+ <div class="foot">
+  <p class="one">This sheet turns the ambient involution into pencil work. The base pair {+X, −X} is the construction’s whole
+  memory of the channel; given it, the two readings generate each other by incidence alone — the complete quadrangle carries the
+  mark to the camera image and the camera image back to the mark, because harmonic conjugation is an involution. The scaffold’s
+  freedom is the projective theorem: any E, any F, either side of the base — same D. And the construction knows the engine’s
+  anatomy: drive the mark to the axis origin (the slit graduation, λ = 1/r) and the gold line GH swings parallel to the base —
+  the drafting signature of img₂ at infinity, the camera’s blow-up at its slit, produced by a ruler. On the seam the two axis
+  constructions fuse into one radial quadrangle — the circle inversion through the footprint; in the field they run separately,
+  one per channel — the same fused/split anatomy as everything else on this board.</p>
+  <p class="verify">Verified in check_quadrangle.js (5: the quadrangle yields the fourth harmonic to 10⁻¹⁴; choice-independence
+  across scaffolds on either side of the base; on the engine the construction equals img₂ exactly and inverts back to img₁; the
+  slit signature D·C = X²; and the seam case as one radial quadrangle — the circle inversion of check_inverse IV1), standing on
+  check_ambient.js (4: cr(img₁, img₂; +X, −X) = −1 identically), check_inverse.js (3), and check_gauge.js (4). The page re-runs
+  four checks — construction = engine, cr = −1, second-scaffold agreement, and the mean-proportional product — on every slider move.</p>
+ </div>
+</div>
+<script id="conj-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function railD(r){ return 1/r; }                                            // fan concurrence gauge (directing)
+function railV(){ return 1; }                                               // vanishing gauge
+function thickness(r){ return 1/r-1; }                                      // V--D separation on the rail
+function rayPt(U,V,u0,v0,Z){ return [leafW(U.Zc,U.Zg,U.r,u0,Z), leafW(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// ---------- the recession wrappers: Zc = Infinity is the orthographic apex ----------
+function chanScaleQ(Zc,Zg,r,Z){ return isFinite(Zc) ? chanScale(Zc,Zg,r,Z) : 1; }
+function leafWQ(Zc,Zg,r,w0,Z){ return w0/chanScaleQ(Zc,Zg,r,Z); }
+function rayPtQ(U,V,u0,v0,Z){ return [leafWQ(U.Zc,U.Zg,U.r,u0,Z), leafWQ(V.Zc,V.Zg,V.r,v0,Z), Z]; }
+function directingDepth(Zc,Zg,r){ // world depth of the D-plane (gauge = 1/r); Infinity when merged (r=1) or banished (r=0)
+  if(!isFinite(Zc) || r===1 || r===0) return Infinity;
+  var pg=-Zc/(Zg-Zc), pT=pg*(1-1/r); return Zc - Zc/pT; }
+// ---------- the parameter cone (the map): square cross-sections funnelling to the ortho apex ----------
+function mapPoint(ru,rv,qn,S0,hMax){ return [ (ru-0.5)*S0*qn, (1-qn)*hMax, (rv-0.5)*S0*qn ]; }
+</script>
+<script>
+
+(function(){
+'use strict';
+var GROUND='#B4B2A6',PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DIR='#12A6A6', MARK='#2456B0', CAM='#E8792B', GOLD='#9A8248';
+var CW=1140, CH=560;
+var DZ=200, X0=78, Y0=52, RV=0.75;
+var state={ r:0.45, zt:-90, e:0.35, f:0.45 };
+
+var y0=430, cx=430, sx=4.4;                       // base line and world->screen for the u-axis
+function SXW(x){ return cx + x*sx; }
+
+function inter(p1,p2,p3,p4){                      // line p1p2 meet line p3p4
+  var a1=p2[1]-p1[1], b1=p1[0]-p2[0], c1=a1*p1[0]+b1*p1[1];
+  var a2=p4[1]-p3[1], b2=p3[0]-p4[0], c2=a2*p3[0]+b2*p3[1];
+  var det=a1*b2-a2*b1; if(Math.abs(det)<1e-9) return null;
+  return [(b2*c1-b1*c2)/det, (a1*c2-a2*c1)/det]; }
+
+// the construction in screen coords (affine image of the base line preserves the projective op)
+function quad(As,Bs,Cs,Es,t){
+  var F=[Es[0]+t*(Cs[0]-Es[0]), Es[1]+t*(Cs[1]-Es[1])];
+  var G=inter(As,F,Es,Bs), H=inter(Bs,F,Es,As);
+  if(!G||!H) return null;
+  var D=inter(G,H,[0,y0],[10,y0]);
+  return {F:F,G:G,H:H,D:D}; }
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var l=-state.zt/DZ, G=1-l*state.r, M=X0*G;
+  var camX = (Math.abs(G)>1e-9)? X0/G : Infinity;
+  var atFixed = Math.abs(M-X0)<0.8;
+
+  // header
+  ctx.textAlign='center';ctx.font='bold 15px Helvetica, Arial, sans-serif';
+  ctx.fillStyle= atFixed?GREEN:INK;
+  ctx.fillText(atFixed?'MARK AT THE FOOTPRINT \u2014 the +1 fixed point: the conjugates coincide'
+    :'THE CONJUGATE, CONSTRUCTED \u2014 straightedge only \u00b7 cr(+X, \u2212X; img\u2081, img\u2082) = \u22121', CW/2, 28);
+  ctx.textAlign='left';
+
+  // ---- base line, the pair, the origin ----
+  ctx.strokeStyle=INK;ctx.lineWidth=2.4;
+  ctx.beginPath();ctx.moveTo(60,y0);ctx.lineTo(1112,y0);ctx.stroke();
+  function tick(x,col,lab,below){ var s=SXW(x);
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(s,y0-8);ctx.lineTo(s,y0+8);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText(lab,s,below?y0+24:y0-14);ctx.textAlign='left'; }
+  tick(X0,PIC,'+X \u00b7 footprint P',true);
+  tick(-X0,VAN,'\u2212X \u00b7 the mirror',true);
+  tick(0,FAINT,'0',true);
+
+  // ---- the mark ----
+  var Cs=[SXW(M),y0];
+  ctx.fillStyle=MARK;ctx.beginPath();ctx.arc(Cs[0],y0,5.5,0,6.2832);ctx.fill();
+  ctx.fillStyle=MARK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  ctx.fillText('img\u2081 \u00b7 the mark',Cs[0],y0-32);ctx.textAlign='left';
+
+  var As=[SXW(X0),y0], Bs=[SXW(-X0),y0];
+  var Es=[cx+state.e*X0*sx, 150];
+  var res=null, Dw=null;
+  if(!atFixed){
+    res=quad(As,Bs,Cs,Es,state.f);
+    if(res&&res.D){ Dw=(res.D[0]-cx)/sx;
+      // scaffold
+      ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.globalAlpha=0.75;
+      [As,Bs,Cs].forEach(function(P){ctx.beginPath();ctx.moveTo(Es[0],Es[1]);ctx.lineTo(P[0],P[1]);ctx.stroke();});
+      ctx.beginPath();ctx.moveTo(As[0],As[1]);ctx.lineTo(res.G[0],res.G[1]);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(Bs[0],Bs[1]);ctx.lineTo(res.H[0],res.H[1]);ctx.stroke();
+      ctx.globalAlpha=1;
+      ctx.fillStyle=GOLD;
+      [[Es,'E'],[res.F,'F'],[res.G,'G'],[res.H,'H']].forEach(function(q){
+        ctx.beginPath();ctx.arc(q[0][0],q[0][1],3.4,0,6.2832);ctx.fill();
+        ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText(q[1],q[0][0]+6,q[0][1]-4); });
+      // the GH line, extended to the base
+      var onCanvas = res.D[0]>=-40 && res.D[0]<=1108;
+      ctx.strokeStyle=GOLD;ctx.lineWidth=2;
+      var endX = onCanvas? res.D[0] : (res.D[0]>1108?1108:-40);
+      var tEnd = (Math.abs(res.D[0]-res.G[0])>1e-6)? (endX-res.G[0])/(res.D[0]-res.G[0]) : 1;
+      var endY = res.G[1]+tEnd*(res.D[1]-res.G[1]);
+      ctx.beginPath();ctx.moveTo(res.H[0],res.H[1]);ctx.lineTo(res.G[0],res.G[1]);ctx.lineTo(endX,endY);ctx.stroke();
+      if(onCanvas){
+        // constructed D (ring) + the engine's camera image (dot) coinciding
+        ctx.strokeStyle=CAM;ctx.lineWidth=2.4;ctx.beginPath();ctx.arc(res.D[0],y0,8,0,6.2832);ctx.stroke();
+        ctx.fillStyle=CAM;ctx.beginPath();ctx.arc(SXW(camX),y0,3.6,0,6.2832);ctx.fill();
+        ctx.fillStyle=CAM;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+        ctx.fillText('img\u2082 \u00b7 constructed = engine',res.D[0],y0+42);ctx.textAlign='left';
+      } else {
+        ctx.fillStyle=CAM;ctx.beginPath();
+        ctx.moveTo(1108,y0);ctx.lineTo(1092,y0-7);ctx.lineTo(1092,y0+7);ctx.closePath();ctx.fill();
+        ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.textAlign='right';
+        ctx.fillText('img\u2082 \u2192 \u221e  (the mark \u2192 the axis origin: the slit)',1104,y0-16);ctx.textAlign='left';
+      }
+    }
+  } else {
+    ctx.strokeStyle=CAM;ctx.lineWidth=2.4;ctx.beginPath();ctx.arc(Cs[0],y0,9,0,6.2832);ctx.stroke();
+    ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+    ctx.fillText('img\u2081 = img\u2082 = +X \u2014 the involution\u2019s +1 still point; slide the depth to separate them',CW/2,y0+44);
+    ctx.textAlign='left';
+  }
+
+  drawInset(ctx, 18, 46, 300, 190, l);
+  drawReadouts(ctx, 880, 62, l, G, M, camX, Dw, atFixed);
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+function drawInset(ctx,x,y,w,h,l){
+  ctx.fillStyle=SURFACE;ctx.globalAlpha=0.6;ctx.fillRect(x,y,w,h);ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle=INK;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+  ctx.fillText('the picture plane \u2014 both axes, same construction',x+8,y+14);
+  var Gu=1-l*state.r, Gv=1-l*RV;
+  function mx(wx){ return x+20+(wx+10)*(w-40)/150; }
+  function my(wy){ return y+h-16-(wy+6)*(h-46)/95; }
+  // frame-ish axes
+  ctx.strokeStyle=FAINT;ctx.lineWidth=0.7;ctx.globalAlpha=0.7;
+  ctx.beginPath();ctx.moveTo(mx(-8),my(0));ctx.lineTo(mx(135),my(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(mx(0),my(-4));ctx.lineTo(mx(0),my(86));ctx.stroke();ctx.globalAlpha=1;
+  var pts=[[X0,Y0,INK,'A'],[X0*Gu,Y0*Gv,MARK,'img\u2081'],[Math.min(X0/Math.max(Gu,0.08),132),Math.min(Y0/Math.max(Gv,0.08),88),CAM,'img\u2082']];
+  // drops
+  ctx.setLineDash([3,3]);ctx.strokeStyle=FAINT;ctx.lineWidth=0.7;
+  pts.slice(1).forEach(function(p){ ctx.beginPath();ctx.moveTo(mx(p[0]),my(p[1]));ctx.lineTo(mx(p[0]),my(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(mx(p[0]),my(p[1]));ctx.lineTo(mx(0),my(p[1]));ctx.stroke(); });
+  ctx.setLineDash([]);
+  pts.forEach(function(p){ ctx.fillStyle=p[2];ctx.beginPath();ctx.arc(mx(p[0]),my(p[1]),3.4,0,6.2832);ctx.fill();
+    ctx.font='bold 9px Helvetica, Arial, sans-serif';ctx.fillText(p[3],mx(p[0])+5,my(p[1])-4); });
+  ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText('x from the u-construction \u00b7 y from the v-construction (base \u00b1Y, r\u1d65 = '+RV.toFixed(2)+')',x+8,y+h-6);
+}
+
+function drawReadouts(ctx,x,y,l,G,M,camX,Dw,atFixed){
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('ONE OPERATION, BOTH WAYS',x,y);
+  ctx.font='11px Helvetica, Arial, sans-serif'; var yy=y+20,lh=17;
+  function row(a,b,c){ctx.fillStyle=c||INK;ctx.fillText(a,x,yy);ctx.textAlign='right';ctx.fillText(b,x+236,yy);ctx.textAlign='left';yy+=lh;}
+  row('rate r / count \u03bb:', state.r.toFixed(2)+' / '+l.toFixed(3), FAINT);
+  row('glide factor G = 1\u2212\u03bbr:', G.toFixed(4), FAINT);
+  row('img\u2081 = X\u00b7G (the mark):', M.toFixed(2), MARK);
+  row('constructed D:', atFixed?'= img\u2081':(Dw===null?'\u2014':Dw.toFixed(2)), CAM);
+  row('engine img\u2082 = X/G:', isFinite(camX)?camX.toFixed(2):'\u221e', CAM);
+  var resid=(Dw===null||atFixed)?null:Math.abs(Dw-camX);
+  row('| D \u2212 img\u2082 |:', resid===null?'\u2014':resid.toExponential(1), resid!==null&&resid<1e-6?GREEN:INK);
+  row('M \u00b7 D  vs  X\u00b2:', (Dw===null||atFixed)?'\u2014':(M*Dw).toFixed(1)+' / '+(X0*X0).toFixed(1), GOLD);
+  yy+=4; ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('swing the scaffold \u2014 E and F move,',x,yy);yy+=13;
+  ctx.fillText('the whole cat\u2019s-cradle swings, D stays nailed.',x,yy);
+}
+
+function runLive(){
+  var out=[], l=-state.zt/DZ, G=1-l*state.r, M=X0*G;
+  function LC(t,ok,v){out.push({t:t,ok:ok,v:v});}
+  var atFixed=Math.abs(M-X0)<0.8;
+  if(atFixed){
+    LC('mark at the footprint: the +1 fixed point \u2014 conjugates coincide; slide depth to separate', true, 'img\u2081 = img\u2082 = +X');
+  } else {
+    var As=[SXW(X0),y0], Bs=[SXW(-X0),y0], Cs=[SXW(M),y0];
+    var r1=quad(As,Bs,Cs,[cx+state.e*X0*sx,150],state.f);
+    var r2=quad(As,Bs,Cs,[cx-0.62*X0*sx,262],0.62);           // an independent hidden scaffold
+    var D1=r1&&r1.D?(r1.D[0]-cx)/sx:null, D2=r2&&r2.D?(r2.D[0]-cx)/sx:null;
+    var cam=X0/G;
+    LC('construction = engine: the quadrangle\u2019s D is the camera image X/G', D1!==null&&Math.abs(D1-cam)<1e-6*(1+Math.abs(cam)), D1===null?'degenerate':'| \u0394 | = '+Math.abs(D1-cam).toExponential(1));
+    var crv=(D1===null)?null:(((M-X0)*(D1+X0))/((M+X0)*(D1-X0)));
+    LC('cr(+X, \u2212X; img\u2081, D) = \u22121 \u2014 the harmonic conjugate, live', crv!==null&&Math.abs(crv+1)<1e-6, crv===null?'\u2014':'cr = '+crv.toFixed(6));
+    LC('choice-independence: a second, hidden scaffold lands the same D', D1!==null&&D2!==null&&Math.abs(D1-D2)<1e-6*(1+Math.abs(D1)), (D1!==null&&D2!==null)?'| D\u2081 \u2212 D\u2082 | = '+Math.abs(D1-D2).toExponential(1):'\u2014');
+    LC('M \u00b7 D = X\u00b2 \u2014 the mean-proportional dialect of the same fact', D1!==null&&Math.abs(M*D1-X0*X0)<1e-4*X0*X0, D1===null?'\u2014':(M*D1).toFixed(1)+' = '+(X0*X0).toFixed(1));
+  }
+  var el=document.getElementById('live'),h='';
+  for(var i=0;i<out.length;i++){var o=out[i];
+    h+='<div class="lc"><span style="color:'+(o.ok?'#46973D':'#ED3121')+'">'+(o.ok?'\u2713':'\u2717')+'</span> '+o.t+' <span style="color:#8E8C80">\u2014 '+o.v+'</span></div>';}
+  el.innerHTML=h;
+}
+function render(){draw();runLive();}
+
+function init(){
+  function bind(id,key){var s=document.getElementById(id);
+    s.addEventListener('input',function(){state[key]=parseFloat(s.value);
+      var lab=document.getElementById('v_'+id);if(lab)lab.textContent=state[key].toFixed(2);render();});}
+  bind('r','r');bind('zt','zt');bind('e','e');bind('f','f');
+  function setAll(r,zt,e,f){ state.r=r;state.zt=zt;state.e=e;state.f=f;
+    [['r',r],['zt',zt],['e',e],['f',f]].forEach(function(p){
+      document.getElementById(p[0]).value=p[1];
+      document.getElementById('v_'+p[0]).textContent=p[1].toFixed(2);});render(); }
+  document.getElementById('swing').addEventListener('click',function(){
+    setAll(state.r,state.zt, -1.3+2.6*Math.random(), 0.2+0.6*Math.random()); });
+  document.getElementById('slit').addEventListener('click',function(){ setAll(1.0,-192,state.e,state.f); });
+  document.getElementById('reset').addEventListener('click',function(){ setAll(0.45,-90,0.35,0.45); });
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
