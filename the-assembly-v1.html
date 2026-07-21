@@ -39,8 +39,8 @@
  <p class="hint">FUSED on the seam (rᵤ = rᵥ, or a rate at 0) · SPLIT in the field · the camera ray always threads both slits · the mark always rides the line · drag the scene to orbit · the view buttons give the straight-on projections</p>
  <div class="bar">
   <button id="v_top">top view</button>
-  <button id="v_side">side view</button>
   <button id="v_front">front view</button>
+  <button id="v_side">side view</button>
   <button id="v_diag">diagonal true-length</button>
   <button id="v_34">¾ view</button>
  </div>
@@ -72,8 +72,7 @@
   10⁻¹²; A2 the mark rides the armature line at parameter λ to 10⁻¹⁴ for every rate pair; A3 img₂ sits on the line
   exactly on the seam and off it in the field (≥ 0.21 world units); A4 the ζ axis bridges to true depth by
   z = −λZp/(1−λ), matching makeProj to 10⁻¹⁴; A5 the gauge product is 1 to 10⁻¹⁶. The page re-runs A1, A2, A3 and A5
-  on every control change. Standing on check_pairing (4), check_klein (5), check_euler_all (5), check_gauge (4), check_views (3: the top,
-  front, and diagonal-true-length views verified against the shipped basis), and the congruence-map verification (6).</p>
+  on every control change. Standing on check_pairing (4), check_klein (5), check_euler_all (5), check_gauge (4), check_views (4: the board orientation — top view true size and shape, front and side elevations edge-on, diagonal true-length — verified against the shipped basis), and the congruence-map verification (6).</p>
  </div>
 </div>
 <script id="assembly-core">
@@ -129,7 +128,7 @@ function ctype(ru,rv){ if(ru<eps&&rv<eps) return 'parallel bundle \u00b7 orthogr
 function onSeam(ru,rv){ return ru<eps||rv<eps||Math.abs(ru-rv)<eps; }
 
 // ---- 3D -> screen (orthographic turntable from the shared core) ----
-var CAM3=[0,-260,0], SC=1.0, CX=430, CY=320;
+var CAM3=[0,-260,0], SC=1.0, CX=430, CY=350;
 function draw3(p){ var B=viewBasis(state.yaw,state.pit);
   return project(B,CAM3,SC,CX,CY,[p[0],p[2],p[1]]); }        // world [x,y,zeta] -> basis [x,zeta,y]
 
@@ -304,7 +303,7 @@ function init(){
     document.getElementById('pit').value=state.pit;document.getElementById('v_pit').textContent=state.pit.toFixed(2); }
   function vpreset(id,yw,pt){document.getElementById(id).addEventListener('click',function(){
     state.yaw=yw;state.pit=pt;syncView();render();});}
-  vpreset('v_top',0,0); vpreset('v_side',1.5708,0); vpreset('v_front',0,1.5708);
+  vpreset('v_top',0,1.5708); vpreset('v_front',0,0); vpreset('v_side',1.5708,0);
   vpreset('v_diag',-0.5951,0.5); vpreset('v_34',0.65,0.32);
   var cv2=document.getElementById('scene'), dragging=false, lx=0, ly=0;
   cv2.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;ly=e.clientY;cv2.setPointerCapture(e.pointerId);e.preventDefault();});
