@@ -35,12 +35,21 @@
  <b style="color:#E8792B">img₂</b> (reading 2 — the cross-slit). On the seam the two readings fuse
  — img₂ sits on the armature line; in the field they split, and the red whisker is the gap.
  Orbit it, sweep the depth, slide the rates through the presets, and watch the fusion come and go.</p>
+ <canvas id="scene" style="width:1140px;height:640px;" role="img" aria-label="a 3D view of the projection assembly: the red picture plane at zeta zero holding the ink armature line with the blue mark, four faint depth planes at equal lambda steps, the light-aqua u-slit and dark-aqua v-slit directing lines at their depths, the scene point S, the orange camera ray threading both slits to its image point, the dashed lateral projector to the mark, and a red gap whisker when the two readings split"></canvas>
+ <p class="hint">FUSED on the seam (rᵤ = rᵥ, or a rate at 0) · SPLIT in the field · the camera ray always threads both slits · the mark always rides the line · drag the scene to orbit · the view buttons give the straight-on projections</p>
  <div class="bar">
-  <label for="yaw">orbit</label><input type="range" id="yaw" min="-1.35" max="1.35" step="0.01" value="0.65"><span class="ro" id="v_yaw">0.65</span>
-  <label for="pit">tilt</label><input type="range" id="pit" min="0.06" max="0.9" step="0.01" value="0.32"><span class="ro" id="v_pit">0.32</span>
+  <button id="v_top">top view</button>
+  <button id="v_side">side view</button>
+  <button id="v_front">front view</button>
+  <button id="v_diag">diagonal true-length</button>
+  <button id="v_34">¾ view</button>
+ </div>
+ <div class="bar">
+  <label for="yaw">orbit</label><input type="range" id="yaw" min="-1.6" max="1.6" step="0.01" value="0.65"><span class="ro" id="v_yaw">0.65</span>
+  <label for="pit">tilt</label><input type="range" id="pit" min="0" max="1.58" step="0.01" value="0.32"><span class="ro" id="v_pit">0.32</span>
   <label for="ru">rᵤ</label><input type="range" id="ru" min="0" max="1" step="0.01" value="0.45"><span class="ro" id="v_ru">0.45</span>
   <label for="rv">rᵥ</label><input type="range" id="rv" min="0" max="1" step="0.01" value="0.75"><span class="ro" id="v_rv">0.75</span>
-  <label for="zt">depth ζ</label><input type="range" id="zt" min="-160" max="-10" step="1" value="-90"><span class="ro" id="v_zt">-90</span>
+  <label for="zt">depth ζ</label><input type="range" id="zt" min="-199" max="-10" step="1" value="-90"><span class="ro" id="v_zt">-90</span>
  </div>
  <div class="bar">
   <button id="p_persp">perspective (1, 1)</button>
@@ -49,8 +58,6 @@
   <button id="p_vax">vanishing-axis (⅓, 1)</button>
   <button id="p_gen">general field (0.45, 0.75)</button>
  </div>
- <canvas id="scene" style="width:1140px;height:640px;" role="img" aria-label="a 3D view of the projection assembly: the red picture plane at zeta zero holding the ink armature line with the blue mark, four faint depth planes at equal lambda steps, the light-aqua u-slit and dark-aqua v-slit directing lines at their depths, the scene point S, the orange camera ray threading both slits to its image point, the dashed lateral projector to the mark, and a red gap whisker when the two readings split"></canvas>
- <p class="hint">FUSED on the seam (rᵤ = rᵥ, or a rate at 0) · SPLIT in the field · the camera ray always threads both slits · the mark always rides the line</p>
  <div id="live"></div>
 
  <div class="foot">
@@ -60,14 +67,13 @@
   structure the Klein-quadric factorization D = C∘R organizes. They are two readings of <b>one congruence</b>: on the seam
   of the rate square they draw the same line (the congruence map’s fused locus, the Erlangen ladder’s ground); in the
   field they split, and the gap you see is exactly the quantity the congruence map charts. The gauge readout is the
-  reciprocity that survives everywhere — glide factor × camera factor = 1 — the harmonic coupling the whole board keeps
-  returning to.</p>
+  reciprocity that survives everywhere — glide factor × camera factor = 1 — the ambient involution whose fixed points ±1 are the board’s two balances — an identity at every depth, with the harmonic law 1/k + 1/c = 1 as its special event (check_gauge).</p>
   <p class="verify">Every drawn element is verified in check_assembly.js (5/5): A1 the camera ray threads both slits to
   10⁻¹²; A2 the mark rides the armature line at parameter λ to 10⁻¹⁴ for every rate pair; A3 img₂ sits on the line
   exactly on the seam and off it in the field (≥ 0.21 world units); A4 the ζ axis bridges to true depth by
   z = −λZp/(1−λ), matching makeProj to 10⁻¹⁴; A5 the gauge product is 1 to 10⁻¹⁶. The page re-runs A1, A2, A3 and A5
-  on every control change. Standing on check_pairing (4), check_klein (5), check_euler_all (5), and the congruence-map
-  verification (6).</p>
+  on every control change. Standing on check_pairing (4), check_klein (5), check_euler_all (5), check_gauge (4), check_views (3: the top,
+  front, and diagonal-true-length views verified against the shipped basis), and the congruence-map verification (6).</p>
  </div>
 </div>
 <script id="assembly-core">
@@ -123,7 +129,7 @@ function ctype(ru,rv){ if(ru<eps&&rv<eps) return 'parallel bundle \u00b7 orthogr
 function onSeam(ru,rv){ return ru<eps||rv<eps||Math.abs(ru-rv)<eps; }
 
 // ---- 3D -> screen (orthographic turntable from the shared core) ----
-var CAM3=[0,-260,0], SC=0.55, CX=352, CY=350;
+var CAM3=[0,-260,0], SC=1.0, CX=430, CY=320;
 function draw3(p){ var B=viewBasis(state.yaw,state.pit);
   return project(B,CAM3,SC,CX,CY,[p[0],p[2],p[1]]); }        // world [x,y,zeta] -> basis [x,zeta,y]
 
@@ -180,6 +186,11 @@ function draw(){
   var pl=draw3([-FW,-FH,0]); ctx.fillStyle=PIC;ctx.font='bold 11px Helvetica, Arial, sans-serif';
   ctx.fillText('picture plane \u00b7 \u03b6 = 0', pl[0]-6, pl[1]+16);
 
+  // frame diagonal (for the true-length view)
+  ctx.strokeStyle=GOLD;ctx.lineWidth=1.2;ctx.globalAlpha=0.85; seg(ctx,[-FW,-FH,0],[FW,FH,0]); ctx.globalAlpha=1;
+  var dgA=draw3([-FW,-FH,0]), dgB=draw3([FW,FH,0]);
+  ctx.fillStyle=GOLD;ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText('diag', (dgA[0]+dgB[0])/2+6, (dgA[1]+dgB[1])/2-4);
+
   // armature line A->V with graduation
   var degen = Math.hypot(V[0]-A[0],V[1]-A[1])<1e-6;
   if(!degen){ ctx.strokeStyle=INK;ctx.lineWidth=2; seg(ctx,[A[0],A[1],0],[V[0],V[1],0]);
@@ -196,6 +207,8 @@ function draw(){
   // scene point + lateral projector (reading 1)
   var S=[X0,Y0,zt];
   ctx.strokeStyle=INK;ctx.lineWidth=1.4;ctx.setLineDash([5,4]); seg(ctx,S,[P1[0],P1[1],0]); ctx.setLineDash([]);
+  var gm2=draw3([(X0+P1[0])/2,(Y0+P1[1])/2,zt/2]);
+  ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText('glide projector \u2192 mark', gm2[0]+7, gm2[1]);
   var Sp=dot(ctx,S,4.5,INK,'#fff'); ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('S',Sp[0]+7,Sp[1]-6);
 
   // camera ray (reading 2) through both slits
@@ -237,9 +250,14 @@ function drawReadouts(ctx,x,y,ru,rv,zt,l,zU,zV,gap,fused,degen,P1,P2){
   row('\u22a5 gap to armature:', gap.toFixed(3)+(fused?'  (fused)':'  (split)'), fused?GREEN:RED);
   var glide=(1-l*ru), cam=DZ/(DZ+ru*zt);
   row('gauge (u): glide\u00d7camera:', (glide*cam).toFixed(6), GOLD);
+  var dA=draw3([-FW,-FH,0]), dB=draw3([FW,FH,0]);
+  var dratio=Math.hypot(dB[0]-dA[0],dB[1]-dA[1])/(SC*2*Math.hypot(FW,FH));
+  row('frame diagonal \u00b7 proj/true:', dratio.toFixed(4), Math.abs(dratio-1)<1e-3?GREEN:FAINT);
   yy+=6; ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
   ctx.fillText('\u03b6 is the graduation coordinate (DZ = 200);',x,yy);yy+=14;
   ctx.fillText('true depth via z = \u2212\u03bbZp/(1\u2212\u03bb)  [check_assembly A4]',x,yy);
+  if(l>0.97){ yy+=16; ctx.fillStyle=GOLD;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText('\u03bb \u2192 1: the vanishing count \u2014 mark \u2192 V, true depth z \u2192 \u2212\u221e',x,yy); }
 }
 
 function runLive(){
@@ -280,6 +298,22 @@ function init(){
     document.getElementById('ru').value=ru;document.getElementById('v_ru').textContent=ru.toFixed(2);
     document.getElementById('rv').value=rv;document.getElementById('v_rv').textContent=rv.toFixed(2);render();});}
   preset('p_persp',1,1);preset('p_push',1,0);preset('p_ortho',0,0);preset('p_vax',0.3333,1);preset('p_gen',0.45,0.75);
+  function clampN(v,a,b){return Math.max(a,Math.min(b,v));}
+  function syncView(){
+    document.getElementById('yaw').value=state.yaw;document.getElementById('v_yaw').textContent=state.yaw.toFixed(2);
+    document.getElementById('pit').value=state.pit;document.getElementById('v_pit').textContent=state.pit.toFixed(2); }
+  function vpreset(id,yw,pt){document.getElementById(id).addEventListener('click',function(){
+    state.yaw=yw;state.pit=pt;syncView();render();});}
+  vpreset('v_top',0,0); vpreset('v_side',1.5708,0); vpreset('v_front',0,1.5708);
+  vpreset('v_diag',-0.5951,0.5); vpreset('v_34',0.65,0.32);
+  var cv2=document.getElementById('scene'), dragging=false, lx=0, ly=0;
+  cv2.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;ly=e.clientY;cv2.setPointerCapture(e.pointerId);e.preventDefault();});
+  cv2.addEventListener('pointermove',function(e){if(!dragging)return;
+    state.yaw=clampN(state.yaw+(e.clientX-lx)*0.006,-1.6,1.6);
+    state.pit=clampN(state.pit-(e.clientY-ly)*0.006,0,1.58);
+    lx=e.clientX;ly=e.clientY;syncView();render();});
+  cv2.addEventListener('pointerup',function(){dragging=false;});
+  cv2.addEventListener('pointercancel',function(){dragging=false;});
   render();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
