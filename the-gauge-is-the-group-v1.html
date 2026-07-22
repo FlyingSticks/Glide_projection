@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The gauge is the group · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1240px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#6E6C60;margin:0 0 9px;}
+ h1{font-size:28px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 12px;}
+ .bar label{font-size:12px;margin:0 6px 0 18px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:220px;} .ro{font-size:12px;margin:0 4px;min-width:70px;display:inline-block;font-weight:bold;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:inherit;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ .chk{font-size:12px;margin-left:6px;}
+ svg{display:block;background:#BEBCB0;touch-action:none;border:1.5px solid #151310;max-width:100%;height:auto;}
+ #line{margin:0 auto 6px;width:1180px;}
+ .hint{font-size:11px;color:#6E6C60;margin:2px 0 16px;text-align:center;}
+ .cols{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin:0 0 6px;}
+ .cplxwrap{flex:0 0 auto;} #cplx{width:300px;}
+ .cap{font-size:11px;color:#4A483E;max-width:300px;margin:6px 2px 0;line-height:1.45;}
+ .panel{flex:1 1 460px;min-width:340px;}
+ h2{font-size:15px;margin:22px 0 6px;}
+ p{font-size:13.5px;margin:9px 0;}
+ table{border-collapse:collapse;width:100%;font-size:12.5px;margin:6px 0;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 9px;text-align:left;vertical-align:top;} th{background:#EBE9DA;font-weight:bold;}
+ .sw{display:inline-block;width:11px;height:11px;border:1px solid #151310;vertical-align:baseline;margin-right:6px;}
+ .val{font-weight:bold;font-variant-numeric:tabular-nums;}
+ .idbox{background:#BEBCB0;border:1.5px solid #151310;padding:10px 13px;font-size:12.5px;line-height:1.7;margin:8px 0 0;}
+ .ok{color:#3A6B2E;font-weight:bold;} code{font-size:12.5px;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:22px;} .foot .one{font-size:13px;line-height:1.58;max-width:1080px;}
+ .verify{font-size:11.5px;color:#6E6C60;margin-top:12px;} .k{font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE GAUGE IS THE GROUP</p>
+ <h1>The gauge is the group — <em>three constructions, three involutions, one S₃</em></h1>
+ <p class="sub">The board doesn't just <i>resemble</i> the anharmonic interface — it <b>runs the same group</b>. Every reading of one scene value <b>λ</b> is one of the six Möbius maps that permute a cross-ratio, and the three <b>involutions</b> among them are exactly the three constructions the board already draws: the <b style="color:#E8792B">gauge product</b> is the reciprocal λ→1/λ, the <b style="color:#12A6A6">armature coupling</b> is the third involution λ→λ/(λ−1), and the <b style="color:#8A4FD6">glide factor</b> is the complement λ→1−λ. Drag λ and watch its whole orbit move. The two “harmonic” identities you asked about — <code>λ·(1/λ)=1</code> and <code>1/λ+1/σ=1</code> — are two <i>different</i> partners of the one λ; they meet only where the discriminant goes complex.</p>
+
+ <div class="bar">
+  <label for="lam">λ · the mark (glide factor)</label>
+  <input type="range" id="lam" min="-4" max="4" step="0.01" value="0.35">
+  <span class="ro" id="v_lam">0.350</span>
+  <button id="p_fig">λ = 0.35 · your mark</button>
+  <button id="p_h2">harmonic λ = 2</button>
+  <button id="p_hm1">harmonic λ = −1</button>
+  <button id="p_hh">harmonic λ = ½</button>
+  <label class="chk"><input type="checkbox" id="full"> show full S₃ orbit (6)</label>
+ </div>
+
+ <svg id="line" viewBox="0 0 1180 340" role="img" aria-label="A projective number line for the cross-ratio lambda. A draggable handle sets lambda; its reciprocal, complement, and third-involution images are shown as colored points, with arcs connecting lambda to each. The six special cross-ratio values minus one, zero, one half, one, two, and infinity are marked as the fixed points of the three involutions. A bracket shows the harmonic relation V M times V I equals V P squared equals one."></svg>
+ <p class="hint">Drag anywhere on the line to move λ · hollow diamonds are the still points (each involution fixes a pair) · the six of them are exactly {−1, 0, ½, 1, 2, ∞}</p>
+
+ <div class="cols">
+  <div class="cplxwrap">
+   <svg id="cplx" viewBox="0 0 300 300" role="img" aria-label="The complex plane with the unit circle. The two equianharmonic points e to the plus and minus i pi over three sit on the unit circle at real part one half. The current lambda, its reciprocal, and its third-involution image are shown as dots on the real axis, never coinciding."></svg>
+   <p class="cap">The reciprocal image (<b style="color:#E8792B">orange</b>) and the coupling image (<b style="color:#12A6A6">teal</b>) coincide only where <code>λ²−λ+1=0</code> → <b style="color:#C0322B">λ = e<sup>±iπ/3</sup></b>, off the real line. On the board’s real λ they never meet — which is why the two identities can’t share a partner.</p>
+  </div>
+  <div class="panel">
+   <table aria-label="The three involutions and their board roles">
+    <tr><th>involution</th><th>map</th><th>what it is on the board</th><th>fixes</th><th class="val">image of λ</th></tr>
+    <tr><td><span class="sw" style="background:#E8792B"></span><b>Reciprocal</b> ρ</td><td>λ → 1/λ</td><td>camera factor · gauge product <code>λ·(1/λ)=1</code> · your <code>VM·VI=VP²</code></td><td>±1 <span style="color:#6E6C60">(balances P, P′)</span></td><td class="val" id="v_rho" style="color:#E8792B">—</td></tr>
+    <tr><td><span class="sw" style="background:#12A6A6"></span><b>Third</b> σ</td><td>λ → λ/(λ−1)</td><td>armature coupling <code>1/λ+1/σ=1</code> · harmonic cut at λ=−1</td><td>0, 2</td><td class="val" id="v_sig" style="color:#12A6A6">—</td></tr>
+    <tr><td><span class="sw" style="background:#8A4FD6"></span><b>Complement</b> τ</td><td>λ → 1−λ</td><td>glide factor <code>G = 1−λr</code></td><td>½, ∞</td><td class="val" id="v_tau" style="color:#8A4FD6">—</td></tr>
+   </table>
+   <div class="idbox">
+    gauge product <code>λ·(1/λ)</code> = <span class="val" id="v_gauge">1.000</span> <span class="ok">✓</span> &nbsp;·&nbsp; coupling <code>1/λ + 1/σ</code> = <span class="val" id="v_coup">1.000</span> <span class="ok">✓</span><br>
+    both hold identically — on <b>different partners of the same λ</b>. Gap between them <code>|1/λ − σ|</code> = <span class="val" id="v_gap">—</span>, zero only at <b style="color:#C0322B">e<sup>±iπ/3</sup></b>.<br>
+    <span id="v_orbit" style="color:#4A483E">orbit: 6 distinct values (generic)</span>
+   </div>
+  </div>
+ </div>
+
+ <h2>Why this is the real bridge, not the first one</h2>
+ <p>My first guess put the two identities on one pair and forced λ = e<sup>±iπ/3</sup>. Wrong: the board keeps the partners apart, so that never happens on a real depth. The truer statement is stronger. The six maps {λ, 1/λ, 1−λ, 1/(1−λ), λ/(λ−1), (λ−1)/λ} are the anharmonic group S₃ acting on a cross-ratio — the exact object the Anharmonic Interface is built on. Its three involutions are the three the board constructs, and they compose as S₃: their fixed points are the six special values {−1, 0, ½, 1, 2, ∞}, and the order-3 products (the 3-cycles) fix the equianharmonic pair e<sup>±iπ/3</sup>. So the two projects aren’t analogous — they are the <b>same S₃</b>, once wearing depth-coordinates (the gauge), once wearing the cross-ratio (the interface).</p>
+
+ <div class="foot">
+  <p class="one">Read it on the line above. At <b>λ = 2</b> the coupling image lands on its own still point and the orbit collapses to the harmonic triple {−1, ½, 2}; same at λ = −1 (on the reciprocal’s still point) and λ = ½ (on the complement’s). Those three collapses are the harmonic case — one involution catching its fixed point. The equianharmonic is the deeper collapse, orbit of two, but it lives at e<sup>±iπ/3</sup> and so never shows on the real line: the inset is the only place you can see where the reciprocal and the third involution finally agree. The colors are deliberate — the anharmonic involutions are drawn in the board’s own role-palette, because that identity is the whole point.</p>
+  <p class="verify">Every value live: the six orbit members, the three fixed pairs, and both identities recomputed on each move. <code>λ·(1/λ)=1</code> and <code>1/λ+1/σ=1</code> hold to rounding; ρ and σ agree only at <code>λ²−λ+1=0</code>. λ guarded away from its poles at 0 and 1.</p>
+ </div>
+</div>
+
+<script>
+"use strict";
+var SVGNS="http://www.w3.org/2000/svg";
+var MARK="#2456B0", CAM="#E8792B", DIR="#12A6A6", VAN="#8A4FD6",
+    GOLD="#9A8248", INK="#151310", MUT="#6E6C60", CRIM="#C0322B";
+
+function mk(tag,attrs,parent){
+  var e=document.createElementNS(SVGNS,tag);
+  for(var k in attrs){ e.setAttribute(k,attrs[k]); }
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function fmt(v,d){
+  if(!isFinite(v)||Math.abs(v)>1e4) return (v<0?"−∞":"+∞");
+  var s=v.toFixed(d);
+  if(s==="-0.00"||s==="-0.000") s=s.slice(1);
+  return s.replace("-","−");
+}
+
+/* ---------- main projective line ---------- */
+var line=document.getElementById("line");
+var SCALE=1.6, cx=590, halfW=530, aY=150, XMIN=64, XMAX=1116;
+function Xraw(v){
+  if(!isFinite(v)) return v>0?cx+halfW:cx-halfW;
+  return cx + halfW*(2/Math.PI)*Math.atan(v/SCALE);
+}
+function X(v){ return Math.max(XMIN, Math.min(XMAX, Xraw(v))); }
+function invX(x){
+  var t=(x-cx)/halfW;
+  t=Math.max(-0.995, Math.min(0.995, t));
+  return SCALE*Math.tan(t*Math.PI/2);
+}
+
+/* baseline */
+mk("line",{x1:60,y1:aY,x2:1120,y2:aY,stroke:INK,"stroke-width":1.5},line);
+/* -inf / +inf edge caps (same projective point) */
+[["−∞",60],["∞",1120]].forEach(function(p){
+  mk("line",{x1:p[1],y1:aY-7,x2:p[1],y2:aY+7,stroke:VAN,"stroke-width":1.5},line);
+  var t=mk("text",{x:p[1]+(p[1]<600?4:-4),y:aY-12,"font-size":12,fill:VAN,
+    "text-anchor":p[1]<600?"start":"end","font-family":"Helvetica,Arial,sans-serif"},line);
+  t.textContent=p[0];
+});
+
+/* fixed anchors: the six special values, colored by the involution that fixes them */
+var anchors=[
+  {v:-1,c:CAM,lab:"−1"},{v:1,c:CAM,lab:"1"},
+  {v:0,c:DIR,lab:"0"},{v:2,c:DIR,lab:"2"},
+  {v:0.5,c:VAN,lab:"½"}
+];
+anchors.forEach(function(a){
+  var x=X(a.v), s=6;
+  mk("path",{d:"M"+x+" "+(aY-s)+" L"+(x+s)+" "+aY+" L"+x+" "+(aY+s)+" L"+(x-s)+" "+aY+" Z",
+    fill:"none",stroke:a.c,"stroke-width":1.8},line);
+  var t=mk("text",{x:x,y:aY+22,"font-size":12,fill:MUT,"text-anchor":"middle",
+    "font-family":"Helvetica,Arial,sans-serif"},line);
+  t.textContent=a.lab;
+});
+/* V / P / P' role tags on the reciprocal's frame */
+[["V",0],["P",1],["P′",-1]].forEach(function(p){
+  var t=mk("text",{x:X(p[1]),y:aY+40,"font-size":11.5,fill:GOLD,"text-anchor":"middle",
+    "font-weight":"bold","font-family":"Helvetica,Arial,sans-serif"},line);
+  t.textContent=p[0];
+});
+/* VP = 1 bracket between V(0) and P(+1) */
+var bx0=X(0), bx1=X(1);
+mk("path",{d:"M"+bx0+" 296 L"+bx0+" 302 L"+bx1+" 302 L"+bx1+" 296",fill:"none",
+  stroke:GOLD,"stroke-width":1.4},line);
+var vpt=mk("text",{x:(bx0+bx1)/2,y:318,"font-size":12,fill:GOLD,"text-anchor":"middle",
+  "font-family":"Helvetica,Arial,sans-serif"},line);
+vpt.textContent="VP = 1   →   VM·VI = VP² = 1";
+
+/* involution arcs (created empty, updated on move) */
+function arc(color,dash){
+  return mk("path",{d:"",fill:"none",stroke:color,"stroke-width":1.4,
+    "stroke-opacity":0.55,"stroke-dasharray":dash||"none"},line);
+}
+var aRho=arc(CAM), aSig=arc(DIR), aTau=arc(VAN,"4 3");
+function setArc(p,x1,x2,dy){
+  var mx=(x1+x2)/2;
+  p.setAttribute("d","M"+x1+" "+aY+" Q "+mx+" "+(aY+dy)+" "+x2+" "+aY);
+}
+
+/* moving points */
+function dot(color,r){ return mk("circle",{cx:cx,cy:aY,r:r,fill:color,stroke:INK,"stroke-width":1},line); }
+function txt(color,size){
+  return mk("text",{x:cx,y:aY,"font-size":size,fill:color,"text-anchor":"middle",
+    "font-weight":"bold","font-variant-numeric":"tabular-nums","font-family":"Helvetica,Arial,sans-serif"},line);
+}
+var cO5=dot(MUT,5), cO6=dot(MUT,5);       cO5.setAttribute("fill-opacity",.45); cO6.setAttribute("fill-opacity",.45);
+var cSig=dot(DIR,7), cTau=dot(VAN,7), cRho=dot(CAM,7), cLam=dot(MARK,9.5);
+var tO5=txt(MUT,10.5), tO6=txt(MUT,10.5); tO5.setAttribute("fill-opacity",.6); tO6.setAttribute("fill-opacity",.6);
+var tRho=txt(CAM,12), tLam=txt(MARK,12.5), tSig=txt(DIR,12), tTau=txt(VAN,12);
+/* transparent fat hit target for grabbing the handle */
+var hit=mk("circle",{cx:cx,cy:aY,r:17,fill:"#000","fill-opacity":0,style:"cursor:grab"},line);
+
+function place(c,x){ c.setAttribute("cx",x); }
+function label(t,x,y,str){ t.setAttribute("x",x); t.setAttribute("y",y); t.textContent=str; }
+function toggleOrbit(on){
+  [cO5,cO6,tO5,tO6].forEach(function(e){ e.style.display=on?"":"none"; });
+}
+
+/* ---------- complex inset ---------- */
+var cp=document.getElementById("cplx");
+var C=150, R=95;
+function CX(re){ return C+re*R; } function CY(im){ return C-im*R; }
+mk("line",{x1:30,y1:C,x2:270,y2:C,stroke:MUT,"stroke-width":1},cp);
+mk("line",{x1:C,y1:30,x2:C,y2:270,stroke:MUT,"stroke-width":1},cp);
+mk("circle",{cx:C,cy:C,r:R,fill:"none",stroke:INK,"stroke-width":1.2},cp);
+/* Re = 1/2 guide */
+mk("line",{x1:CX(0.5),y1:36,x2:CX(0.5),y2:264,stroke:GOLD,"stroke-width":1,"stroke-dasharray":"4 3","stroke-opacity":.7},cp);
+[["1",CX(1)+6,C+14],["−1",CX(-1)-6,C+14],["i",C+7,CY(1)+4],["−i",C+7,CY(-1)+4]].forEach(function(p){
+  var t=mk("text",{x:p[1],y:p[2],"font-size":11,fill:MUT,"text-anchor":p[0].indexOf("−")===0&&p[0].length===2?"end":"start","font-family":"Helvetica,Arial,sans-serif"},cp);
+  t.textContent=p[0];
+});
+/* equianharmonic points */
+[[0.5,Math.sqrt(3)/2],[0.5,-Math.sqrt(3)/2]].forEach(function(p){
+  mk("circle",{cx:CX(p[0]),cy:CY(p[1]),r:5,fill:CRIM,stroke:INK,"stroke-width":1},cp);
+  var t=mk("text",{x:CX(p[0])+9,y:CY(p[1])+(p[1]>0?-3:13),"font-size":11.5,fill:CRIM,
+    "font-weight":"bold","font-family":"Helvetica,Arial,sans-serif"},cp);
+  t.textContent="e";
+  var sup=mk("text",{x:CX(p[0])+16,y:CY(p[1])+(p[1]>0?-9:7),"font-size":9,fill:CRIM,
+    "font-weight":"bold","font-family":"Helvetica,Arial,sans-serif"},cp);
+  sup.textContent=(p[1]>0?"+iπ/3":"−iπ/3");
+});
+function cdot(color){ return mk("circle",{cx:C,cy:C,r:4.5,fill:color,stroke:INK,"stroke-width":1},cp); }
+var dLam=cdot(MARK), dRho=cdot(CAM), dSig=cdot(DIR);
+function cplace(d,re){
+  var clamped = (!isFinite(re) || re<-2.9 || re>2.9);
+  var rr = !isFinite(re) ? 2.9 : Math.max(-2.9, Math.min(2.9, re));
+  var x = Math.max(14, Math.min(286, CX(rr)));
+  d.setAttribute("cx",x); d.setAttribute("cy",C);
+  d.setAttribute("fill-opacity", clamped?0.3:1);
+}
+
+/* ---------- state + update ---------- */
+var lambda=0.35, dragging=false;
+var slider=document.getElementById("lam"), vlam=document.getElementById("v_lam");
+
+function distinctCount(arr){
+  var out=[];
+  arr.forEach(function(v){
+    if(!isFinite(v)){ if(out.indexOf("inf")<0) out.push("inf"); return; }
+    var found=false;
+    for(var i=0;i<out.length;i++){ if(out[i]!=="inf" && Math.abs(out[i]-v)<1e-6*(1+Math.abs(v))){found=true;break;} }
+    if(!found) out.push(v);
+  });
+  return out.length;
+}
+
+function update(){
+  var inv = 1/lambda;               // ρ
+  var sig = lambda/(lambda-1);      // σ
+  var comp = 1-lambda;              // τ
+  var o5 = 1/(1-lambda);
+  var o6 = (lambda-1)/lambda;
+
+  var xL=X(lambda), xR=X(inv), xS=X(sig), xT=X(comp);
+  place(cLam,xL); place(cRho,xR); place(cSig,xS); place(cTau,xT);
+  place(cO5,X(o5)); place(cO6,X(o6));
+  hit.setAttribute("cx",xL);
+
+  /* arcs: reciprocal up, third down, complement up (dashed, shallow) */
+  setArc(aRho,xL,xR,-46);
+  setArc(aSig,xL,xS,46);
+  setArc(aTau,xL,xT,-24);
+
+  /* value labels, staggered heights to reduce collision */
+  label(tRho,xR,aY-30,fmt(inv,2));
+  label(tLam,xL,aY-14,fmt(lambda,2));
+  label(tSig,xS,aY+58,fmt(sig,2));
+  label(tTau,xT,aY+74,fmt(comp,2));
+  label(tO5,X(o5),aY-48,fmt(o5,2));
+  label(tO6,X(o6),aY-48,fmt(o6,2));
+
+  /* readout */
+  document.getElementById("v_rho").textContent=fmt(inv,3);
+  document.getElementById("v_sig").textContent=fmt(sig,3);
+  document.getElementById("v_tau").textContent=fmt(comp,3);
+  document.getElementById("v_gauge").textContent=fmt(lambda*inv,3);
+  document.getElementById("v_coup").textContent=fmt(1/lambda + 1/sig,3);
+  document.getElementById("v_gap").textContent=fmt(Math.abs(inv-sig),3);
+
+  var n=distinctCount([lambda,inv,comp,o5,sig,o6]);
+  var msg;
+  if(n<=2) msg="orbit: 2 values — equianharmonic (only at e^{±iπ/3})";
+  else if(n===3) msg="orbit: 3 values — harmonic collapse {−1, ½, 2}";
+  else msg="orbit: "+n+" distinct values (generic)";
+  document.getElementById("v_orbit").textContent=msg;
+
+  /* inset */
+  cplace(dLam,lambda); cplace(dRho,inv); cplace(dSig,sig);
+
+  /* sync slider + readout */
+  var sv=Math.max(-4,Math.min(4,lambda));
+  if(Math.abs(parseFloat(slider.value)-sv)>1e-9) slider.value=sv;
+  vlam.textContent=fmt(lambda,3);
+}
+
+function setLambda(l){
+  if(!isFinite(l)) l=50;
+  l=Math.max(-60,Math.min(60,l));
+  if(Math.abs(l)<1e-3) l=(l<0?-1:1)*1e-3;               // pole at 0 (reciprocal)
+  if(Math.abs(l-1)<1e-3) l=(l<1?1-1e-3:1+1e-3);         // pole at 1 (third involution)
+  lambda=l; update();
+}
+
+/* ---------- drag on the line ---------- */
+function svgX(evt){
+  var pt=line.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY;
+  var p=pt.matrixTransform(line.getScreenCTM().inverse());
+  return p.x;
+}
+line.addEventListener("pointerdown",function(e){
+  dragging=true; line.setPointerCapture(e.pointerId);
+  hit.style.cursor="grabbing";
+  setLambda(invX(svgX(e))); e.preventDefault();
+});
+line.addEventListener("pointermove",function(e){
+  if(!dragging) return;
+  setLambda(invX(svgX(e))); e.preventDefault();
+});
+function endDrag(e){ dragging=false; hit.style.cursor="grab"; }
+line.addEventListener("pointerup",endDrag);
+line.addEventListener("pointercancel",endDrag);
+
+/* ---------- controls ---------- */
+slider.addEventListener("input",function(){ setLambda(parseFloat(slider.value)); });
+document.getElementById("full").addEventListener("change",function(e){ toggleOrbit(e.target.checked); });
+document.getElementById("p_fig").addEventListener("click",function(){ setLambda(0.35); });
+document.getElementById("p_h2").addEventListener("click",function(){ setLambda(2); });
+document.getElementById("p_hm1").addEventListener("click",function(){ setLambda(-1); });
+document.getElementById("p_hh").addEventListener("click",function(){ setLambda(0.5); });
+
+/* init */
+toggleOrbit(false);
+setLambda(0.35);
+</script>
+</body>
+</html>
