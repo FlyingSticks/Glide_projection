@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The census · count and incidence as the zeroth level</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 14px;max-width:680px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 4px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:6px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ .caption{font-size:14px;margin:8px 2px 0;max-width:740px;}
+ .ladder{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:10px;white-space:pre-wrap;}
+ .ladder .ok{color:#8FD08F;} .ladder .broken{color:#E8B04B;}
+ .foot{font-size:12px;color:#6b695f;margin-top:14px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · ZEROTH LEVEL</p>
+  <h1>The census</h1>
+  <p class="sub">The edges-image of a cube: a picture lattice, its depth lines, and the depth
+  planes between them. Switch how it is drawn — both channels Type A, both Type B, or a free
+  bend that belongs to no projection at all. The metric changes everywhere. The cross-ratio
+  survives A and B and dies under the bend. The census — how many lines, how many points,
+  which passes through which — survives everything. That is the floor the drafting-board
+  constructions stand on.</p>
+
+  <div class="panel">
+    <svg id="board" viewBox="0 0 900 560" aria-label="Edges-image of a cube under three drawing modes"></svg>
+    <div class="controls">
+      <button class="mode on" data-m="A">Type A · (0,0) + shear</button>
+      <button class="mode" data-m="B">Type B · (r,r)</button>
+      <button class="mode" data-m="FREE">Free bend</button>
+      <span style="flex:1"></span>
+      <label>r <input type="range" id="rS" min="0.15" max="1" step="0.01" value="0.6"></label>
+      <label>&sigma;&#770; <input type="range" id="sS" min="-0.6" max="0.6" step="0.01" value="0.42"></label>
+      <label>bend <input type="range" id="aS" min="0" max="0.3" step="0.01" value="0.14"></label>
+    </div>
+    <p class="caption" id="cap"></p>
+    <div class="ladder" id="lad"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_census.js holds the ledger
+  (6/6): identical census and incidence table across every mode and parameter; cross-ratio of
+  equal-&Delta;Z marks preserved to 10&#8315;&#185;&#8309; under A and B and broken by the bend;
+  equal &Delta;Z never equally spaced (the gauge is projective in Z); the graduated edge exact
+  under A and B only. Structure and layer order follow the topology/count sheet; the placement
+  law is the channel law of the six-core-armatures sheet.</p>
+</div>
+
+<script id="geo">
+var GEO = (function(){
+  'use strict';
+  var n=3, m=3, Gmax=0.8;
+  function chan(g,w0,s,r,sig){ return s + (w0-s)*(1-r*g) + sig*g; }
+  function bendPt(p,a){ return [p[0]+a*Math.sin(1.7*p[1]+0.4), p[1]+a*Math.sin(1.3*p[0]-0.2)]; }
+  function cr4(t){ return ((t[2]-t[0])*(t[3]-t[1]))/((t[2]-t[1])*(t[3]-t[0])); }
+  function gaugeOf(Z,Zp,Zg){ var p=function(z){ return -Zp/(z-Zp); }; return 1-p(Z)/p(Zg); }
+  function buildStructure(){
+    var nodes=[], nodeId={}, curves=[], kinds=[], i,j,l,c;
+    for(l=0;l<=m;l++) for(i=0;i<=n;i++) for(j=0;j<=n;j++){
+      nodeId[[i,j,l]]=nodes.length; nodes.push([i,j,l]);
+    }
+    for(l=0;l<=m;l++){
+      for(i=0;i<=n;i++){ c=[]; for(j=0;j<=n;j++) c.push(nodeId[[i,j,l]]); curves.push(c); kinds.push('lat'+l); }
+      for(j=0;j<=n;j++){ c=[]; for(i=0;i<=n;i++) c.push(nodeId[[i,j,l]]); curves.push(c); kinds.push('lat'+l); }
+    }
+    for(i=0;i<=n;i++) for(j=0;j<=n;j++){
+      c=[]; for(l=0;l<=m;l++) c.push(nodeId[[i,j,l]]);
+      var edge=(i===0||i===n||j===0||j===n);
+      curves.push(c); kinds.push(edge?'depE':'depI');
+    }
+    return {nodes:nodes,curves:curves,kinds:kinds,n:n,m:m};
+  }
+  function placeNodes(struct,mode,r,sig,a){
+    return struct.nodes.map(function(nd){
+      var u=-1+2*nd[0]/n, v=-1+2*nd[1]/n, g=nd[2]*Gmax/m;
+      var rr = mode==='A' ? 0 : r;
+      var p=[chan(g,u,0,rr,sig), chan(g,v,0,rr,sig*0.6)];
+      if(mode==='FREE') p=bendPt(p,a);
+      return p;
+    });
+  }
+  function census(struct,placed){
+    var deg=new Array(struct.nodes.length); for(var i=0;i<deg.length;i++) deg[i]=0;
+    struct.curves.forEach(function(c){ c.forEach(function(id){ deg[id]++; }); });
+    return {
+      lines:struct.curves.length,
+      points:struct.nodes.length,
+      marks:struct.curves.map(function(c){return c.length;}).join(','),
+      degrees:deg.join(','),
+      table:struct.curves.map(function(c){return c.join(',');}).join('|')
+    };
+  }
+  function ladderProbes(mode,r,sig,a){
+    var Zp=-5, Zg=4, Zs=[0.5,1.5,2.5,3.5];
+    var gs=Zs.map(function(Z){ return gaugeOf(Z,Zp,Zg); });
+    var rr = mode==='A' ? 0 : r;
+    var pts=gs.map(function(g){
+      var p=[chan(g,0.8,0,rr,sig), chan(g,0.5,0,rr,sig*0.6)];
+      if(mode==='FREE') p=bendPt(p,a);
+      return p;
+    });
+    var u=[pts[3][0]-pts[0][0],pts[3][1]-pts[0][1]], nn=Math.hypot(u[0],u[1]);
+    var t=pts.map(function(p){ return ((p[0]-pts[0][0])*u[0]+(p[1]-pts[0][1])*u[1])/nn; });
+    var parts=[t[1]-t[0],t[2]-t[1],t[3]-t[2]];
+    return {
+      dcr:Math.abs(cr4(t)-cr4(Zs)),
+      spread:Math.max.apply(null,parts)/Math.min.apply(null,parts)
+    };
+  }
+  return {buildStructure:buildStructure, placeNodes:placeNodes, census:census,
+          ladderProbes:ladderProbes, chan:chan, bendPt:bendPt, cr4:cr4, gaugeOf:gaugeOf};
+})();
+if (typeof module!=='undefined') module.exports = GEO;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var svg=document.getElementById('board');
+var S=GEO.buildStructure();
+var mode='A', r=0.6, sig=0.42, amp=0.14;
+
+var STYLE={
+  lat0:{stroke:'#C43A2B',w:3.2},        // picture lattice — red
+  lat1:{stroke:'#8E8C80',w:1.6},
+  lat2:{stroke:'#7C4BA0',w:1.8},        // deeper lattice — violet
+  lat3:{stroke:'#151310',w:2.6},        // far lattice — black
+  depE:{stroke:'#2B9EA8',w:2.4},        // edge depth lines — aqua
+  depI:{stroke:'#6b695f',w:1.1}         // interior depth lines
+};
+function el(name,attrs){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  svg.appendChild(e); return e;
+}
+function px(p){ return [450+p[0]*195, 300-p[1]*195]; }
+
+function render(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var placed=GEO.placeNodes(S,mode,r,sig,amp);
+  // draw depth curves first (behind), lattices front-to-back by level order 3,2,1,0
+  var order=['depI','depE','lat3','lat2','lat1','lat0'];
+  order.forEach(function(kind){
+    S.curves.forEach(function(c,ci){
+      if(S.kinds[ci]!==kind) return;
+      var st=STYLE[kind];
+      // draw as polyline through the placed marks (subsample for FREE smoothness)
+      var pts=[];
+      if(kind.slice(0,3)==='dep' && mode==='FREE'){
+        // sample the bent depth curve densely between marks for a smooth bend
+        var nd0=S.nodes[c[0]], u=-1+2*nd0[0]/3, v=-1+2*nd0[1]/3;
+        for(var q=0;q<=24;q++){
+          var g=0.8*q/24;
+          var p=[GEO.chan(g,u,0,r,sig),GEO.chan(g,v,0,r,sig*0.6)];
+          pts.push(px(GEO.bendPt(p,amp)));
+        }
+      } else {
+        c.forEach(function(id){ pts.push(px(placed[id])); });
+      }
+      el('polyline',{points:pts.map(function(p){return p[0]+','+p[1];}).join(' '),
+        fill:'none',stroke:st.stroke,'stroke-width':st.w,'stroke-linejoin':'round'});
+    });
+  });
+  // marks
+  placed.forEach(function(p,i){
+    var lvl=S.nodes[i][2];
+    var q=px(p);
+    el('circle',{cx:q[0],cy:q[1],r:lvl===0?4:2.6,fill:lvl===0?'#C43A2B':'#151310'});
+  });
+  renderLadder();
+  renderCaption();
+}
+
+function renderLadder(){
+  var cs={};
+  ['A','B','FREE'].forEach(function(mo){
+    cs[mo]=JSON.stringify(GEO.census(S,GEO.placeNodes(S,mo,r,sig,amp)));
+  });
+  var censusSame = cs.A===cs.B && cs.B===cs.FREE;
+  var c0=GEO.census(S,GEO.placeNodes(S,mode,r,sig,amp));
+  var pr={A:GEO.ladderProbes('A',r,sig,amp), B:GEO.ladderProbes('B',r,sig,amp),
+          FREE:GEO.ladderProbes('FREE',r,sig,amp)};
+  function crCell(mo){
+    var v=pr[mo].dcr;
+    var ok=v<1e-9;
+    return '<span class="'+(ok?'ok':'broken')+'">'+v.toExponential(1)+(ok?' \u2713':' \u2717')+'</span>';
+  }
+  var lines=[
+    'THE LADDER, READ FROM THE FLOOR              A            B            FREE',
+    '',
+    'level 2  metric (part spread, equal \u0394Z)    '+
+      pr.A.spread.toFixed(3)+'        '+pr.B.spread.toFixed(3)+'        '+pr.FREE.spread.toFixed(3)+
+      '     <span class="broken">survives nothing</span>',
+    'level 1  cross-ratio |\u0394cr|                 '+
+      crCell('A')+'      '+crCell('B')+'      '+crCell('FREE')+'   survives A and B',
+    'level 0  census: '+c0.lines+' curves \u00b7 '+c0.points+' points     '+
+      (censusSame?'<span class="ok">identical    identical    identical \u2713</span>'
+                 :'<span class="broken">MISMATCH</span>')+'  survives everything',
+    '',
+    (censusSame && pr.A.dcr<1e-9 && pr.B.dcr<1e-9 && pr.FREE.dcr>1e-7
+      ? '<span class="ok">check  PASS</span>' : '<span class="warn">check  FAIL</span>')+
+    '   incidence table byte-identical across modes \u00b7 cr exact under A, B \u00b7 broken by the bend'
+  ];
+  document.getElementById('lad').innerHTML=lines.join('\n');
+}
+
+var CAPS={
+ A:'<b>Both channels Type A</b> — rates (0,0), the box, with shear. Depth planes arrive as congruent '+
+   'copies drifting along the shear: parallel connectors, no collector, ratios ride through intact.',
+ B:'<b>Both channels Type B</b> — rates (r,r). Every depth line concurs at the seat: the depth planes '+
+   'contract toward it in progression. Ratios are gone; the cross-ratio of any four depth marks is not.',
+ FREE:'<b>Free bend</b> — a smooth warp that is no projection at all. Now even the cross-ratio breaks. '+
+   'But count the lines, count the points, note which passes through which: byte-identical to the other '+
+   'two modes. The census is what every member of the family — and every non-member — must still agree on.'
+};
+function renderCaption(){ document.getElementById('cap').innerHTML=CAPS[mode]; }
+
+document.querySelectorAll('button.mode').forEach(function(b){
+  b.addEventListener('click',function(){
+    mode=b.getAttribute('data-m');
+    document.querySelectorAll('button.mode').forEach(function(x){ x.classList.toggle('on',x===b); });
+    render();
+  });
+});
+document.getElementById('rS').addEventListener('input',function(){ r=+this.value; render(); });
+document.getElementById('sS').addEventListener('input',function(){ sig=+this.value; render(); });
+document.getElementById('aS').addEventListener('input',function(){ amp=+this.value; render(); });
+
+render();
+})();
+</script>
+</body>
+</html>

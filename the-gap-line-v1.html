@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The gap line · four random lines to a harmonic range</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 18px;max-width:640px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 6px;}
+ button{font:inherit;font-size:14px;padding:7px 14px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.step.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ button.tgl.on{background:#3a3830;color:#EFEDE3;border-color:#3a3830;}
+ .caption{font-size:14px;margin:10px 2px 0;min-height:3.2em;max-width:720px;}
+ .caption b{font-weight:700;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · HARMONIC UNDERCARRIAGE</p>
+  <h1>The gap line</h1>
+  <p class="sub">Four random lines of indefinite length, six crossings. Nothing else is given —
+  and the harmonic range is already in there. Drag any handle; the checks re-run on every move.</p>
+
+  <div class="panel">
+    <svg id="board" viewBox="0 0 900 620" aria-label="Four draggable lines and the harmonic construction"></svg>
+    <div class="controls">
+      <button class="step on" data-step="1">1 · Lines</button>
+      <button class="step" data-step="2">2 · Gap line</button>
+      <button class="step" data-step="3">3 · Quadrilateral</button>
+      <button class="step" data-step="4">4 · Harmonic</button>
+      <span style="flex:1"></span>
+      <button class="tgl" id="allDiag">All three diagonals</button>
+      <button id="rnd">Randomize</button>
+    </div>
+    <p class="caption" id="cap"></p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. This page re-runs
+  check_harmonic&#8202;·&#8202;live on each input — harmonic residual on all three diagonals,
+  uniqueness of the gap pair, and the six-value orbit. Grounded in the drafting-board
+  constructions of <i>Glide Drawings</i>; the theorem is the complete quadrilateral's.</p>
+</div>
+
+<script id="geo">
+// ---- pure geometry (extracted and tested headlessly by node) ----
+var GEO = (function(){
+  'use strict';
+  function lineFrom2(p,q){ return [p[1]-q[1], q[0]-p[0], p[0]*q[1]-p[1]*q[0]]; }
+  function meet(l,m){
+    var x=l[1]*m[2]-l[2]*m[1], y=l[2]*m[0]-l[0]*m[2], w=l[0]*m[1]-l[1]*m[0];
+    if(Math.abs(w)<1e-12) return null;
+    return [x/w,y/w];
+  }
+  function crossRatio(a,b,x,y){
+    var dx=b[0]-a[0], dy=b[1]-a[1], n=Math.hypot(dx,dy);
+    if(n<1e-12) return NaN;
+    var u=[dx/n,dy/n];
+    function t(p){ return (p[0]-a[0])*u[0]+(p[1]-a[1])*u[1]; }
+    var tb=t(b), tx=t(x), ty=t(y);
+    return ((tx-0)*(ty-tb))/((tx-tb)*(ty-0));
+  }
+  function segsCross(p1,p2,p3,p4){
+    function d(a,b,c){ return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]); }
+    var d1=d(p3,p4,p1), d2=d(p3,p4,p2), d3=d(p1,p2,p3), d4=d(p1,p2,p4);
+    return ((d1>0)!==(d2>0)) && ((d3>0)!==(d4>0));
+  }
+  var PAIRINGS=[[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]];
+  function key(i,j){ return i<j ? i+''+j : j+''+i; }
+  // lines: array of 4 homogeneous lines. Returns {P, pairings:[{A,B,X,Y,Q,cr,simple,oneSide}...], gapIndex}
+  function analyse(lines){
+    var P={}, i, j;
+    for(i=0;i<4;i++) for(j=i+1;j<4;j++){
+      var pt=meet(lines[i],lines[j]);
+      if(!pt) return null;
+      P[i+''+j]=pt;
+    }
+    var out=[], gapIndex=-1;
+    for(var k=0;k<3;k++){
+      var a=PAIRINGS[k][0][0], b=PAIRINGS[k][0][1], c=PAIRINGS[k][1][0], d=PAIRINGS[k][1][1];
+      var A=P[key(a,b)], B=P[key(c,d)];
+      var Q=[P[key(a,c)],P[key(a,d)],P[key(b,d)],P[key(b,c)]];
+      var gap=lineFrom2(A,B);
+      var X=meet(gap,lineFrom2(Q[0],Q[2]));
+      var Y=meet(gap,lineFrom2(Q[1],Q[3]));
+      if(!X||!Y) return null;
+      var simple = !segsCross(Q[0],Q[1],Q[2],Q[3]) && !segsCross(Q[1],Q[2],Q[3],Q[0]);
+      var s0=Math.sign(gap[0]*Q[0][0]+gap[1]*Q[0][1]+gap[2]), oneSide=true;
+      for(var m=1;m<4;m++){
+        if(Math.sign(gap[0]*Q[m][0]+gap[1]*Q[m][1]+gap[2])!==s0){ oneSide=false; break; }
+      }
+      var cr=crossRatio(A,B,X,Y);
+      out.push({A:A,B:B,X:X,Y:Y,Q:Q,gap:gap,cr:cr,simple:simple,oneSide:oneSide});
+      if(oneSide) gapIndex = (gapIndex===-1)? k : -2; // -2 marks non-unique
+    }
+    return {P:P, pairings:out, gapIndex:gapIndex};
+  }
+  function orbit(l){
+    return [l, 1/l, 1-l, 1/(1-l), l/(l-1), (l-1)/l];
+  }
+  return {lineFrom2:lineFrom2, meet:meet, crossRatio:crossRatio, analyse:analyse, orbit:orbit};
+})();
+if (typeof module!=='undefined') module.exports = GEO;
+</script>
+
+<script>
+(function(){
+'use strict';
+var svg=document.getElementById('board'), NS='http://www.w3.org/2000/svg';
+var W=900,H=620;
+var COL={line:'#3f3d36', pt:'#151310', gapline:'#2456C8', gappt:'#2456C8',
+         quad:'#C43A2B', diag:'#2E9E4B', ring:'#C99A2E', ghost:'#8E8C80'};
+var step=1, showAll=false;
+
+// state: 4 lines, each as two draggable endpoints
+var handles=[]; // [ [p,q], ... ] x4
+function randomLines(){
+  handles=[];
+  for(var i=0;i<4;i++){
+    var cx=180+Math.random()*540, cy=140+Math.random()*340;
+    var ang=Math.random()*Math.PI, r=150+Math.random()*90;
+    handles.push([
+      [cx-r*Math.cos(ang), cy-r*Math.sin(ang)],
+      [cx+r*Math.cos(ang), cy+r*Math.sin(ang)]
+    ]);
+  }
+}
+// a seeded pleasant start close to Kevin's sketch
+handles=[
+  [[120,430],[760,150]],
+  [[150,120],[700,520]],
+  [[90,260],[820,330]],
+  [[430,90],[560,560]]
+];
+
+function lines(){ return handles.map(function(h){ return GEO.lineFrom2(h[0],h[1]); }); }
+
+// clip an infinite homogeneous line to the viewBox rectangle
+function clipLine(l){
+  var pts=[], eps=1e-9;
+  var edges=[[[0,0],[W,0]],[[W,0],[W,H]],[[W,H],[0,H]],[[0,H],[0,0]]];
+  edges.forEach(function(e){
+    var el=GEO.lineFrom2(e[0],e[1]);
+    var p=GEO.meet(l,el);
+    if(!p) return;
+    if(p[0]>=-eps && p[0]<=W+eps && p[1]>=-eps && p[1]<=H+eps){
+      // dedupe corners
+      for(var i=0;i<pts.length;i++) if(Math.hypot(pts[i][0]-p[0],pts[i][1]-p[1])<1e-6) return;
+      pts.push(p);
+    }
+  });
+  return pts.length>=2 ? [pts[0],pts[1]] : null;
+}
+
+function el(name,attrs,parent){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  (parent||svg).appendChild(e); return e;
+}
+function txt(x,y,s,fill,size,anchor){
+  var t=el('text',{x:x,y:y,fill:fill||'#151310','font-size':size||15,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':'700',
+    'text-anchor':anchor||'middle','paint-order':'stroke','stroke':'#CFCDC1','stroke-width':4});
+  t.textContent=s; return t;
+}
+
+function inBox(p,pad){ pad=pad||-200; return p[0]>pad&&p[0]<W-pad&&p[1]>pad&&p[1]<H-pad; }
+
+var lastGood=null;
+function render(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var L=lines();
+  var res=GEO.analyse(L);
+  var degenerate = !res || res.gapIndex<0;
+  if(!degenerate) lastGood=res;
+  var R = degenerate ? lastGood : res;
+
+  // the four lines
+  L.forEach(function(l){
+    var c=clipLine(l);
+    if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+      stroke:COL.line,'stroke-width':2.4,'stroke-linecap':'round'});
+  });
+
+  if(R){
+    var g=R.pairings[R.gapIndex>=0?R.gapIndex:0];
+
+    // step >=3: red quadrilateral
+    if(step>=3){
+      var q=g.Q;
+      el('polygon',{points:q.map(function(p){return p[0]+','+p[1];}).join(' '),
+        fill:'rgba(196,58,43,0.10)',stroke:COL.quad,'stroke-width':4,'stroke-linejoin':'round'});
+    }
+    // step >=4: green diagonals + other-diagonal toggle
+    if(step>=4){
+      el('line',{x1:g.Q[0][0],y1:g.Q[0][1],x2:g.Q[2][0],y2:g.Q[2][1],stroke:COL.diag,'stroke-width':3});
+      el('line',{x1:g.Q[1][0],y1:g.Q[1][1],x2:g.Q[3][0],y2:g.Q[3][1],stroke:COL.diag,'stroke-width':3});
+      if(showAll){
+        R.pairings.forEach(function(pp,i){
+          if(i===R.gapIndex) return;
+          var c=clipLine(GEO.lineFrom2(pp.A,pp.B));
+          if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+            stroke:COL.ghost,'stroke-width':2,'stroke-dasharray':'3 6'});
+          [pp.X,pp.Y].forEach(function(p){
+            if(inBox(p)) el('circle',{cx:p[0],cy:p[1],r:5,fill:'none',stroke:COL.ghost,'stroke-width':2});
+          });
+        });
+      }
+    }
+    // step >=2: blue dashed gap line, gap pair A,B
+    if(step>=2){
+      var c=clipLine(GEO.lineFrom2(g.A,g.B));
+      if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+        stroke:COL.gapline,'stroke-width':2.6,'stroke-dasharray':'8 7'});
+      [[g.A,'A'],[g.B,'B']].forEach(function(ab){
+        el('circle',{cx:ab[0][0],cy:ab[0][1],r:7,fill:COL.gappt});
+        txt(ab[0][0]+14,ab[0][1]-10,ab[1],COL.gapline,16);
+      });
+    }
+    // step 4: number the four points along the gap line, ring X and Y
+    if(step>=4){
+      var dx=g.B[0]-g.A[0], dy=g.B[1]-g.A[1], n=Math.hypot(dx,dy), u=[dx/n,dy/n];
+      var four=[{p:g.A,kind:'AB'},{p:g.B,kind:'AB'},{p:g.X,kind:'XY'},{p:g.Y,kind:'XY'}];
+      four.forEach(function(f){ f.t=(f.p[0]-g.A[0])*u[0]+(f.p[1]-g.A[1])*u[1]; });
+      four.sort(function(a,b){ return a.t-b.t; });
+      four.forEach(function(f,i){
+        if(f.kind==='XY'){
+          el('circle',{cx:f.p[0],cy:f.p[1],r:6,fill:COL.diag});
+        }
+        el('circle',{cx:f.p[0],cy:f.p[1],r:11,fill:'none',stroke:COL.ring,'stroke-width':2.5});
+        txt(f.p[0]-16,f.p[1]+22,String(i+1),COL.ring,14);
+      });
+    }
+    // six intersection points always on top
+    for(var k in R.P){
+      var p=R.P[k];
+      if(inBox(p,-40)) el('circle',{cx:p[0],cy:p[1],r:5.5,fill:COL.pt});
+    }
+  }
+
+  // drag handles
+  handles.forEach(function(h,li){
+    h.forEach(function(p,pi){
+      var c=el('circle',{cx:p[0],cy:p[1],r:9,fill:'#DCDAD0',stroke:'#6b695f','stroke-width':1.5,
+        cursor:'grab','data-l':li,'data-p':pi});
+      c.style.touchAction='none';
+    });
+  });
+
+  renderReadout(res, degenerate);
+  renderCaption(R, degenerate);
+}
+
+function fmt(v,d){ return (v>=0?' ':'')+v.toFixed(d===undefined?6:d); }
+function renderReadout(res, degenerate){
+  var ro=document.getElementById('ro');
+  if(degenerate){
+    ro.innerHTML='<span class="warn">degenerate arrangement — two lines near-parallel or three near-concurrent.\n'+
+      'Drag on; showing the last valid configuration.</span>';
+    return;
+  }
+  var lines2=[], worst=0, nSimple=0;
+  res.pairings.forEach(function(p,i){
+    worst=Math.max(worst,Math.abs(p.cr+1));
+    if(p.simple) nSimple++;
+    lines2.push('diagonal '+(i+1)+(i===res.gapIndex?' (gap)':'      ')+
+      '   cr(A,B;X,Y) = '+fmt(p.cr)+'   |cr+1| = '+Math.abs(p.cr+1).toExponential(2));
+  });
+  var g=res.pairings[res.gapIndex];
+  var orb=GEO.orbit(g.cr).map(function(v){ return v.toFixed(3); });
+  var uniq={}; orb.forEach(function(v){ uniq[v]=1; });
+  var ok = worst<1e-6 && res.gapIndex>=0;
+  lines2.push('');
+  lines2.push('six-value orbit of cr: { '+orb.join(', ')+' }');
+  lines2.push('distinct values: '+Object.keys(uniq).length+'  (harmonic collapses 6 \u2192 3: \u22121, 2, \u00bd)');
+  lines2.push('');
+  lines2.push((ok?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   3/3 diagonals harmonic \u00b7 gap pair unique \u00b7 '+nSimple+'/3 four-gons simple \u00b7 worst residual '+
+    worst.toExponential(2));
+  ro.innerHTML=lines2.join('\n');
+}
+
+var CAPS={
+ 1:'<b>Given: 4 random lines, 6 intersection points.</b> Each pair of lines meets once \u2014 the first line carries 3 of the points, the next adds 2, the next 1. No lengths, no angles, no measurements.',
+ 2:'<b>The unique line crossing the gap.</b> Three of the point-pairs are not joined by any drawn line. Exactly one of those pairs \u2014 A and B \u2014 has its join leave the other four points entirely to one side: it crosses the gap without cutting through the figure. (Simplicity alone does not single it out; this one-side property does.)',
+ 3:'<b>The unique irregular quadrilateral.</b> The four remaining points, taken with the four given lines as sides, close into the red quadrilateral \u2014 the one bounded cell the gap pair looks across.',
+ 4:'<b>Two unique diagonals \u2192 harmonic ratio.</b> The green diagonals of the red quadrilateral cut the gap line in two new points. Four points now sit on the blue line \u2014 A, B and the two cuts \u2014 and their cross-ratio is exactly \u22121, at every drag. The involution fixing the two green cuts exchanges A and B.'
+};
+function renderCaption(){
+  document.getElementById('cap').innerHTML=CAPS[step];
+}
+
+// ---- interaction ----
+var drag=null;
+svg.addEventListener('pointerdown',function(ev){
+  var t=ev.target;
+  if(t.tagName==='circle' && t.hasAttribute('data-l')){
+    drag={l:+t.getAttribute('data-l'), p:+t.getAttribute('data-p')};
+    svg.setPointerCapture(ev.pointerId);
+    ev.preventDefault();
+  }
+});
+svg.addEventListener('pointermove',function(ev){
+  if(!drag) return;
+  var r=svg.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*W/r.width, y=(ev.clientY-r.top)*H/r.height;
+  handles[drag.l][drag.p]=[Math.max(8,Math.min(W-8,x)), Math.max(8,Math.min(H-8,y))];
+  render();
+});
+svg.addEventListener('pointerup',function(){ drag=null; });
+svg.addEventListener('pointercancel',function(){ drag=null; });
+
+document.querySelectorAll('button.step').forEach(function(b){
+  b.addEventListener('click',function(){
+    step=+b.getAttribute('data-step');
+    document.querySelectorAll('button.step').forEach(function(x){ x.classList.toggle('on',x===b); });
+    render();
+  });
+});
+document.getElementById('allDiag').addEventListener('click',function(){
+  showAll=!showAll; this.classList.toggle('on',showAll);
+  if(step<4){ step=4;
+    document.querySelectorAll('button.step').forEach(function(x){ x.classList.toggle('on',x.getAttribute('data-step')==='4'); });
+  }
+  render();
+});
+document.getElementById('rnd').addEventListener('click',function(){
+  var tries=0;
+  do{ randomLines(); tries++; } while(tries<40 && !(function(){ var r=GEO.analyse(lines()); return r && r.gapIndex>=0; })());
+  render();
+});
+
+render();
+})();
+</script>
+</body>
+</html>

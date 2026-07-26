@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type A and Type B · the two transfers and the channel law</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ h2{font-size:16px;margin:22px 0 8px;letter-spacing:0.06em;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 14px;max-width:660px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;margin-bottom:18px;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 4px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:6px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ input[type=range]{vertical-align:middle;}
+ .caption{font-size:14px;margin:8px 2px 0;max-width:720px;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:10px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;}
+ .law{font-family:"Courier New",monospace;font-size:14px;background:#DCDAD0;border:1px solid #9a988c;border-radius:4px;padding:8px 12px;display:inline-block;margin:6px 0;}
+ .foot{font-size:12px;color:#6b695f;margin-top:14px;}
+ .strips{display:flex;gap:10px;flex-wrap:wrap;}
+ .strips>div{flex:1;min-width:280px;}
+ .badge{font-size:12px;letter-spacing:0.12em;font-weight:700;margin-top:6px;}
+ .badge.a{color:#2E6E9E;} .badge.b{color:#C43A2B;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · ENGINE ROOM</p>
+  <h1>Type A and Type B</h1>
+  <p class="sub">Two ways to carry a length ratio from one line to another — the ruled transfer with
+  no collector point, and the transfer through a collector. The drafting-board pair is the channel
+  law's own pair: rate zero and rate positive. Drag everything; the checks re-run per move.</p>
+
+  <div class="panel">
+    <h2 style="margin-top:4px">I · THE TWO TRANSFERS</h2>
+    <svg id="xfer" viewBox="0 0 900 430" aria-label="Transfer of four equal parts onto a draggable target line"></svg>
+    <div class="controls">
+      <button id="mA" class="on">Type A · direction</button>
+      <button id="mB">Type B · collector</button>
+      <span style="flex:1"></span>
+      <span id="xcap" style="font-size:13px;color:#4a473f"></span>
+    </div>
+    <p class="caption" id="xnote"></p>
+  </div>
+
+  <div class="panel">
+    <h2 style="margin-top:4px">II · THE SAME PAIR INSIDE THE CHANNEL LAW</h2>
+    <div class="law">w&nbsp;=&nbsp;s&#770;&nbsp;+&nbsp;(w&#770;&nbsp;&#8722;&nbsp;s&#770;)&nbsp;&middot;&nbsp;(1&nbsp;&#8722;&nbsp;r&middot;g)&nbsp;+&nbsp;&sigma;&#770;&middot;g</div>
+    <div class="strips">
+      <div>
+        <svg id="stripU" viewBox="0 0 440 400"></svg>
+        <div class="badge" id="badgeU"></div>
+      </div>
+      <div>
+        <svg id="stripV" viewBox="0 0 440 400"></svg>
+        <div class="badge" id="badgeV"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="pre on" data-ru="0" data-rv="0">box (0,0)</button>
+      <button class="pre" data-ru="0" data-rv="1">pushbroom (0,1) · the Hybrid</button>
+      <button class="pre" data-ru="k" data-rv="1">vanishing axis (1&#8722;k,&#8202;1)</button>
+      <button class="pre" data-ru="1" data-rv="1">pinhole (1,1)</button>
+    </div>
+    <div class="controls">
+      <label>k <input type="range" id="kS" min="0.05" max="0.9" step="0.01" value="0.6"></label>
+      <label>shear &sigma;&#770; <input type="range" id="sigS" min="-0.5" max="0.5" step="0.01" value="0.25"></label>
+    </div>
+    <p class="caption">A channel's depth lines are the drawn edges. At <b>r = 0</b> they are parallel
+    — Kevin's Type A, no collector, ratios ride through onto anything. At <b>r &gt; 0</b> every
+    depth line of the channel concurs at gauge 1/r — the seat (or, past the frame, the directing
+    seat) <i>is</i> the collector point, and the channel is Type B: cross-ratio survives, equal
+    parts arrive in progression on any non-parallel line. The pushbroom pairs one of each — the
+    Hybrid panel of the drafting sheet.</p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_typeab.js holds the ledger
+  (10/10): graduated edge affine at every rate, Type A ratio-carriage onto non-parallel targets,
+  Type B progression with cross-ratio preserved to 10&#8315;&#185;&#8310;, and concurrency of every
+  r&nbsp;&gt;&nbsp;0 channel at gauge 1/r. The channel law is quoted from the six-core-armatures
+  sheet; the transfer vocabulary is the drafting board's.</p>
+</div>
+
+<script id="geo">
+var GEO = (function(){
+  'use strict';
+  function lineFrom2(p,q){ return [p[1]-q[1], q[0]-p[0], p[0]*q[1]-p[1]*q[0]]; }
+  function meet(l,m){
+    var x=l[1]*m[2]-l[2]*m[1], y=l[2]*m[0]-l[0]*m[2], w=l[0]*m[1]-l[1]*m[0];
+    return Math.abs(w)<1e-12 ? null : [x/w,y/w];
+  }
+  function chan(g,w0,s,r,sig){ return s + (w0-s)*(1-r*g) + sig*g; }
+  function cr4(t){ return ((t[2]-t[0])*(t[3]-t[1]))/((t[2]-t[1])*(t[3]-t[0])); }
+  // transfer 5 source marks onto target line; mode 'A': direction d; mode 'B': collector E
+  function transfer(marks, targetLine, mode, ctrl){
+    var out=[];
+    for(var i=0;i<marks.length;i++){
+      var p=marks[i], l;
+      if(mode==='A') l=lineFrom2(p,[p[0]+ctrl[0],p[1]+ctrl[1]]);
+      else l=lineFrom2(ctrl,p);
+      var q=meet(l,targetLine);
+      if(!q) return null;
+      out.push(q);
+    }
+    return out;
+  }
+  function stats(img){
+    if(!img) return null;
+    var u=[img[img.length-1][0]-img[0][0], img[img.length-1][1]-img[0][1]];
+    var n=Math.hypot(u[0],u[1]); if(n<1e-9) return null;
+    var t=img.map(function(p){ return ((p[0]-img[0][0])*u[0]+(p[1]-img[0][1])*u[1])/n; });
+    var parts=[]; for(var i=1;i<t.length;i++) parts.push(Math.abs(t[i]-t[i-1]));
+    var spread=Math.max.apply(null,parts)/Math.min.apply(null,parts);
+    return { t:t, parts:parts, spread:spread, cr:cr4(t.slice(0,4)) };
+  }
+  return {lineFrom2:lineFrom2, meet:meet, chan:chan, cr4:cr4, transfer:transfer, stats:stats};
+})();
+if (typeof module!=='undefined') module.exports = GEO;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var COL={src:'#151310', tgt:'#3f3d36', xa:'#2E6E9E', xb:'#C43A2B', seat:'#C99A2E',
+         edge:'#2456C8', mark:'#151310', dim:'#8E8C80'};
+
+function el(svg,name,attrs){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  svg.appendChild(e); return e;
+}
+function txt(svg,x,y,s,fill,size,anchor,w){
+  var t=el(svg,'text',{x:x,y:y,fill:fill||'#151310','font-size':size||14,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':w||'700','text-anchor':anchor||'middle'});
+  t.textContent=s; return t;
+}
+function clear(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+// ===================== Panel I: the two transfers =====================
+var xs=document.getElementById('xfer');
+var mode='A';
+var srcA=[110,120], srcB=[520,120];                 // source segment (fixed)
+var tgt=[[140,340],[760,250]];                      // draggable target endpoints
+var dirH=[700,60];                                  // Type A direction handle (drag)
+var colE=[700,60];                                  // Type B collector (drag)
+
+function srcMarks(){
+  var m=[]; for(var i=0;i<=4;i++)
+    m.push([srcA[0]+(srcB[0]-srcA[0])*i/4, srcA[1]+(srcB[1]-srcA[1])*i/4]);
+  return m;
+}
+function renderXfer(){
+  clear(xs);
+  var marks=srcMarks();
+  var tl=GEO.lineFrom2(tgt[0],tgt[1]);
+  var ctrl = (mode==='A') ? [dirH[0]-srcB[0], dirH[1]-srcB[1]] : colE;
+  var img=GEO.transfer(marks,tl,mode,ctrl);
+  var st=GEO.stats(img);
+
+  // source with equal parts
+  el(xs,'line',{x1:srcA[0],y1:srcA[1],x2:srcB[0],y2:srcB[1],stroke:COL.src,'stroke-width':4});
+  marks.forEach(function(p){ el(xs,'circle',{cx:p[0],cy:p[1],r:5,fill:COL.src}); });
+  txt(xs,(srcA[0]+srcB[0])/2,srcA[1]-14,'4 equal parts',COL.src,13);
+
+  // target line (extended a little past handles)
+  var ex=0.18, dx=tgt[1][0]-tgt[0][0], dy=tgt[1][1]-tgt[0][1];
+  el(xs,'line',{x1:tgt[0][0]-ex*dx,y1:tgt[0][1]-ex*dy,x2:tgt[1][0]+ex*dx,y2:tgt[1][1]+ex*dy,
+    stroke:COL.tgt,'stroke-width':3});
+  txt(xs,tgt[1][0]+ex*dx+8,tgt[1][1]+ex*dy,'target',COL.tgt,13,'start');
+
+  var c=(mode==='A')?COL.xa:COL.xb;
+  if(img){
+    marks.forEach(function(p,i){
+      var q=img[i];
+      var a=(mode==='B')?colE:p;
+      // draw connector from collector (B) or through mark along direction (A)
+      if(mode==='B') el(xs,'line',{x1:colE[0],y1:colE[1],x2:q[0],y2:q[1],stroke:c,'stroke-width':1.6});
+      else {
+        // extend from beyond the mark to the target
+        el(xs,'line',{x1:p[0]-0.35*(q[0]-p[0]),y1:p[1]-0.35*(q[1]-p[1]),x2:q[0],y2:q[1],
+          stroke:c,'stroke-width':1.6,'stroke-dasharray': mode==='A'?'none':'none'});
+      }
+      el(xs,'circle',{cx:q[0],cy:q[1],r:5,fill:c});
+    });
+  }
+  // handles
+  if(mode==='A'){
+    el(xs,'circle',{cx:dirH[0],cy:dirH[1],r:9,fill:'#DCDAD0',stroke:COL.xa,'stroke-width':2,
+      cursor:'grab','data-h':'dir'});
+    txt(xs,dirH[0]+14,dirH[1]-8,'direction',COL.xa,13,'start');
+  } else {
+    el(xs,'circle',{cx:colE[0],cy:colE[1],r:9,fill:'#DCDAD0',stroke:COL.xb,'stroke-width':2,
+      cursor:'grab','data-h':'col'});
+    txt(xs,colE[0]+14,colE[1]-8,'collector E',COL.xb,13,'start');
+  }
+  tgt.forEach(function(p,i){
+    el(xs,'circle',{cx:p[0],cy:p[1],r:9,fill:'#DCDAD0',stroke:'#6b695f','stroke-width':1.5,
+      cursor:'grab','data-h':'t'+i});
+  });
+
+  var xcap=document.getElementById('xcap');
+  var note=document.getElementById('xnote');
+  if(st){
+    var frac=st.parts.map(function(p){ var tot=st.parts.reduce(function(a,b){return a+b;},0);
+      return (p/tot).toFixed(3); }).join(' · ');
+    if(mode==='A'){
+      xcap.textContent='parts on target: '+frac+'   spread '+st.spread.toFixed(6);
+      note.innerHTML='<b>Type A — no collector point.</b> All connectors share one direction (drag it): '+
+        'the second ruling of a doubly ruled surface, seen edge-on. Equal parts arrive equal on <i>any</i> '+
+        'target, parallel or not. Midpoints go to midpoints — F&#772;B&#772; bisects both rails.';
+    } else {
+      var dcr=Math.abs(st.cr - GEO.cr4([0,1,2,3]));
+      xcap.textContent='parts: '+frac+'   spread '+st.spread.toFixed(4)+'   \u0394cr '+dcr.toExponential(1);
+      note.innerHTML='<b>Type B — collector point E.</b> All connectors concur (drag E, drag the target). '+
+        'On a non-parallel target the equal parts arrive as a <i>progression</i> — but the cross-ratio '+
+        'arrives untouched. Make the target parallel to the source and watch the parts equalize: '+
+        'the "non-parallel" annotation on the drafting sheet is load-bearing.';
+    }
+  } else {
+    xcap.textContent='degenerate — connector parallel to target';
+  }
+  renderChecks(st);
+}
+
+// ===================== Panel II: channel strips =====================
+var stripU=document.getElementById('stripU'), stripV=document.getElementById('stripV');
+var rates={ru:0, rv:0}, kVal=0.6, sig=0.25, preset='box';
+function rateOf(spec){ return spec==='k' ? (1-kVal) : parseFloat(spec); }
+
+function renderStrip(svg,r,sigc,label){
+  clear(svg);
+  var W=440,H=400, x0=60, xw=320, yPic=340, yTop=30;
+  var gMax=0.9, gSpan=1.65;              // vertical range of gauge shown
+  var gy=function(g){ return yPic - g*(yPic-yTop)/gSpan; };
+  var wx=function(w){ return x0 + (w+1.15)*xw/2.3; };
+  // gauge axis
+  el(svg,'line',{x1:x0-18,y1:gy(0),x2:x0-18,y2:gy(gSpan),stroke:COL.dim,'stroke-width':1});
+  [0,0.5,1,1.5].forEach(function(g){
+    el(svg,'line',{x1:x0-22,y1:gy(g),x2:x0-14,y2:gy(g),stroke:COL.dim,'stroke-width':1});
+    txt(svg,x0-28,gy(g)+4,g.toFixed(1),COL.dim,11,'end','400');
+  });
+  txt(svg,x0-28,yTop-8,'g',COL.dim,12,'end');
+  // picture line at g=0
+  el(svg,'line',{x1:wx(-1.1),y1:gy(0),x2:wx(1.1),y2:gy(0),stroke:'#151310','stroke-width':3});
+  txt(svg,wx(0),gy(0)+22,'picture · '+label,'#151310',13);
+  var w0s=[-1,-0.5,0,0.5,1];
+  // depth lines
+  w0s.forEach(function(w0){
+    var p0=[wx(GEO.chan(0,w0,0,r,sigc)),gy(0)];
+    var p1=[wx(GEO.chan(gMax,w0,0,r,sigc)),gy(gMax)];
+    el(svg,'line',{x1:p0[0],y1:p0[1],x2:p1[0],y2:p1[1],stroke:COL.edge,'stroke-width':2.4});
+    // dashed continuation toward collector when r>0
+    if(r>1e-9){
+      var gC=Math.min(1/r,gSpan);
+      var p2=[wx(GEO.chan(gC,w0,0,r,sigc)),gy(gC)];
+      el(svg,'line',{x1:p1[0],y1:p1[1],x2:p2[0],y2:p2[1],stroke:COL.edge,'stroke-width':1.4,
+        'stroke-dasharray':'4 5'});
+    }
+    // equal-gauge marks on the edge
+    [0.225,0.45,0.675,0.9].forEach(function(g){
+      el(svg,'circle',{cx:wx(GEO.chan(g,w0,0,r,sigc)),cy:gy(g),r:2.6,fill:COL.mark});
+    });
+    el(svg,'circle',{cx:p0[0],cy:p0[1],r:4,fill:'#151310'});
+  });
+  // collector marker
+  if(r>1e-9){
+    var gC=1/r, inside=gC<=gSpan;
+    var cx=wx(0+sigc/r), cy=gy(Math.min(gC,gSpan));
+    el(svg,'circle',{cx:cx,cy:cy,r:inside?7:5,fill:'none',stroke:COL.seat,'stroke-width':2.5,
+      'stroke-dasharray':inside?'none':'2 3'});
+    txt(svg,cx,cy-12,(inside?'collector · gauge ':'\u2192 gauge ')+ (1/r).toFixed(2),COL.seat,12);
+  }
+  return {r:r};
+}
+
+function renderStrips(){
+  var ru=rateOf(rates.ru), rv=rateOf(rates.rv);
+  renderStrip(stripU,ru,sig,'u channel · r = '+ru.toFixed(2));
+  renderStrip(stripV,rv,sig*0.6,'v channel · r = '+rv.toFixed(2));
+  var bu=document.getElementById('badgeU'), bv=document.getElementById('badgeV');
+  function badge(b,r){
+    if(r<1e-9){ b.textContent='TYPE A · PARALLEL · NO COLLECTOR'; b.className='badge a'; }
+    else { b.textContent='TYPE B · COLLECTOR AT GAUGE '+(1/r).toFixed(2); b.className='badge b'; }
+  }
+  badge(bu,ru); badge(bv,rv);
+  renderChecks();
+}
+
+// ===================== live checks =====================
+function renderChecks(st){
+  var ro=document.getElementById('ro');
+  var lines=[];
+  // transfer check: Type A spread == 1 on current (possibly non-parallel) target
+  var marks=srcMarks(), tl=GEO.lineFrom2(tgt[0],tgt[1]);
+  var iA=GEO.transfer(marks,tl,'A',[dirH[0]-srcB[0],dirH[1]-srcB[1]]);
+  var iB=GEO.transfer(marks,tl,'B',colE);
+  var sA=GEO.stats(iA), sB=GEO.stats(iB);
+  var okA=sA&&Math.abs(sA.spread-1)<1e-9;
+  var dcr=sB?Math.abs(sB.cr-GEO.cr4([0,1,2,3])):NaN;
+  var okB=sB&&dcr<1e-9;
+  lines.push('transfer   A: spread\u22121 = '+(sA?(sA.spread-1).toExponential(2):'\u2014')+
+             '    B: \u0394cr = '+(sB?dcr.toExponential(2):'\u2014'));
+  // channel check: parallelism (r=0) or concurrency at 1/r
+  var ru=rateOf(rates.ru), rv=rateOf(rates.rv), chin=[];
+  var chOK=true;
+  [[ru,sig,'u'],[rv,sig*0.6,'v']].forEach(function(cfg){
+    var r=cfg[0], sg=cfg[1], nm=cfg[2];
+    if(r<1e-9){
+      var d0=null, worst=0;
+      [-1,-0.3,0.6,1].forEach(function(w0){
+        var d=[GEO.chan(1,w0,0,0,sg)-GEO.chan(0,w0,0,0,sg),1];
+        if(!d0) d0=d; else worst=Math.max(worst,Math.abs(d0[0]*d[1]-d0[1]*d[0]));
+      });
+      chin.push(nm+': parallel, cross '+worst.toExponential(1));
+      if(worst>1e-9) chOK=false;
+    } else {
+      var seat=[0+sg/r,1/r], worst2=0;
+      [-1,-0.3,0.6,1].forEach(function(w0){
+        var L=GEO.lineFrom2([GEO.chan(0,w0,0,r,sg),0],[GEO.chan(0.6,w0,0,r,sg),0.6]);
+        worst2=Math.max(worst2,Math.abs(L[0]*seat[0]+L[1]*seat[1]+L[2])/Math.hypot(L[0],L[1]));
+      });
+      chin.push(nm+': concur@1/r, res '+worst2.toExponential(1));
+      if(worst2>1e-9) chOK=false;
+    }
+  });
+  lines.push('channels   '+chin.join('    '));
+  var all=okA&&okB&&chOK;
+  lines.push((all?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   Type A ratio-exact \u00b7 Type B cross-ratio-exact \u00b7 seat = collector at gauge 1/r');
+  ro.innerHTML=lines.join('\n');
+}
+
+// ===================== interaction =====================
+var drag=null;
+xs.addEventListener('pointerdown',function(ev){
+  var t=ev.target;
+  if(t.tagName==='circle'&&t.hasAttribute('data-h')){
+    drag=t.getAttribute('data-h'); xs.setPointerCapture(ev.pointerId); ev.preventDefault();
+  }
+});
+xs.addEventListener('pointermove',function(ev){
+  if(!drag) return;
+  var r=xs.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*900/r.width, y=(ev.clientY-r.top)*430/r.height;
+  x=Math.max(8,Math.min(892,x)); y=Math.max(8,Math.min(422,y));
+  if(drag==='dir') dirH=[x,y];
+  else if(drag==='col') colE=[x,y];
+  else if(drag==='t0') tgt[0]=[x,y];
+  else if(drag==='t1') tgt[1]=[x,y];
+  renderXfer();
+});
+xs.addEventListener('pointerup',function(){ drag=null; });
+xs.addEventListener('pointercancel',function(){ drag=null; });
+
+document.getElementById('mA').addEventListener('click',function(){
+  mode='A'; this.classList.add('on'); document.getElementById('mB').classList.remove('on'); renderXfer();
+});
+document.getElementById('mB').addEventListener('click',function(){
+  mode='B'; this.classList.add('on'); document.getElementById('mA').classList.remove('on'); renderXfer();
+});
+document.querySelectorAll('button.pre').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('button.pre').forEach(function(x){ x.classList.toggle('on',x===b); });
+    rates={ru:b.getAttribute('data-ru'), rv:b.getAttribute('data-rv')};
+    renderStrips();
+  });
+});
+document.getElementById('kS').addEventListener('input',function(){ kVal=+this.value; renderStrips(); });
+document.getElementById('sigS').addEventListener('input',function(){ sig=+this.value; renderStrips(); renderXfer(); });
+
+renderXfer(); renderStrips();
+})();
+</script>
+</body>
+</html>
