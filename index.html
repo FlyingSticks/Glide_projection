@@ -54,121 +54,212 @@
  Nothing here is asserted on trust: every page re-runs its own machine checks as you drag.</p>
  <p class="budget">The spine below is about an hour. Everything else is there when you want it.</p>
 
- <h2>THE SPINE — start here, in order</h2>
+  <h2>THE SPINE — start here, in order</h2>
+ <p class="secnote">About an hour, in this order. Everything below is there when you want it.</p>
  <ol class="spine">
-  <li><a href="the-introduction-v2.html">The introduction</a><div class="sub">What is claimed, what is machine-verified, and where the walls are. Ten minutes; it keeps the ledger.</div></li>
-  <li><a href="the-assembly-v1.html">The assembly</a><div class="sub">Everything on one ray, in 3D: picture plane, depth stack, both slits, the camera ray threading them, the graduated edge with its mark. Orbit it; watch fused become split.</div></li>
-  <li><a href="the-congruence-map.html">The congruence map</a><div class="sub">The (rᵤ, rᵥ) square. Diagonal: pinhole. Edges: pushbroom. Origin: orthographic. That is the seam; the field is everything else.</div></li>
-  <li><a href="geometry-euler-all-v1.html">The tower and the field</a><div class="sub">Where it sits among Euclidean, metric, affine, projective — one Euler diagram, one overlap, and the overlap is the seam.</div></li>
-  <li><a href="the-inversion-viewer-v1.html">The inversion viewer</a><div class="sub">A real mesh under both readings at once. Drawn lines agree on the seam; the full maps agree only at the corners.</div></li>
+  <li><a href="the-introduction-v2.html">The introduction</a><br><span class="sub">Thesis, the four desiderata, and the ledger of what is machine-verified against what is synthesis. Read this first; it tells you how much weight every other page will bear.</span></li>
+  <li><a href="the-inversion-v1.html">The inversion</a><br><span class="sub">The big idea in one sheet. Are parallel rays capturing a converging shape, or converging rays capturing a rectilinear one? Both — a congruence given a role, and the role can be swapped.</span></li>
+  <li><a href="the-assembly-v1.html">The assembly</a><br><span class="sub">The two readings built side by side on the same lines, so the disagreement is visible rather than argued.</span></li>
+  <li><a href="the-congruence-map.html">The congruence map</a><br><span class="sub">The reference plate: which projections live where, degrees of freedom and formulas machine-verified.</span></li>
+  <li><a href="geometry-euler-all-v1.html">The tower and the field</a><br><span class="sub">Klein's ladder drawn whole, with the constructed projections placed off it.</span></li>
+  <li><a href="the-inversion-viewer-v2.html">The inversion viewer</a><br><span class="sub">Drop in any .obj and see the same vertices under both readings at once. The thesis, on your own model.</span></li>
  </ol>
 
  <h2>CONTEXT I — THE AMBIENT LADDER</h2>
- <p class="secnote">Klein classifies geometries by what their transformations preserve: Euclidean inside
- metric inside affine inside projective, three–four–six–eight degrees of freedom, cross-ratio as the crown
- invariant. The glide/cross-slit field is not a fifth ring. It <i>overlaps</i> the tower, and the overlap is
- exactly the seam — the classical world is the measure-zero locus where the two readings happen to agree.</p>
+ <p class="secnote">Where this family sits among the geometries, and what survives beneath all of them.</p>
  <div class="cards cI">
   <div class="card"><a class="t" href="geometry-euler-diagram.html">The geometry tower</a>
-   <p>Klein's ladder as a plate: E(2) ⊂ Sim(2) ⊂ Aff(2) ⊂ PGL(3), the maps, the dof ladder 3·4·6·8, and the one idea underneath — fix a line, fix the circular points, fix the scale.</p>
-   <p class="meta">the reference plate · dof and formulas machine-verified</p></div>
+   <p>Klein's nested geometries, each rung defined by what its transformations leave alone.</p>
+</div>
   <div class="card"><a class="t" href="geometry-euler-all-v1.html">The tower and the field</a>
-   <p>The four nested rings plus the field as an overlapping fifth region — neither contains the other. Pinhole sits in the projective band, orthographic reaches into the affine band, pushbroom straddles their boundary; the split field lies outside every ring.</p>
-   <p class="meta">check_euler_all 5/5 · Laguerre stated exactly, verified to 10⁻¹⁶</p></div>
+   <p>The same tower with the constructed projections placed beside it — the ones that are not rungs.</p>
+</div>
   <div class="card"><a class="t" href="the-congruence-map.html">The congruence map</a>
-   <p>The ladder laid over the rate square: the fused locus is the top of the Erlangen ladder, and it has measure zero. The field's height is a measured perpendicular gap, charted.</p>
-   <p class="meta">verified against the shipped engine 6/6 · seam gap 10⁻¹⁴, field ≥ 0.49</p></div>
+   <p>Fix the lines, fix the circular points, fix the scale: the reference plate for the whole family.</p>
+   <p class="meta">the reference plate · dof and formulas machine-verified</p>
+</div>
   <div class="card"><a class="t" href="the-census-v1.html">The census</a>
-   <p>The floor under the tower. The cube's edges-image drawn three ways — both channels Type A, both Type B, and a free bend that is no projection at all. Metric survives nothing; cross-ratio survives A and B; the census — counts and the byte-identical incidence table — survives everything, the bend included.</p>
-   <p class="meta">check_census 6/6 · the ladder's zeroth level</p></div>
+   <p>The floor under the tower. Counts and incidence survive every drawing mode, including deformations that are no projection at all; cross-ratio survives only the projective ones.</p>
+   <p class="meta">check_census 6/6 · the ladder's zeroth level</p>
+</div>
  </div>
 
  <h2>CONTEXT II — RAYS VERSUS EDGES</h2>
- <p class="secnote">One congruence over the ambient space, two readings of it. The ray reading <i>gathers</i>:
- sightlines converge through the slits to an image point. The edge reading <i>graduates</i>: the image rides a
- straight drawn line at a counted fraction of depth. Fused on the seam, split in the field — and the split is
- a drawable, measurable gap.</p>
+ <p class="secnote">The two readings of one congruence, and the seam where they agree exactly.</p>
  <div class="cards cII">
   <div class="card"><a class="t" href="the-assembly-v1.html">The assembly</a>
-   <p>One scene point carrying every structure at once, with straight-on views (top in true size, elevations edge-on, the diagonal in true length) and finger-drag orbit. Five live checks per input, including the conjugation cr(img₁, img₂; +X, −X) = −1.</p>
-   <p class="meta">check_assembly 5/5 · check_views 4/4 · check_ambient 4/4</p></div>
-  <div class="card"><a class="t" href="the-inversion-viewer-v1.html">The inversion viewer</a>
-   <p>The two readings on a mesh, with rotation of the picture plane about the viewing axis. The two levels of agreement made visible: same drawn lines on the seam; same maps only at the corners.</p>
-   <p class="meta">7 checks incl. rotation isometry</p></div>
+   <p>Both readings assembled on the same congruence, one panel each.</p>
+</div>
+  <div class="card"><a class="t" href="the-inversion-viewer-v2.html">The inversion viewer</a>
+   <p>Any mesh, both readings, live. Picture-plane rotation about the viewing axis included.</p>
+</div>
   <div class="card"><a class="t" href="station-point-to-vanishing-axis-v3color.html">Station point to vanishing axis</a>
-   <p>Sheet 38. Slide k and the station point stretches into a vanishing axis — the pinhole dissolving into the lateral, with the cross-slit ghost driven by the same control.</p>
-   <p class="meta">Sheet 38 · the morph that motivates everything</p></div>
+   <p>Sheet 38. The k-slider pulls a station point apart into a vanishing axis and a directing axis, with the cross-slit ghost driven by the same control.</p>
+   <p class="meta">sheet 38</p>
+</div>
   <div class="card"><a class="t" href="glide-vs-crossslit.html">Glide versus cross-slit</a>
-   <p>The early side-by-side: the same congruence drawn as rays and as edges, where the split was first seen.</p>
-   <p class="meta">the first comparison</p></div>
+   <p>The two families side by side: which one bends the edges and which one bends the rays.</p>
+</div>
+  <div class="card"><a class="t" href="the-glide-axioms-v3.html">The glide axioms and transforms</a>
+   <p>The family put in order: one primitive, four axioms for the edge role, one transform that swaps the role, and everything else demoted to theorem.</p>
+</div>
+ </div>
+
+ <h2>THE OPTICAL SIDE — CAMERA AND CONSTRUCTION</h2>
+ <p class="secnote">What a two-slit camera can actually do, where it stops being a camera, and what the difference is made of.</p>
+ <div class="cards cII">
+  <div class="card"><a class="t" href="station_point_to_slits_v12.html">Station point to slits</a>
+   <p>Sheet 37. One control between two projections: the station point opened into two slits at two depths.</p>
+   <p class="meta">sheet 37</p>
+</div>
+  <div class="card"><a class="t" href="the-zones-v1.html">The three zones</a>
+   <p>A cross-slit does not blend the ordinary view with the reversed one. It contains both and a third besides, separated by the two slits — five faces, three faces, one face. With the face-shape reading, and the isotropic depth where a square stays square.</p>
+   <p class="meta">check_xslit_zones 9/9 · check_isotropic 5/5 · check_aspect 9/9</p>
+</div>
+  <div class="card"><a class="t" href="the-midplane-v1.html">The midplane</a>
+   <p>Slide the picture plane to the midpoint of the slits and the second square depth runs off to infinity and returns from the other side. The square is the harmonic conjugate of the picture plane in the two slits — that is the invariant; the far-field aspect is not.</p>
+   <p class="meta">check_midplane 10/10 · check_invariance 8/8</p>
+</div>
+  <div class="card"><a class="t" href="the-halfformed-v1.html">Half-formed</a>
+   <p>A slit does not dim an image, it settles one coordinate and leaves the other free. Put the picture plane between the slits and every scene point arrives as a stripe, its second coordinate fixed by something the ray has not yet reached.</p>
+   <p class="meta">check_halfformed 9/9</p>
+</div>
  </div>
 
  <h2>THE HARMONIC UNDERCARRIAGE</h2>
- <p class="secnote">Why "graduated edge" is exact. The graduation is a cross-ratio, λ = ad/bc; its two
- self-dual values ±1 are the board's two balances — coincident reachable inside the frame, harmonic only by
- stepping outside. And the two readings themselves are harmonic conjugates of each other through the
- footprint pair, at every depth — which is why a straightedge converts one into the other.</p>
+ <p class="secnote">The projective machinery the constructions run on — and the axiom they quietly depend upon.</p>
  <div class="cards cH">
   <div class="card"><a class="t" href="the-cd-v1.html">C and D</a>
-   <p>The ground floor: two cuts on a segment, four gaps, and the two events — coincident (C meets D) and harmonic (C and D as conjugates, one inside, one out).</p>
-   <p class="meta">check_cd 4/4 · check_quadrants 4/4</p></div>
+   <p>The moving mark and the directing point, with the four labelled gaps between them.</p>
+</div>
   <div class="card"><a class="t" href="the-bridge-v1.html">The bridge</a>
-   <p>The four cut-points are one channel's armature — picture point, mark, directing point, vanishing point — and λ = ad/bc is the depth graduation, live in two linked panels.</p>
-   <p class="meta">check_bridge 4/4 · check_crossratio 6/6</p></div>
+   <p>Two linked panels showing the cross-ratio identity live.</p>
+</div>
   <div class="card"><a class="t" href="the-hinge-v1.html">The hinge</a>
-   <p>One condition, |ad| = |bc|, wearing three costumes — matched size, similar shape, straight corner-diagonals — and the sign of λ that tells the two balances apart.</p>
-   <p class="meta">check_costumes 4/4 · check_diagonals 6/6</p></div>
+   <p>Three costume panels — matched size, similar shape, straight corner-diagonals — with a sign-distinguishing readout.</p>
+</div>
   <div class="card"><a class="t" href="the-loci-v1.html">The two loci</a>
-   <p>+1 is a line through the frame's interior; −1 is a hyperbola lying wholly outside it. The geometric reason harmonic can only be reached by stepping out — drawn on the armature, with the four planes on the frame's edges.</p>
-   <p class="meta">check_planes 5/5 · check_loci 5/5 · check_hyperbola 5/5</p></div>
+   <p>Where the harmonic condition sends a point, and what has to leave the frame to get there.</p>
+</div>
   <div class="card"><a class="t" href="the-conjugate-v1.html">The conjugate construction</a>
-   <p>Reading 2 from reading 1 by straightedge alone: base pair {+X, −X}, mark in, camera image out — and back again, because the conjugation is an involution. Swing the scaffold; the answer doesn't move.</p>
-   <p class="meta">check_quadrangle 5/5 · check_inverse 3/3</p></div>
+   <p>The quadrangle scaffold. Swing it; the answer does not move.</p>
+   <p class="meta">check_quadrangle 5/5 · check_inverse 3/3</p>
+</div>
   <div class="card"><a class="t" href="the-gap-line-v1.html">The gap line</a>
-   <p>Nothing given but four random lines and their six crossings — and the harmonic range is already latent. The unique unjoined pair, its gap-crossing line, the one quadrilateral it looks across, and cr = −1 live on every drag — on all three diagonals, not only the drawn one. The quadrilateral dual of the conjugate construction's quadrangle.</p>
-   <p class="meta">check_harmonic 10/10 · uniqueness by the one-side test, not simplicity</p></div>
+   <p>Four random lines, six crossings, and the harmonic range already latent. The unique unjoined pair, its gap-crossing line, and cr = −1 on all three diagonals.</p>
+   <p class="meta">check_harmonic 10/10 · uniqueness by the one-side test, not simplicity</p>
+</div>
+  <div class="card"><a class="t" href="the-trichotomy-v2.html">The trichotomy</a>
+   <p>The gap line divides the other four vertices 0–4, 1–3 or 2–2, one of each, every arrangement. The even split is the bowtie. Frames all nine points of the system on request.</p>
+   <p class="meta">check_simple 8/8 · check_straddle 7/7 · check_frame 5/5</p>
+</div>
+  <div class="card"><a class="t" href="the-fano-v1.html">Fano</a>
+   <p>Your diagonal triangle is a triangle because the plane is not of characteristic 2. In PG(2,2) it collapses to a point and the harmonic conjugate stops being a new point — the axiom the whole undercarriage stands on.</p>
+   <p class="meta">check_fano 5/5</p>
+</div>
+  <div class="card"><a class="t" href="the-gauge-is-the-group-v1.html">The gauge is the group</a>
+   <p>The board does not merely resemble the anharmonic group — it runs it. Six Möbius readings of one scene value, and the three involutions among them are the three constructions already drawn.</p>
+</div>
+  <div class="card"><a class="t" href="inside-and-minus.html">Does inside require minus?</a>
+   <p>No. Inside runs on order and multiplication; minus is what it becomes when the two sides are twins, or when you choose to measure it as a signed field.</p>
+</div>
+  <div class="card"><a class="t" href="inside-outside-no-circle.html">Inside and outside, without a circle</a>
+   <p>One projection carries the whole unbounded outside into a bounded inside — the reciprocal, drawn with a straightedge. The fixed point is all that is left of the circle.</p>
+</div>
+  <div class="card"><a class="t" href="reciprocal-images-invariant-v3.html">Reciprocal images and the invariant</a>
+   <p>Rotate the radius and the rectangle changes shape without ever changing area, because it stays equal to the square on the radius.</p>
+</div>
  </div>
 
  <h2>THE ENGINE ROOM</h2>
- <p class="secnote">The plates the theory drives: the channel law, the six core armatures, and the component
- assemblies built on them.</p>
+ <p class="secnote">The channel law and the armatures every other sheet runs on.</p>
  <div class="cards cE">
   <div class="card"><a class="t" href="six-core-armatures-v1.html">The six core armatures</a>
-   <p>The engine itself: the channel law s(r, z) and the six armatures every other sheet runs on.</p>
-   <p class="meta">the source of the shared core</p></div>
+   <p>The channel law and the six armatures every other sheet runs on.</p>
+   <p class="meta">the source of the shared core</p>
+</div>
+  <div class="card"><a class="t" href="the-channel-rates-v1.html">The channel rates</a>
+   <p>How the two equations work: one reciprocal foreshortening runs the depth, and each channel takes a fraction of it.</p>
+</div>
   <div class="card"><a class="t" href="the-type-ab-v1.html">Type A and Type B</a>
-   <p>The drafting board's two length transfers, read off the channel law. r = 0 is Type A — parallel connectors, no collector point, ratios ride onto any target. r &gt; 0 is Type B — every depth line concurs at gauge 1/r: the seat is the collector, and only the cross-ratio survives onto a non-parallel line. The pushbroom (0,1) is the Hybrid — one channel of each.</p>
-   <p class="meta">check_typeab 10/10 · seat = collector verified to 10⁻¹⁶</p></div>
+   <p>The drafting board's two length transfers, read off the channel law. Rate zero is the ruled transfer with no collector; every positive rate concurs at gauge 1/r — the seat is the collector.</p>
+   <p class="meta">check_typeab 10/10 · seat = collector verified to 10⁻¹⁶</p>
+</div>
+  <div class="card"><a class="t" href="the-directing-organizer-v2.html">The directing-point organizer</a>
+   <p>Construction, depth measure and projection in one instrument: the picture plane true-size, the vanishing plane at the eye, and the directing point of each channel yours to place.</p>
+</div>
+  <div class="card"><a class="t" href="the-split-element-v1.html">The split element</a>
+   <p>The fully general glide. Both channels finite and unequal, so each glide line carries two directing points, one per channel, landing on two perpendicular axes.</p>
+</div>
+  <div class="card"><a class="t" href="the-depth-knit-v1.html">The depth-plane knit</a>
+   <p>Scattered line elements at one depth. Stretch, translate and orient them freely and the same division persists, the marks crowding toward each vanishing point.</p>
+</div>
+  <div class="card"><a class="t" href="merges-and-depths-3d-v1.html">Merges and depths, in space</a>
+   <p>The merges-and-depths panels lifted off the page: level sets as translucent sheets, a ray as one leaf of each channel crossed.</p>
+</div>
   <div class="card"><a class="t" href="component-glides-v1.html">Component glides</a>
-   <p>Sheet 40: double-herringbone and eggcrate assemblies under forced-shear continuity.</p>
-   <p class="meta">Sheet 40 · harness-checked</p></div>
+   <p>Double herringbone and eggcrate assemblies with forced-shear continuity.</p>
+   <p class="meta">28+ harness assertions</p>
+</div>
   <div class="card"><a class="t" href="series-component-chains-v1.html">Series component chains</a>
-   <p>Sheet 41: five-cell series chains with the dynamic closure floor.</p>
-   <p class="meta">Sheet 41 · harness-checked</p></div>
+   <p>Five-cell chains with a dynamic closure floor.</p>
+</div>
+ </div>
+
+ <h2>REFERENCE</h2>
+ <p class="secnote">Standing references — open these alongside anything else.</p>
+ <div class="cards cA">
+  <div class="card"><a class="t" href="the-glossary-v1.html">The glossary</a>
+   <p>Key terms of the board, defined once and used consistently everywhere else.</p>
+</div>
   <div class="card"><a class="t" href="the-glide-atlas-v1.html">The glide atlas</a>
-   <p>The configurations in one spread.</p>
-   <p class="meta">reference</p></div>
+   <p>The catalogue of members, by rate pair.</p>
+</div>
  </div>
 
  <h2>ANNEX — earlier states and companions</h2>
- <p class="secnote">Superseded drafts and early studies, kept reachable; and the companion pages that live on
- the Overflow site.</p>
+ <p class="secnote">Superseded drafts kept for provenance, and the companion site.</p>
  <div class="cards cA">
   <div class="card"><a class="t" href="the-introduction-v1.html">The introduction, earlier draft</a>
-   <p>Superseded by the introduction above; kept for the record.</p>
-   <p class="meta">draft</p></div>
-  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v2.html">Station point to vanishing axis, earlier state</a>
-   <p>Sheet 38 before the color pass.</p>
-   <p class="meta">superseded by v3color</p></div>
-  <div class="card"><a class="t" href="station_point_to_slits_v12.html">Station point to slits</a>
-   <p>Early study: pulling the station point apart into the two slits.</p>
-   <p class="meta">early study</p></div>
+   <p>Kept for provenance.</p>
+   <p class="meta">superseded by v2</p>
+</div>
+  <div class="card"><a class="t" href="the-inversion-viewer-v1.html">The inversion viewer, earlier state</a>
+   <p>Before the picture-plane rotation feature.</p>
+   <p class="meta">superseded by v2</p>
+</div>
+  <div class="card"><a class="t" href="the-directing-organizer-v1.html">The directing-point organizer, earlier state</a>
+   <p>Before the depth-measure panel.</p>
+   <p class="meta">superseded by v2</p>
+</div>
+  <div class="card"><a class="t" href="reciprocal-images-invariant-v2.html">Reciprocal images, earlier state</a>
+   <p>Kept for provenance.</p>
+   <p class="meta">superseded by v3</p>
+</div>
+  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v1.html">Station point to vanishing axis, v1</a>
+   <p>Early state of sheet 38.</p>
+   <p class="meta">sheet 38 · early</p>
+</div>
+  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v2.html">Station point to vanishing axis, v2</a>
+   <p>Later state of sheet 38.</p>
+   <p class="meta">sheet 38 · earlier state</p>
+</div>
+  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v8.html">Station point to vanishing axis, v8</a>
+   <p>A further state of sheet 38 — see the note below about which of these is current.</p>
+   <p class="meta">sheet 38 · sequence unresolved</p>
+</div>
+  <div class="card"><a class="t" href="station_point_to_slits_v10.html">Station point to slits, v10</a>
+   <p>Earlier state of sheet 37.</p>
+   <p class="meta">superseded by v12</p>
+</div>
   <div class="card"><a class="t" href="https://flyingsticks.github.io/Overflow/cross-ratio-pm2.html">Cross-ratio, free point (Overflow)</a>
    <p>The free 2-D point with signed lengths; the diagonal and the hyperbola as the ±1 loci.</p>
-   <p class="meta">companion site · constant corrected to ξη = −HW/4</p></div>
+   <p class="meta">companion site · constant corrected to ξη = −HW/4</p>
+</div>
   <div class="card"><a class="t" href="https://flyingsticks.github.io/Overflow/Cross_ratio_size_and_shape_2.html">Cross-ratio, size and shape (Overflow)</a>
    <p>The four lengths, the size pair and the shape pair, and the conservation ad·bc = ac·bd.</p>
-   <p class="meta">companion site</p></div>
+   <p class="meta">companion site</p>
+</div>
  </div>
 
  <div class="foot">
