@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Half-formed · one coordinate settled, one still open</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 16px;max-width:700px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;margin-bottom:16px;}
+ .ph{font-size:12px;letter-spacing:0.2em;color:#4a473f;margin:0 0 7px;font-weight:700;}
+ .ph .cnt{float:right;letter-spacing:0;font-weight:400;color:#6b695f;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 2px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:7px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ input[type=range]{vertical-align:middle;width:250px;}
+ .caption{font-size:14px;margin:9px 2px 0;max-width:740px;min-height:4.2em;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;} .readout .hi{color:#C9A6E8;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · CONSTRUCTED PROJECTION</p>
+  <h1>Half-formed</h1>
+  <p class="sub">A slit does not dim an image or blur it. It settles one coordinate completely and
+  leaves the other entirely free. So a half-organised image is not a faint point — it is a line, and
+  the scene arrives at the picture plane sorted into stripes but not yet into points. Slide the
+  picture plane and watch how many coordinates exist by the time the ray gets there.</p>
+
+  <div class="panel">
+    <p class="ph">THE ORDER OF STOPS<span class="cnt" id="cnt"></span></p>
+    <svg id="axis" viewBox="0 0 900 200" aria-label="Depth axis showing the order in which the ray meets the slits and the picture plane"></svg>
+    <div class="controls">
+      <label>picture plane <input type="range" id="pp" min="-2" max="7.4" step="0.02" value="0"></label>
+      <button class="preset on" data-p="0">camera</button>
+      <button class="preset" data-p="3.5">midway</button>
+      <button class="preset" data-p="6.5">behind both</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="ph">THE PICTURE PLANE, FACE ON<span class="cnt" id="state"></span></p>
+    <svg id="face" viewBox="0 0 900 440" aria-label="The picture plane showing settled and unsettled coordinates for three scene points"></svg>
+    <p class="caption" id="cap"></p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_halfformed.js holds the ledger
+  (9/9): rays through the horizontal slit alone land on a straight horizontal line with the vertical
+  coordinate already at its final value; the vertical slit does the same the other way; the two lines
+  meet at exactly one point, the image. The count of coordinates settled at the crossing is 2, 1 or 0,
+  fixed by the signs of the slit depths &mdash; and the camera regime is exactly both positive, the
+  picture plane passed last.</p>
+</div>
+
+<script id="geo">
+var HF = (function(){
+  'use strict';
+  var SH=2, SV=5;              // horizontal slit, vertical slit — fixed in space
+  var p=0;                     // picture plane
+  var SCENE=9;                 // scene depth, absolute
+  var PTS=[[1.3,-0.8],[-1.6,0.9],[0.4,1.7]];   // three scene points, (X, Y)
+  function setPlane(v){ p=v; }
+  function plane(){ return p; }
+  function slits(){ return {h:SH, v:SV}; }
+  function scene(){ return SCENE; }
+  function points(){ return PTS; }
+  function zh(){ return SH-p; }               // slit depths measured from the picture plane
+  function zv(){ return SV-p; }
+  function Z(){ return SCENE-p; }             // scene depth from the picture plane
+  // a slit has acted by the time the ray reaches the picture plane iff its depth is positive
+  function actedH(){ return zh()>0; }
+  function actedV(){ return zv()>0; }
+  function settled(){ return (actedH()?1:0)+(actedV()?1:0); }
+  // the final image coordinates
+  function Mx(){ return zv()/(zv()-Z()); }    // vertical slit settles x
+  function My(){ return -zh()/(Z()-zh()); }   // horizontal slit settles y
+  function image(i){ return [PTS[i][0]*Mx(), PTS[i][1]*My()]; }
+  // the ordered list of stops along the projector, scene first
+  function stops(){
+    var s=[{name:'scene', at:SCENE, kind:'scene'},
+           {name:'vertical slit', at:SV, kind:'v'},
+           {name:'horizontal slit', at:SH, kind:'h'},
+           {name:'picture plane', at:p, kind:'plane'}];
+    s.sort(function(a,b){ return b.at-a.at; });
+    return s;
+  }
+  function planeIsLast(){ var s=stops(); return s[s.length-1].kind==='plane'; }
+  function regime(){
+    var n=settled();
+    return n===2 ? 'camera' : n===1 ? 'half' : 'none';
+  }
+  return {slits:slits, setPlane:setPlane, plane:plane, scene:scene, points:points,
+          zh:zh, zv:zv, Z:Z, actedH:actedH, actedV:actedV, settled:settled,
+          Mx:Mx, My:My, image:image, stops:stops, planeIsLast:planeIsLast, regime:regime};
+})();
+if (typeof module!=='undefined') module.exports = HF;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var C={ink:'#151310', ghost:'#8E8C80', plane:'#C43A2B', slitH:'#2456C8', slitV:'#C99A2E',
+       set:'#151310', open:'#7C4BA0', frame:'#6b695f'};
+function el(s,n,a){ var e=document.createElementNS(NS,n);
+  for(var k in a) e.setAttribute(k,a[k]); s.appendChild(e); return e; }
+function txt(s,x,y,t,fill,size,anchor,w){
+  var e=el(s,'text',{x:x,y:y,fill:fill||C.ink,'font-size':size||13,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':w||'700','text-anchor':anchor||'middle',
+    'paint-order':'stroke',stroke:'#CFCDC1','stroke-width':3.5});
+  e.textContent=t; return e; }
+function clear(s){ while(s.firstChild) s.removeChild(s.firstChild); }
+
+// ---------------- panel 1: the order of stops ----------------
+var axis=document.getElementById('axis');
+var AW=900, AH=200, AL=56, AR=44, Amin=-2.6, Amax=10;
+function ax(v){ return AL + (v-Amin)*(AW-AL-AR)/(Amax-Amin); }
+function renderAxis(){
+  clear(axis);
+  var S=HF.slits(), p=HF.plane(), st=HF.stops();
+  // travel direction
+  el(axis,'line',{x1:ax(HF.scene()),y1:52,x2:ax(Amin+0.4),y2:52,stroke:C.ghost,'stroke-width':1.6});
+  el(axis,'polygon',{points:ax(Amin+0.4)+',52 '+(ax(Amin+0.4)+13)+',46 '+(ax(Amin+0.4)+13)+',58',fill:C.ghost});
+  txt(axis,(ax(HF.scene())+ax(Amin))/2,42,'the ray travels this way',C.ghost,12,'middle','400');
+  // baseline
+  el(axis,'line',{x1:AL,y1:132,x2:AW-AR,y2:132,stroke:C.frame,'stroke-width':1.4});
+  for(var v=-2;v<=10;v+=2){
+    el(axis,'line',{x1:ax(v),y1:132,x2:ax(v),y2:137,stroke:C.frame,'stroke-width':1});
+    txt(axis,ax(v),152,String(v),C.frame,11,'middle','400');
+  }
+  // the fixed features
+  el(axis,'line',{x1:ax(S.v),y1:66,x2:ax(S.v),y2:132,stroke:C.slitV,'stroke-width':3});
+  txt(axis,ax(S.v),60,'vertical slit',C.slitV,12);
+  txt(axis,ax(S.v),172,'settles x',C.slitV,12);
+  el(axis,'line',{x1:ax(S.h),y1:66,x2:ax(S.h),y2:132,stroke:C.slitH,'stroke-width':3});
+  txt(axis,ax(S.h),60,'horizontal slit',C.slitH,12);
+  txt(axis,ax(S.h),172,'settles y',C.slitH,12);
+  el(axis,'circle',{cx:ax(HF.scene()),cy:132,r:6,fill:C.ink});
+  txt(axis,ax(HF.scene()),60,'scene',C.ink,12);
+  // the picture plane
+  el(axis,'line',{x1:ax(p),y1:74,x2:ax(p),y2:144,stroke:C.plane,'stroke-width':3.4});
+  el(axis,'polygon',{points:ax(p)+',144 '+(ax(p)-7)+',158 '+(ax(p)+7)+',158',fill:C.plane});
+  txt(axis,ax(p),190,'picture plane',C.plane,12);
+  // order badges along the top
+  var order=st.map(function(s){ return s.kind; });
+  var lbl=st.map(function(s){ return s.name; }).join('  →  ');
+  txt(axis,(AL+AW-AR)/2,22,lbl,C.ink,13);
+  document.getElementById('cnt').textContent =
+    HF.settled()+' of 2 coordinates settled by the picture plane';
+}
+
+// ---------------- panel 2: the picture plane, face on ----------------
+var face=document.getElementById('face');
+var FW=900, FH=440;
+function renderFace(){
+  clear(face);
+  var cx=FW/2, cy=FH/2+6, k=78;
+  var aH=HF.actedH(), aV=HF.actedV();
+  // frame
+  el(face,'rect',{x:cx-260,y:cy-170,width:520,height:340,fill:'none',stroke:C.frame,
+    'stroke-width':2,'stroke-dasharray':'6 6'});
+  txt(face,cx-260,cy-180,'picture plane',C.frame,12,'start','400');
+  var P=HF.points();
+  for(var i=0;i<P.length;i++){
+    var img=HF.image(i);
+    var X=cx+img[0]*k, Y=cy-img[1]*k;
+    // the line left by the slit that HAS acted; the free direction is the other one
+    if(aV && !aH){
+      // x settled → a vertical line of possible landings
+      el(face,'line',{x1:X,y1:cy-168,x2:X,y2:cy+168,stroke:C.open,'stroke-width':2.6});
+      for(var t=-150;t<=150;t+=25)
+        el(face,'line',{x1:X-5,y1:cy+t,x2:X+5,y2:cy+t,stroke:C.open,'stroke-width':1.4,opacity:0.75});
+    } else if(aH && !aV){
+      el(face,'line',{x1:cx-258,y1:Y,x2:cx+258,y2:Y,stroke:C.open,'stroke-width':2.6});
+      for(var u=-250;u<=250;u+=25)
+        el(face,'line',{x1:cx+u,y1:Y-5,x2:cx+u,y2:Y+5,stroke:C.open,'stroke-width':1.4,opacity:0.75});
+    } else if(aH && aV){
+      // both settled: show the two constraint lines faintly, and the point solid
+      el(face,'line',{x1:X,y1:cy-168,x2:X,y2:cy+168,stroke:C.ghost,'stroke-width':1.2,'stroke-dasharray':'3 6'});
+      el(face,'line',{x1:cx-258,y1:Y,x2:cx+258,y2:Y,stroke:C.ghost,'stroke-width':1.2,'stroke-dasharray':'3 6'});
+    }
+    // the mark itself
+    if(aH&&aV){
+      el(face,'circle',{cx:X,cy:Y,r:8,fill:C.set});
+    } else if(aH||aV){
+      el(face,'circle',{cx:X,cy:Y,r:8,fill:'none',stroke:C.open,'stroke-width':2.4,'stroke-dasharray':'3 3'});
+    }
+  }
+  if(!aH && !aV){
+    txt(face,cx,cy,'nothing has acted — neither coordinate exists yet',C.ghost,15);
+    txt(face,cx,cy+24,'the ray crosses the picture plane before either slit',C.ghost,13,'middle','400');
+  }
+  // what is settled
+  var msg = (aH&&aV) ? 'x settled · y settled — the image exists'
+          : aV ? 'x settled · y OPEN — each point is a vertical line'
+          : aH ? 'y settled · x OPEN — each point is a horizontal line'
+          : 'nothing settled';
+  txt(face,cx,30,msg,(aH&&aV)?C.set:C.open,16);
+  document.getElementById('state').textContent =
+    HF.regime()==='camera' ? 'fully formed' : HF.regime()==='half' ? 'half-formed' : 'unformed';
+}
+
+// ---------------- text ----------------
+var CAPS={
+ camera:'<b>Both slits passed before the picture plane.</b> Each scene point has met both '+
+   'constraints by the time it lands: the vertical slit fixed its column, the horizontal slit fixed '+
+   'its row. The faint crossed lines are those two constraints; the mark is where they meet. This is '+
+   'the only arrangement a camera can be built to do.',
+ half:'<b>The picture plane sits between the slits.</b> One constraint has acted and one has not. '+
+   'Every scene point arrives at a known column and no known row — its image is the whole marked line, '+
+   'not a point on it. The row is fixed by a slit the ray has not yet reached, lying behind the picture '+
+   'plane. The scene has been sorted into stripes but not into points. Nothing is faint here; one '+
+   'coordinate is simply absent.',
+ none:'<b>The picture plane sits behind both slits.</b> The ray crosses the image before either slit '+
+   'has acted on it. Neither coordinate exists. There is no stripe and no point — only the fact that '+
+   'a line through this scene point will eventually be selected, somewhere downstream.'
+};
+function renderText(){
+  document.getElementById('cap').innerHTML=CAPS[HF.regime()];
+  var rows=[], p=HF.plane(), S=HF.slits();
+  rows.push('picture plane '+p.toFixed(2)+'      horizontal slit '+S.h+'      vertical slit '+S.v+
+    '      scene '+HF.scene());
+  rows.push('slit depths from the picture plane:  horizontal '+HF.zh().toFixed(2)+
+    '    vertical '+HF.zv().toFixed(2));
+  rows.push('');
+  rows.push('order along the projector: '+HF.stops().map(function(s){return s.name;}).join(' → '));
+  rows.push('');
+  rows.push('horizontal slit passed by then?  '+(HF.actedH()?'yes — y settled at Y·My'
+    :'<span class="hi">no  — y does not exist yet</span>'));
+  rows.push('vertical slit passed by then?    '+(HF.actedV()?'yes — x settled at X·Mx'
+    :'<span class="hi">no  — x does not exist yet</span>'));
+  rows.push('coordinates settled at the crossing: '+HF.settled()+' of 2');
+  rows.push('');
+  var camOK = (HF.settled()===2)===(HF.zh()>0&&HF.zv()>0);
+  var lastOK = HF.planeIsLast()===(HF.settled()===2);
+  rows.push(((camOK&&lastOK)?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   settled = 2 ⟺ both slit depths positive ⟺ the picture plane is passed last');
+  document.getElementById('ro').innerHTML=rows.join('\n');
+}
+
+function renderAll(){ renderAxis(); renderFace(); renderText(); }
+document.getElementById('pp').addEventListener('input',function(){
+  HF.setPlane(+this.value);
+  document.querySelectorAll('button.preset').forEach(function(b){ b.classList.remove('on'); });
+  renderAll();
+});
+document.querySelectorAll('button.preset').forEach(function(b){
+  b.addEventListener('click',function(){
+    var v=+b.getAttribute('data-p');
+    document.getElementById('pp').value=v;
+    HF.setPlane(v);
+    document.querySelectorAll('button.preset').forEach(function(x){ x.classList.toggle('on',x===b); });
+    renderAll();
+  });
+});
+HF.setPlane(0);
+renderAll();
+})();
+</script>
+</body>
+</html>

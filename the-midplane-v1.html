@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The midplane · where the second square goes</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 16px;max-width:700px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;margin-bottom:16px;}
+ .ph{font-size:12px;letter-spacing:0.2em;color:#4a473f;margin:0 0 7px;font-weight:700;}
+ .ph .cnt{float:right;letter-spacing:0;font-weight:400;color:#6b695f;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 2px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:7px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ input[type=range]{vertical-align:middle;width:260px;}
+ .caption{font-size:14px;margin:9px 2px 0;max-width:740px;min-height:4.4em;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;} .readout .hi{color:#C9A6E8;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · CONSTRUCTED PROJECTION</p>
+  <h1>The midplane</h1>
+  <p class="sub">A square face images square at two depths. Slide the picture plane toward the
+  midpoint of the slits and watch the second one leave: it runs off to infinity, arrives, and comes
+  back from the other side. At the midpoint exactly it is nowhere finite — and the shape returns to
+  square at infinity in both directions instead. One slit now sits behind the picture plane, so no
+  ray can reach the image having passed both. This is drawn, not photographed.</p>
+
+  <div class="panel">
+    <p class="ph">SECTION · SLITS FIXED, PICTURE PLANE MOVING<span class="cnt" id="cfg"></span></p>
+    <svg id="sect" viewBox="0 0 900 150" aria-label="Absolute positions of the two slits and the sliding picture plane"></svg>
+    <div class="controls">
+      <label>picture plane <input type="range" id="pp" min="-1.2" max="6.2" step="0.01" value="0"></label>
+      <button id="mid">Put it at the midpoint</button>
+      <button id="cam">Back to camera position</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="ph">FACE SHAPE AGAINST DEPTH<span class="cnt" id="lim"></span></p>
+    <svg id="plot" viewBox="0 0 900 420" aria-label="Aspect of a square face against depth, both directions"></svg>
+    <p class="caption" id="cap"></p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_midplane.js holds the ledger
+  (10/10): A(&infin;) = |z&#8322;/z&#8321;| always, so the shape is square at infinity exactly when the
+  picture plane is the arithmetic midpoint of the slits; the finite square depth Z<sub>h</sub> is their
+  harmonic mean and diverges as that midpoint is approached; and travelling from the scene the ray meets
+  one slit, then the picture plane, then the other &mdash; it must pass the image before it has met both,
+  so no exposure can realise this. Two means of the same pair: the harmonic one names a depth, the
+  arithmetic one names a picture plane. check_invariance.js (8/8) settles which quantity is which:
+  A(&infin;) = |z&#8322;/z&#8321;| is affine &mdash; it is anchored to the ideal point and moves when the
+  picture plane moves. The invariant is (S&#8321;, S&#8322;&#8202;;&#8202;square, picture plane) = &minus;1,
+  preserved under any projectivity of the depth line. The map from picture plane to square depth is the
+  involution with the two slits as its fixed points, exchanging their midpoint with the point at infinity
+  &mdash; which is the midplane configuration, stated without coordinates.</p>
+</div>
+
+<script id="geo">
+var MP = (function(){
+  'use strict';
+  var S1=2, S2=5;            // the two slits, fixed in space
+  var p=0;                   // picture-plane position
+  function setPlane(v){ p=v; }
+  function plane(){ return p; }
+  function slits(){ return [S1,S2]; }
+  function midpoint(){ return (S1+S2)/2; }          // arithmetic — a picture-plane position
+  function z1(){ return S1-p; }                      // slit depths measured from the picture plane
+  function z2(){ return S2-p; }
+  function Mx(Z){ return z2()/(z2()-Z); }
+  function My(Z){ return -z1()/(Z-z1()); }
+  function aspect(Z){ return Math.abs(Mx(Z))/Math.abs(My(Z)); }
+  function farAspect(){ return Math.abs(z2()/z1()); }             // the limit at either infinity
+  // the second square depth: harmonic mean of the slit depths. Infinite at the midpoint.
+  function Zh(){
+    var a=z1(), b=z2(), s=a+b;
+    if(Math.abs(s)<1e-12) return null;               // the midpoint: nowhere finite
+    return 2*a*b/s;
+  }
+  function isMidpoint(){ return Math.abs(z1()+z2())<1e-9; }
+  function isConstruction(){ return z1()*z2()<0; }   // one slit behind the picture plane
+  // ordering along a projector, scene first
+  function raySequence(Z){
+    var a=z1(), b=z2();
+    var stops=[['scene',Z],['slit '+(b>a?'far':'near'),b],['picture plane',0],['slit',a]];
+    return stops.sort(function(u,v){ return v[1]-u[1]; });
+  }
+  function planeIsLast(Z){
+    var seq=raySequence(Z);
+    return seq[seq.length-1][0]==='picture plane';
+  }
+  // the square depth in ABSOLUTE coordinates, and the invariant that governs it
+  function ZsqAbsolute(){ var z=Zh(); return z===null ? null : p+z; }
+  function invariant(){                       // (S1, S2 ; Zsq, p) — always −1
+    var Z=ZsqAbsolute();
+    if(Z===null) return null;
+    return ((Z-S1)/(Z-S2))/((p-S1)/(p-S2));
+  }
+  function conjugateOf(x){                    // the involution itself
+    if(!isFinite(x)) return midpoint();
+    var a=S1-x, b=S2-x, s=a+b;
+    return Math.abs(s)<1e-12 ? Infinity : x + 2*a*b/s;
+  }
+  return {slits:slits, setPlane:setPlane, plane:plane, midpoint:midpoint,
+          ZsqAbsolute:ZsqAbsolute, invariant:invariant, conjugateOf:conjugateOf,
+          z1:z1, z2:z2, Mx:Mx, My:My, aspect:aspect, farAspect:farAspect, Zh:Zh,
+          isMidpoint:isMidpoint, isConstruction:isConstruction,
+          raySequence:raySequence, planeIsLast:planeIsLast};
+})();
+if (typeof module!=='undefined') module.exports = MP;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var C={slit:'#C99A2E', plane:'#C43A2B', iso:'#7C4BA0', ink:'#151310', dim:'#8E8C80',
+       grow:'rgba(46,158,75,0.13)', mix:'rgba(201,154,46,0.13)', shrink:'rgba(36,86,200,0.08)'};
+function el(svg,n,a){ var e=document.createElementNS(NS,n);
+  for(var k in a) e.setAttribute(k,a[k]); svg.appendChild(e); return e; }
+function txt(svg,x,y,s,fill,size,anchor,w){
+  var t=el(svg,'text',{x:x,y:y,fill:fill||C.ink,'font-size':size||13,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':w||'700','text-anchor':anchor||'middle',
+    'paint-order':'stroke',stroke:'#CFCDC1','stroke-width':3.5});
+  t.textContent=s; return t; }
+function clear(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+// ---------------- section ----------------
+var sect=document.getElementById('sect');
+var SW=900, SH=150, SL=60, SR=40;
+var Amin=-2, Amax=7;
+function sx(v){ return SL + (v-Amin)*(SW-SL-SR)/(Amax-Amin); }
+function renderSection(){
+  clear(sect);
+  var s=MP.slits(), p=MP.plane(), mid=MP.midpoint();
+  el(sect,'line',{x1:SL,y1:100,x2:SW-SR,y2:100,stroke:'#6b695f','stroke-width':1.4});
+  for(var v=-2;v<=7;v++){
+    el(sect,'line',{x1:sx(v),y1:100,x2:sx(v),y2:105,stroke:'#6b695f','stroke-width':1});
+    txt(sect,sx(v),120,String(v),'#6b695f',11,'middle','400');
+  }
+  // midpoint tick
+  el(sect,'line',{x1:sx(mid),y1:56,x2:sx(mid),y2:100,stroke:C.iso,'stroke-width':1.6,'stroke-dasharray':'3 4'});
+  txt(sect,sx(mid),50,'midpoint '+mid.toFixed(2),C.iso,12);
+  // slits
+  s.forEach(function(v,i){
+    el(sect,'line',{x1:sx(v),y1:34,x2:sx(v),y2:100,stroke:C.slit,'stroke-width':3});
+    txt(sect,sx(v),28,(i===0?'slit ':'slit ')+v,C.slit,12);
+  });
+  // picture plane
+  el(sect,'line',{x1:sx(p),y1:30,x2:sx(p),y2:112,stroke:C.plane,'stroke-width':3.4});
+  el(sect,'polygon',{points:sx(p)+',112 '+(sx(p)-7)+',126 '+(sx(p)+7)+',126',fill:C.plane});
+  txt(sect,sx(p),140,'picture plane',C.plane,12);
+  // which side the scene sits on
+  el(sect,'line',{x1:sx(p)+6,y1:82,x2:SW-SR-6,y2:82,stroke:C.dim,'stroke-width':1.4,
+    'stroke-dasharray':'2 5'});
+  txt(sect,(sx(p)+SW-SR)/2,76,'scene lies this way',C.dim,11,'middle','400');
+  document.getElementById('cfg').textContent =
+    MP.isMidpoint() ? 'picture plane AT the midpoint — construction only'
+    : MP.isConstruction() ? 'one slit behind the picture plane — construction only'
+    : 'both slits in front — a realisable camera';
+}
+
+// ---------------- shape plot ----------------
+var plot=document.getElementById('plot');
+var PW=900, PH=420, PL=64, PR=30, PT=44, PB=52;
+var Zmin=-10, Zmax=12, Alo=0.05, Ahi=20;
+function px(Z){ return PL + (Z-Zmin)*(PW-PL-PR)/(Zmax-Zmin); }
+function ay(A){ var v=Math.min(Math.max(A,Alo),Ahi);
+  return (PH-PB) - (Math.log(v/Alo)/Math.log(Ahi/Alo))*(PH-PB-PT); }
+function renderPlot(){
+  clear(plot);
+  var a=MP.z1(), b=MP.z2(), lo=Math.min(a,b), hi=Math.max(a,b);
+  var lim=MP.farAspect(), zh=MP.Zh();
+  // bands by behaviour
+  el(plot,'rect',{x:px(Zmin),y:PT,width:px(lo)-px(Zmin),height:PH-PB-PT,fill:C.grow});
+  el(plot,'rect',{x:px(lo),y:PT,width:px(hi)-px(lo),height:PH-PB-PT,fill:C.mix});
+  el(plot,'rect',{x:px(hi),y:PT,width:px(Zmax)-px(hi),height:PH-PB-PT,fill:C.shrink});
+  // axes
+  el(plot,'line',{x1:PL,y1:PH-PB,x2:PW-PR,y2:PH-PB,stroke:'#6b695f','stroke-width':1.4});
+  [0.1,1,10].forEach(function(v){
+    el(plot,'line',{x1:PL-5,y1:ay(v),x2:PW-PR,y2:ay(v),stroke:'#9a988c','stroke-width':1,
+      'stroke-dasharray': v===1?'none':'2 5',opacity:v===1?0.95:0.6});
+    txt(plot,PL-12,ay(v)+4,(v===1?'1:1':(v<1?'0.1':'10')),'#6b695f',11,'end','400');
+  });
+  txt(plot,PL-12,PT-6,'w:h','#6b695f',12,'end');
+  for(var z=-10;z<=12;z+=2){
+    el(plot,'line',{x1:px(z),y1:PH-PB,x2:px(z),y2:PH-PB+5,stroke:'#6b695f','stroke-width':1});
+    txt(plot,px(z),PH-PB+19,String(z),'#6b695f',11,'middle','400');
+  }
+  txt(plot,(PL+PW-PR)/2,PH-12,'depth  Z   ( measured from the picture plane )','#4a473f',12);
+  // the picture plane itself
+  el(plot,'line',{x1:px(0),y1:PT,x2:px(0),y2:PH-PB,stroke:C.plane,'stroke-width':2,'stroke-dasharray':'5 4'});
+  // slits
+  [a,b].forEach(function(v){
+    el(plot,'line',{x1:px(v),y1:PT,x2:px(v),y2:PH-PB,stroke:C.slit,'stroke-width':2.4,'stroke-dasharray':'7 5'});
+    txt(plot,px(v),PH-PB-8,'slit',C.slit,12);
+  });
+  // the limit at infinity, reached from both ends
+  el(plot,'line',{x1:PL,y1:ay(lim),x2:PW-PR,y2:ay(lim),stroke:C.iso,'stroke-width':2,'stroke-dasharray':'9 6'});
+  txt(plot,PL+92,ay(lim)-9,'limit at infinity  '+lim.toFixed(3)+':1',C.iso,12);
+  // the aspect curve
+  (function(){
+    var seg=[], N=2400;
+    function flush(){ if(seg.length>1)
+      el(plot,'polyline',{points:seg.join(' '),fill:'none',stroke:C.ink,'stroke-width':2.8}); seg=[]; }
+    for(var i=0;i<=N;i++){
+      var Z=Zmin+(Zmax-Zmin)*i/N;
+      if(Math.abs(Z-a)<0.05||Math.abs(Z-b)<0.05){ flush(); continue; }
+      var A=MP.aspect(Z);
+      if(!isFinite(A)||A<Alo||A>Ahi){ flush(); continue; }
+      seg.push(px(Z)+','+ay(A));
+    }
+    flush();
+  })();
+  // square markers
+  el(plot,'circle',{cx:px(0),cy:ay(1),r:9,fill:'none',stroke:C.iso,'stroke-width':3});
+  txt(plot,px(0),ay(1)+26,'picture plane',C.iso,12);
+  if(zh===null){
+    // gone to infinity — mark both ends
+    [PL+16, PW-PR-16].forEach(function(X,i){
+      el(plot,'circle',{cx:X,cy:ay(1),r:9,fill:'none',stroke:C.iso,'stroke-width':3,'stroke-dasharray':'3 3'});
+      txt(plot,X,ay(1)+26,i?'→ ∞':'∞ ←',C.iso,12);
+    });
+    txt(plot,(PL+PW-PR)/2,PT+18,'the second square has left the axis — it is at infinity, in both directions',
+      C.iso,13);
+  } else if(zh>Zmin&&zh<Zmax){
+    el(plot,'circle',{cx:px(zh),cy:ay(1),r:9,fill:'none',stroke:C.iso,'stroke-width':3});
+    txt(plot,px(zh),ay(1)+26,'Zh '+zh.toFixed(2),C.iso,12);
+  } else {
+    var X = zh>0 ? PW-PR-16 : PL+16;
+    el(plot,'polygon',{points:(zh>0?(X+10)+','+ay(1)+' '+(X-4)+','+(ay(1)-7)+' '+(X-4)+','+(ay(1)+7)
+                                  :(X-10)+','+ay(1)+' '+(X+4)+','+(ay(1)-7)+' '+(X+4)+','+(ay(1)+7)),
+      fill:C.iso});
+    txt(plot,X,ay(1)+26,'Zh '+(Math.abs(zh)>999?zh.toExponential(1):zh.toFixed(0)),C.iso,12);
+  }
+  // shape thumbnails
+  var samples=[];
+  for(var k=0;k<11;k++) samples.push(Zmin+(Zmax-Zmin)*(k+0.5)/11);
+  samples.forEach(function(Z){
+    if(Math.abs(Z-a)<0.4||Math.abs(Z-b)<0.4) return;
+    var A=MP.aspect(Z);
+    if(!isFinite(A)) return;
+    var s0=13, w=s0*Math.sqrt(Math.min(Math.max(A,0.12),8)), hh=s0*s0/w;
+    el(plot,'rect',{x:px(Z)-w/2,y:PT-24-hh/2,width:w,height:hh,fill:'none',
+      stroke:Math.abs(A-1)<0.02?C.iso:'#4a473f','stroke-width':Math.abs(A-1)<0.02?2.4:1.6});
+  });
+  document.getElementById('lim').textContent =
+    'A(∞) = '+lim.toFixed(4)+' : 1'+(Math.abs(lim-1)<1e-6?'  — square':'');
+}
+
+// ---------------- captions and readout ----------------
+function renderText(){
+  var a=MP.z1(), b=MP.z2(), lim=MP.farAspect(), zh=MP.Zh(), p=MP.plane();
+  var cap=document.getElementById('cap');
+  if(MP.isMidpoint()){
+    cap.innerHTML='<b>The picture plane is exactly midway between the slits.</b> The two slit depths '+
+      'are equal and opposite, so their harmonic mean — the second square depth — is undefined: it has '+
+      'gone to infinity. And there the shape returns to square, approached from both directions. '+
+      'The square that was a place on the axis is now the limit of the axis. No ray can form this: '+
+      'travelling from the scene it meets the far slit, then the picture plane, then the near slit, so '+
+      'the image is fixed before the second condition is met. It is half-constructed, and only a '+
+      'drafting board can finish it. Slide the plane from one slit to the other and the second square '+
+      'makes one full circuit of the projective depth line — out to infinity, through it, and back — '+
+      'sitting at zero when the plane rests on either slit.';
+  } else if(MP.isConstruction()){
+    cap.innerHTML='<b>One slit lies behind the picture plane.</b> Still not a camera — the ray reaches '+
+      'the image before it has met both slits. The second square depth Z<sub>h</sub> has crossed to the '+
+      'far side and is running toward infinity as the picture plane approaches the midpoint. The '+
+      'limiting shape is '+lim.toFixed(3)+':1 and is closing on square.';
+  } else {
+    cap.innerHTML='<b>Both slits in front of the picture plane.</b> A realisable cross-slit camera. '+
+      'A square images square at the picture plane and again at Z<sub>h</sub> = '+
+      (zh===null?'∞':zh.toFixed(3))+', the harmonic mean of the slit depths. Far away the shape settles '+
+      'on '+lim.toFixed(3)+':1 — the ratio of the slit depths, not a square.';
+  }
+  var rows=[];
+  rows.push('picture plane at '+p.toFixed(3)+'      slits at '+MP.slits().join(' and ')+
+    '      midpoint '+MP.midpoint().toFixed(3));
+  rows.push('slit depths from the picture plane:  z1 = '+a.toFixed(3)+'    z2 = '+b.toFixed(3)+
+    '    sum = '+(a+b).toFixed(3));
+  rows.push('');
+  rows.push('second square depth  Zh = 2·z1·z2/(z1+z2) = '+
+    (zh===null?'<span class="hi">undefined — at infinity</span>':zh.toFixed(4)));
+  rows.push('shape at infinity    A(∞) = |z2/z1| = '+lim.toFixed(6)+
+    (Math.abs(lim-1)<1e-6?'  <span class="hi">← square</span>':''));
+  rows.push('             Zh = 0 on either slit, ±∞ at the midpoint — one circuit of the');
+  rows.push('             projective depth line as the plane crosses from slit to slit');
+  rows.push('');
+  var inv=MP.invariant(), Zabs=MP.ZsqAbsolute();
+  rows.push('<span class="hi">the invariant</span>   in absolute coordinates the square sits at '+
+    (Zabs===null?'infinity':Zabs.toFixed(4))+',');
+  rows.push('             and  ( slit '+MP.slits()[0]+' , slit '+MP.slits()[1]+' ; square , picture plane )  =  '+
+    (inv===null?'−1 (at the ideal point)':inv.toFixed(9)));
+  rows.push('             The square is the HARMONIC CONJUGATE of the picture plane in the');
+  rows.push('             two slits. A(∞) moves when the plane moves; this does not.');
+  rows.push('');
+  var seq=MP.raySequence(9).map(function(s){ return s[0]; }).join(' → ');
+  rows.push('along a projector: '+seq);
+  rows.push('picture plane is the last stop?  '+(MP.planeIsLast(9)?'yes — realisable as a camera'
+    :'<span class="warn">no — the image is fixed before both slits are met</span>'));
+  rows.push('');
+  // live consistency checks
+  var okLim = Math.abs(MP.aspect(1e9)-lim)<1e-6 && Math.abs(MP.aspect(-1e9)-lim)<1e-6;
+  var okSq  = Math.abs(MP.aspect(0)-1)<1e-12;
+  var okZh  = zh===null ? MP.isMidpoint() : Math.abs(MP.aspect(zh)-1)<1e-9;
+  rows.push(((okLim&&okSq&&okZh)?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   A(0) = 1 · A(±∞) equal and = |z2/z1| · A(Zh) = 1 where Zh is finite');
+  document.getElementById('ro').innerHTML=rows.join('\n');
+}
+
+function renderAll(){ renderSection(); renderPlot(); renderText(); }
+document.getElementById('pp').addEventListener('input',function(){
+  MP.setPlane(+this.value); renderAll();
+});
+document.getElementById('mid').addEventListener('click',function(){
+  var m=MP.midpoint();
+  document.getElementById('pp').value=m;
+  MP.setPlane(m); renderAll();
+});
+document.getElementById('cam').addEventListener('click',function(){
+  document.getElementById('pp').value=0;
+  MP.setPlane(0); renderAll();
+});
+MP.setPlane(0);
+renderAll();
+})();
+</script>
+</body>
+</html>

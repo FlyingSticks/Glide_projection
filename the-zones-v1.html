@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The three zones · where a receding cube grows</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 16px;max-width:690px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;margin-bottom:16px;}
+ .ph{font-size:12px;letter-spacing:0.2em;color:#4a473f;margin:0 0 7px;font-weight:700;}
+ .ph .cnt{float:right;letter-spacing:0;font-weight:400;color:#6b695f;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 2px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:7px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ input[type=range]{vertical-align:middle;width:190px;}
+ .caption{font-size:14px;margin:9px 2px 0;max-width:740px;min-height:3.2em;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;}
+ .key{font-size:12.5px;color:#4a473f;margin:8px 2px 0;}
+ .sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin:0 3px 0 10px;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · OPTICAL PROJECTION</p>
+  <h1>The three zones</h1>
+  <p class="sub">A cross-slit projection does not blend the ordinary view with the reversed one.
+  It contains both, and a third besides, separated by the two slits. Move the cube through the
+  depth range and watch the front view change what it is willing to show you.</p>
+
+  <div class="panel">
+    <p class="ph">MAGNIFICATION AGAINST DEPTH<span class="cnt" id="cntZ"></span></p>
+    <svg id="plot" viewBox="0 0 900 380" aria-label="Magnification of each channel against depth, with the two slits as asymptotes"></svg>
+    <div class="controls">
+      <button class="zone on" data-z="A">in front of both slits</button>
+      <button class="zone" data-z="B">between the slits</button>
+      <button class="zone" data-z="C">beyond both slits</button>
+      <span style="flex:1"></span>
+      <label>position <input type="range" id="pos" min="0.08" max="0.92" step="0.005" value="0.45"></label>
+    </div>
+    <p class="key"><span class="sw" style="background:#C43A2B"></span>|M<sub>x</sub>| horizontal channel — blows up at the vertical slit
+      <span class="sw" style="background:#2456C8"></span>|M<sub>y</sub>| vertical channel — blows up at the horizontal slit
+      <span class="sw" style="background:#151310"></span>the cube's depth span
+      <span class="sw" style="background:#7C4BA0"></span>the isotropic depth</p>
+  </div>
+
+  <div class="panel">
+    <p class="ph">THE RESULTING FRONT VIEW<span class="cnt" id="cntF"></span></p>
+    <svg id="front" viewBox="0 0 900 470" aria-label="Cross-slit front view of the cube at the chosen depth"></svg>
+    <p class="caption" id="cap"></p>
+  </div>
+
+  <div class="panel">
+    <p class="ph">THE TWO EXTREMES ARE ONE PICTURE</p>
+    <svg id="cong" viewBox="0 0 900 330" aria-label="Perspective interior room beside the reversed exterior cube"></svg>
+    <p class="caption">Small square inside large square, four trapezoids between — the same eight
+    image points, to the last decimal. Only the depth reading differs: on the left the small square
+    is the far wall of a room you are standing inside; on the right it is the near face of a solid
+    cube outside you. Zone A of the cross-slit produces the right-hand picture with a camera.</p>
+  </div>
+
+  <div class="readout" id="ro"></div>
+
+  <p class="foot">House rule: no claim without a passing check. check_xslit_zones.js holds the ledger
+  (9/9): the closed forms M<sub>x</sub> = z&#8322;/(z&#8322;&minus;Z) and M<sub>y</sub> = &minus;z&#8321;/(Z&minus;z&#8321;)
+  are verified against the raw two-slit construction to 10&#8315;&#185;&#8310;; each channel's asymptote
+  is its own slit; the face counts are 5, 3, 1 in the three zones; and a straight edge images as a
+  genuine curve, which is why the receding edges below are drawn bent. check_isotropic.js adds the
+  violet marker (5/5): |M<sub>x</sub>| = |M<sub>y</sub>| at the harmonic mean of the slit depths, at that
+  depth only, always between the slits, and (z&#8321;, z&#8322;&#8202;;&#8202;Z<sub>h</sub>, 0) = &minus;1. A physically built cross-slit
+  has both slits between scene and sensor, so real hardware works in zone C only &mdash; zones A and B
+  are in the family's geometry, not in its operating range.</p>
+</div>
+
+<script id="geo">
+var XS = (function(){
+  'use strict';
+  var z1=2, z2=5;                       // horizontal slit, vertical slit
+  function Mx(Z){ return z2/(z2-Z); }   // horizontal channel
+  function My(Z){ return -z1/(Z-z1); }  // vertical channel
+  function image(X,Y,Z){ return [X*Mx(Z), Y*My(Z)]; }
+  function zoneOf(Z){ return Z<z1 ? 'A' : (Z<z2 ? 'B' : 'C'); }
+  // depth window for a cube sitting inside a zone, at fractional position t
+  function cubeAt(zone, t){
+    var lo, hi, span;
+    if(zone==='A'){ lo=0.10; hi=z1-0.10; }
+    else if(zone==='B'){ lo=z1+0.10; hi=z2-0.10; }
+    else { lo=z2+0.35; hi=z2+7.0; }
+    span=(hi-lo)*0.34;
+    var Zn = lo + t*((hi-lo)-span);
+    return {Zn:Zn, Zf:Zn+span};
+  }
+  // how many faces of a head-on cube are visible
+  function faces(Zn,Zf){
+    var wN=Math.abs(Mx(Zn)), wF=Math.abs(Mx(Zf));
+    var hN=Math.abs(My(Zn)), hF=Math.abs(My(Zf));
+    return { n: 1 + (wF>wN?2:0) + (hF>hN?2:0),
+             sides:(wF>wN), caps:(hF>hN), wN:wN, wF:wF, hN:hN, hF:hF };
+  }
+  // a receding edge, sampled — it images as a curve, not a segment
+  function recedingEdge(X,Y,Zn,Zf,n){
+    var out=[], i;
+    n=n||24;
+    for(i=0;i<=n;i++){
+      var Z=Zn+(Zf-Zn)*i/n;
+      out.push(image(X,Y,Z));
+    }
+    return out;
+  }
+  // departure of that curve from its own chord, as a fraction of chord length
+  function sag(pts){
+    var a=pts[0], b=pts[pts.length-1];
+    var L=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    if(L<1e-12) return 0;
+    var s=0;
+    for(var i=0;i<pts.length;i++){
+      var p=pts[i];
+      s=Math.max(s, Math.abs((b[0]-a[0])*(a[1]-p[1])-(a[0]-p[0])*(b[1]-a[1]))/L);
+    }
+    return s/L;
+  }
+  // the one depth where the two channels agree: |Mx| = |My|.
+  // It is the harmonic mean of the slit depths, and (z1, z2 ; Zh, 0) = -1 —
+  // the harmonic conjugate of the picture plane with respect to the two slits.
+  function isotropicDepth(){ return 2*z1*z2/(z1+z2); }
+  function crossRatio(a,b,c,d){ return ((c-a)/(c-b))/((d-a)/(d-b)); }
+  function isotropicCheck(){
+    var Zh=isotropicDepth();
+    var mx=Math.abs(Mx(Zh)), my=Math.abs(My(Zh));
+    return { Zh:Zh, mx:mx, my:my,
+             gap:Math.abs(mx-my)/mx,
+             cr:crossRatio(z1,z2,Zh,0) };
+  }
+  return {z1:z1, z2:z2, Mx:Mx, My:My, image:image, zoneOf:zoneOf,
+          cubeAt:cubeAt, faces:faces, recedingEdge:recedingEdge, sag:sag,
+          isotropicDepth:isotropicDepth, crossRatio:crossRatio, isotropicCheck:isotropicCheck};
+})();
+if (typeof module!=='undefined') module.exports = XS;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var C={x:'#C43A2B', y:'#2456C8', cube:'#151310', slit:'#C99A2E', iso:'#7C4BA0',
+       zA:'rgba(46,158,75,0.13)', zB:'rgba(201,154,46,0.13)', zC:'rgba(36,86,200,0.08)',
+       wall:'#2B9EA8', face:'#151310', dim:'#8E8C80'};
+var zone='A', pos=0.45;
+
+function el(svg,n,a){ var e=document.createElementNS(NS,n);
+  for(var k in a) e.setAttribute(k,a[k]); svg.appendChild(e); return e; }
+function txt(svg,x,y,s,fill,size,anchor,weight){
+  var t=el(svg,'text',{x:x,y:y,fill:fill||'#151310','font-size':size||13,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':weight||'700','text-anchor':anchor||'middle',
+    'paint-order':'stroke',stroke:'#CFCDC1','stroke-width':3.5});
+  t.textContent=s; return t;
+}
+function clear(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+// ---------------- panel 1: magnification against depth ----------------
+var plot=document.getElementById('plot');
+var PW=900, PH=380, PL=64, PR=24, PT=26, PB=48;
+var Zmax=12, Mlo=0.06, Mhi=40;
+function px(Z){ return PL + Z*(PW-PL-PR)/Zmax; }
+function py(M){
+  var a=Math.log(Math.min(Math.max(Math.abs(M),Mlo),Mhi)/Mlo)/Math.log(Mhi/Mlo);
+  return (PH-PB) - a*(PH-PB-PT);
+}
+function renderPlot(){
+  clear(plot);
+  var cube=XS.cubeAt(zone,pos);
+  // zone bands
+  el(plot,'rect',{x:px(0),y:PT,width:px(XS.z1)-px(0),height:PH-PB-PT,fill:C.zA});
+  el(plot,'rect',{x:px(XS.z1),y:PT,width:px(XS.z2)-px(XS.z1),height:PH-PB-PT,fill:C.zB});
+  el(plot,'rect',{x:px(XS.z2),y:PT,width:px(Zmax)-px(XS.z2),height:PH-PB-PT,fill:C.zC});
+  txt(plot,(px(0)+px(XS.z1))/2,PT+18,'ZONE A · both grow','#2E6E4B',12);
+  txt(plot,(px(XS.z1)+px(XS.z2))/2,PT+18,'ZONE B · one grows, one shrinks','#8A6A14',12);
+  txt(plot,(px(XS.z2)+px(Zmax))/2,PT+18,'ZONE C · both shrink','#2A4A8A',12);
+  // axes
+  el(plot,'line',{x1:PL,y1:PH-PB,x2:PW-PR,y2:PH-PB,stroke:'#6b695f','stroke-width':1.4});
+  [0.1,1,10].forEach(function(m){
+    el(plot,'line',{x1:PL-5,y1:py(m),x2:PW-PR,y2:py(m),stroke:'#9a988c','stroke-width':1,
+      'stroke-dasharray': m===1?'none':'2 5', opacity: m===1?0.9:0.6});
+    txt(plot,PL-12,py(m)+4,(m===1?'1×':(m<1?'0.1×':'10×')),'#6b695f',11,'end','400');
+  });
+  txt(plot,PL-12,PT+4,'|M|','#6b695f',12,'end');
+  [0,2,4,6,8,10,12].forEach(function(z){
+    el(plot,'line',{x1:px(z),y1:PH-PB,x2:px(z),y2:PH-PB+5,stroke:'#6b695f','stroke-width':1});
+    txt(plot,px(z),PH-PB+19,String(z),'#6b695f',11,'middle','400');
+  });
+  txt(plot,(PW-PR+PL)/2,PH-10,'depth  Z   ( picture plane at 0 )','#4a473f',12);
+  // the two slits — the asymptotes
+  [[XS.z1,'horizontal slit','#C99A2E'],[XS.z2,'vertical slit','#C99A2E']].forEach(function(s){
+    el(plot,'line',{x1:px(s[0]),y1:PT,x2:px(s[0]),y2:PH-PB,stroke:C.slit,'stroke-width':2.4,
+      'stroke-dasharray':'7 5'});
+    txt(plot,px(s[0]),PH-PB-8,s[1],C.slit,12);
+  });
+  // magnification curves, broken at the asymptotes
+  function curve(f,col,skip){
+    var seg=[], N=1400;
+    for(var i=0;i<=N;i++){
+      var Z=i*Zmax/N;
+      if(Math.abs(Z-skip)<0.035){ flush(); continue; }
+      var v=Math.abs(f(Z));
+      if(v<Mlo||v>Mhi){ flush(); continue; }
+      seg.push(px(Z)+','+py(v));
+    }
+    flush();
+    function flush(){
+      if(seg.length>1) el(plot,'polyline',{points:seg.join(' '),fill:'none',stroke:col,'stroke-width':2.8});
+      seg=[];
+    }
+  }
+  curve(XS.Mx,C.x,XS.z2);
+  curve(XS.My,C.y,XS.z1);
+  // the cube's depth span
+  var y0=PH-PB;
+  el(plot,'rect',{x:px(cube.Zn),y:PT+30,width:px(cube.Zf)-px(cube.Zn),height:y0-PT-30,
+    fill:'rgba(21,19,16,0.09)',stroke:C.cube,'stroke-width':2});
+  txt(plot,(px(cube.Zn)+px(cube.Zf))/2,PT+45,'cube',C.cube,13);
+  // where the cube's faces sit on each curve
+  [[cube.Zn,'near'],[cube.Zf,'far']].forEach(function(f){
+    [[XS.Mx,C.x],[XS.My,C.y]].forEach(function(m){
+      var v=Math.abs(m[0](f[0]));
+      if(v>=Mlo&&v<=Mhi) el(plot,'circle',{cx:px(f[0]),cy:py(v),r:5,fill:m[1]});
+    });
+  });
+  // the isotropic depth — drawn LAST so the cube window and the face dots
+  // cannot cover it; the pixel check caught exactly that occlusion
+  var Zh=XS.isotropicDepth(), Mh=Math.abs(XS.Mx(Zh));
+  el(plot,'line',{x1:px(Zh),y1:py(Mh),x2:px(Zh),y2:PH-PB,stroke:C.iso,'stroke-width':1.8,
+    'stroke-dasharray':'2 4'});
+  el(plot,'line',{x1:PL,y1:py(Mh),x2:px(Zh),y2:py(Mh),stroke:C.iso,'stroke-width':1.8,
+    'stroke-dasharray':'2 4'});
+  el(plot,'circle',{cx:px(Zh),cy:py(Mh),r:10,fill:'none',stroke:C.iso,'stroke-width':3});
+  el(plot,'polygon',{points:(px(Zh))+','+(PH-PB-7)+' '+(px(Zh)-6)+','+(PH-PB+3)+' '+(px(Zh)+6)+','+(PH-PB+3),
+    fill:C.iso});
+  txt(plot,px(Zh),py(Mh)-20,'|Mx| = |My|',C.iso,13);
+  txt(plot,px(Zh),py(Mh)-36,'square stays square',C.iso,12);
+
+  document.getElementById('cntZ').textContent =
+    'Z = '+cube.Zn.toFixed(2)+' … '+cube.Zf.toFixed(2)+'   ·   zone '+XS.zoneOf(cube.Zn);
+  return cube;
+}
+
+// ---------------- panel 2: the front view ----------------
+var front=document.getElementById('front');
+var FW=900, FH=470;
+function renderFront(cube){
+  clear(front);
+  var f=XS.faces(cube.Zn,cube.Zf);
+  var m=Math.max(f.wN,f.wF,f.hN,f.hF);
+  var k=Math.min((FW*0.40)/m,(FH*0.40)/m);
+  var cx=FW/2, cy=FH/2+8;
+  function P(p){ return [cx+p[0]*k, cy-p[1]*k]; }
+
+  // the four receding edges, sampled — they are curves
+  var corners=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  var edges=corners.map(function(c){
+    return XS.recedingEdge(c[0],c[1],cube.Zn,cube.Zf,28).map(P);
+  });
+  // walls: left/right ride the horizontal channel, top/bottom the vertical
+  var walls=[
+    {a:3,b:0,show:f.sides,name:'left'},
+    {a:1,b:2,show:f.sides,name:'right'},
+    {a:2,b:3,show:f.caps, name:'top'},
+    {a:0,b:1,show:f.caps, name:'bottom'}
+  ];
+  walls.forEach(function(w){
+    if(!w.show) return;
+    var pts=edges[w.a].concat(edges[w.b].slice().reverse());
+    el(front,'polygon',{points:pts.map(function(p){return p[0]+','+p[1];}).join(' '),
+      fill:'rgba(43,158,168,0.20)',stroke:C.wall,'stroke-width':2.2,'stroke-linejoin':'round'});
+  });
+  // far face then near face
+  function faceRect(Z,col,w){
+    var q=corners.map(function(c){ return P(XS.image(c[0],c[1],Z)); });
+    el(front,'polygon',{points:q.map(function(p){return p[0]+','+p[1];}).join(' '),
+      fill:'none',stroke:col,'stroke-width':w});
+    return q;
+  }
+  faceRect(cube.Zf,C.dim,2.4);
+  faceRect(cube.Zn,C.face,3.4);
+  // draw the receding edges themselves
+  edges.forEach(function(e){
+    el(front,'polyline',{points:e.map(function(p){return p[0]+','+p[1];}).join(' '),
+      fill:'none',stroke:C.wall,'stroke-width':2.2,'stroke-dasharray': (f.sides||f.caps)?'none':'4 5',
+      opacity:(f.sides||f.caps)?1:0.5});
+  });
+  txt(front,cx,36,f.n+(f.n===1?' FACE VISIBLE':' FACES VISIBLE'),C.face,22);
+  txt(front,cx,FH-16,'near face '+(f.wN>f.wF?'wider':'narrower')+' than far · '+
+    'near '+(f.hN>f.hF?'taller':'shorter')+' than far','#4a473f',13);
+  var sag=XS.sag(XS.recedingEdge(-1,-1,cube.Zn,cube.Zf,28));
+  document.getElementById('cntF').textContent='receding edges bend '+(100*sag).toFixed(1)+'% of chord';
+  return f;
+}
+
+// ---------------- panel 3: the congruence ----------------
+function renderCong(){
+  var svg=document.getElementById('cong');
+  clear(svg);
+  var gF=0.55, inner=1-gF;
+  function fig(ox,label,smallIsFar){
+    var s=118, cy=168;
+    function sq(h,col,w){
+      var q=[[-h,-h],[h,-h],[h,h],[-h,h]].map(function(p){ return [ox+p[0]*s, cy-p[1]*s]; });
+      el(svg,'polygon',{points:q.map(function(p){return p[0]+','+p[1];}).join(' '),
+        fill:'none',stroke:col,'stroke-width':w});
+      return q;
+    }
+    var O=sq(1,'#151310',3.2), I=sq(inner,'#C43A2B',3.2);
+    for(var i=0;i<4;i++) el(svg,'line',{x1:O[i][0],y1:O[i][1],x2:I[i][0],y2:I[i][1],
+      stroke:C.wall,'stroke-width':2.2});
+    txt(svg,ox,44,label,'#151310',15);
+    txt(svg,ox,cy,smallIsFar?'FAR':'NEAR','#C43A2B',13);
+    txt(svg,ox,cy+s+26,smallIsFar?'you are inside · small square is the back wall'
+                                 :'you are outside · small square is the front face','#4a473f',12);
+  }
+  fig(238,'ONE-POINT PERSPECTIVE, INTERIOR',true);
+  fig(662,'REVERSED EXTERIOR CUBE  ( = zone A )',false);
+  el(svg,'line',{x1:450,y1:60,x2:450,y2:300,stroke:'#9a988c','stroke-width':1,'stroke-dasharray':'4 6'});
+  txt(svg,450,318,'identical to the last decimal · opposite depth reading','#6b695f',12);
+}
+
+// ---------------- readout ----------------
+function renderReadout(cube,f){
+  var rows=[];
+  var Zn=cube.Zn, Zf=cube.Zf;
+  rows.push('               near Z='+Zn.toFixed(2)+'      far Z='+Zf.toFixed(2)+'      behaviour');
+  rows.push('horizontal Mx  '+XS.Mx(Zn).toFixed(3).padStart(9)+'  '+XS.Mx(Zf).toFixed(3).padStart(12)+
+    '      '+(f.wF>f.wN?'GROWS with depth':'shrinks with depth'));
+  rows.push('vertical   My  '+XS.My(Zn).toFixed(3).padStart(9)+'  '+XS.My(Zf).toFixed(3).padStart(12)+
+    '      '+(f.hF>f.hN?'GROWS with depth':'shrinks with depth'));
+  rows.push('');
+  var ic=XS.isotropicCheck();
+  rows.push('isotropic depth Zh = 2·z1·z2/(z1+z2) = '+ic.Zh.toFixed(4)+
+    '   |Mx| = |My| = '+ic.mx.toFixed(4)+'   (relative gap '+ic.gap.toExponential(1)+')');
+  rows.push('             (z1, z2 ; Zh, 0) = '+ic.cr.toFixed(9)+
+    '  — the harmonic conjugate of the picture plane in the two slits');
+  rows.push('             the cube '+((Zn<=ic.Zh&&ic.Zh<=Zf)?'STRADDLES it — a square face images square here'
+                                                            :'does not span it'));
+  rows.push('');
+  var z=XS.zoneOf(Zn);
+  var expect={A:5,B:3,C:1}[z];
+  rows.push('zone '+z+'  →  '+f.n+' faces visible'+(f.n===expect?'':'  ??')+
+    '   ( A:5 · B:3 · C:1 )');
+  rows.push('');
+  var ok = f.n===expect && XS.zoneOf(Zn)===XS.zoneOf(Zf);
+  rows.push((ok?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   cube lies wholly in one zone · face count matches the zone law');
+  document.getElementById('ro').innerHTML=rows.join('\n');
+}
+
+var CAPS={
+ A:'<b>Zone A — in front of both slits.</b> Both channels grow with depth, so the far face is larger '+
+   'than the near one in every direction, and all four receding walls swing into view around a small '+
+   'front face. Five faces. This is your inverted cube, and it is the interior-room picture.',
+ B:'<b>Zone B — between the slits.</b> The horizontal channel is past its slit and growing; the vertical '+
+   'channel has not reached its own slit and is still shrinking. The far face is wider but shorter than '+
+   'the near one, so the left and right walls appear while the top and bottom stay hidden. Three faces — '+
+   'the genuinely mixed picture, and the one nothing else on the board draws. Somewhere inside this zone '+
+   'the two channels cross: at the harmonic mean of the slit depths, marked in violet, a square face '+
+   'images as a square. It is the harmonic conjugate of the picture plane with respect to the two slits.',
+ C:'<b>Zone C — beyond both slits.</b> Both channels shrink. The far face is smaller in every direction '+
+   'and hides behind the near one. One face: the ordinary exterior view. This is the only zone a physically '+
+   'built cross-slit camera can reach, since its slits sit between the scene and the sensor.'
+};
+
+function renderAll(){
+  var cube=renderPlot();
+  var f=renderFront(cube);
+  document.getElementById('cap').innerHTML=CAPS[zone];
+  renderReadout(cube,f);
+}
+document.querySelectorAll('button.zone').forEach(function(b){
+  b.addEventListener('click',function(){
+    zone=b.getAttribute('data-z');
+    document.querySelectorAll('button.zone').forEach(function(x){ x.classList.toggle('on',x===b); });
+    renderAll();
+  });
+});
+document.getElementById('pos').addEventListener('input',function(){ pos=+this.value; renderAll(); });
+
+renderCong();
+renderAll();
+})();
+</script>
+</body>
+</html>

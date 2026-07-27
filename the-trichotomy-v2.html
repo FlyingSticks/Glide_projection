@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The trichotomy · 0–4, 1–3, 2–2</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 16px;max-width:680px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .tabs{display:flex;gap:8px;margin:12px 0 4px;flex-wrap:wrap;}
+ .tab{flex:1;min-width:170px;font:inherit;text-align:left;padding:8px 11px;border:1px solid #6b695f;
+      background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;line-height:1.3;}
+ .tab:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ .tab.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ .tab .sp{font-size:19px;font-weight:700;letter-spacing:0.04em;display:block;}
+ .tab .vd{font-size:11.5px;letter-spacing:0.14em;opacity:0.85;}
+ .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 4px;}
+ button.util{font:inherit;font-size:14px;padding:6px 13px;border:1px solid #6b695f;background:#DCDAD0;border-radius:4px;cursor:pointer;color:#151310;}
+ button.util.on{background:#3a3830;color:#EFEDE3;border-color:#3a3830;}
+ .caption{font-size:14px;margin:10px 2px 0;max-width:730px;min-height:3.4em;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;}
+ .key{font-size:12.5px;color:#4a473f;margin:8px 2px 0;}
+ .sw{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin:0 3px 0 10px;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · HARMONIC UNDERCARRIAGE</p>
+  <h1>The trichotomy</h1>
+  <p class="sub">Four random lines, six crossings, three ways to pair the lines. Ask one question of each
+  pairing — how does its gap line divide the other four vertices? — and the three answers are always
+  0&#8202;&ndash;&#8202;4, 1&#8202;&ndash;&#8202;3, 2&#8202;&ndash;&#8202;2, one of each. That is the whole
+  classification. Drag anything; the badges re-sort themselves.</p>
+
+  <div class="panel">
+    <svg id="board" viewBox="0 0 900 600" aria-label="Four draggable lines with one pairing's gap line and quadrilateral"></svg>
+
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-k="0"><span class="sp" data-sp>–</span><span class="vd" data-vd>–</span></button>
+      <button class="tab" data-k="1"><span class="sp" data-sp>–</span><span class="vd" data-vd>–</span></button>
+      <button class="tab" data-k="2"><span class="sp" data-sp>–</span><span class="vd" data-vd>–</span></button>
+    </div>
+
+    <div class="controls">
+      <button class="util" id="harm">Show harmonic cuts</button>
+      <button class="util" id="ghost">Diagonal triangle</button>
+      <button class="util" id="frame">Frame the nine</button>
+      <button class="util" id="reset">Reset view</button>
+      <span style="flex:1"></span>
+      <button class="util" id="rnd">Randomize</button>
+    </div>
+
+    <p class="key">gap pair <span class="sw" style="background:#2456C8"></span>A, B &nbsp;·&nbsp;
+      remaining four by side of the gap line:
+      <span class="sw" style="background:#2B9EA8"></span>near
+      <span class="sw" style="background:#7C4BA0"></span>far &nbsp;·&nbsp;
+      quadrilateral <span class="sw" style="background:#C43A2B"></span>simple
+      <span class="sw" style="background:#C99A2E"></span>crossed &nbsp;·&nbsp;
+      <span class="sw" style="background:#2E9E4B"></span>diagonal-triangle vertices &mdash; only three exist,
+      and each lies on two of the three gap lines</p>
+
+    <p class="caption" id="cap"></p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_simple.js holds this ledger (8/8):
+  each 4-gon's four sides lie one each on the four given lines; the three splits are always 0&#8211;4,
+  1&#8211;3, 2&#8211;2; the 2&#8211;2 pairing is the crossed one in 2000/2000 arrangements; and
+  cr&nbsp;=&nbsp;&minus;1 holds on all three regardless. Simplicity is affine, not projective &mdash; which
+  is why it merges the 0 and 1 cases and cannot serve as the selector.</p>
+</div>
+
+<script id="geo">
+var GEO = (function(){
+  'use strict';
+  function lineFrom2(p,q){ return [p[1]-q[1], q[0]-p[0], p[0]*q[1]-p[1]*q[0]]; }
+  function meet(l,m){
+    var x=l[1]*m[2]-l[2]*m[1], y=l[2]*m[0]-l[0]*m[2], w=l[0]*m[1]-l[1]*m[0];
+    return Math.abs(w)<1e-12 ? null : [x/w,y/w];
+  }
+  function crossRatio(a,b,x,y){
+    var dx=b[0]-a[0], dy=b[1]-a[1], n=Math.hypot(dx,dy);
+    if(n<1e-12) return NaN;
+    var u=[dx/n,dy/n];
+    function t(p){ return (p[0]-a[0])*u[0]+(p[1]-a[1])*u[1]; }
+    var tb=t(b), tx=t(x), ty=t(y);
+    return (tx*(ty-tb))/((tx-tb)*ty);
+  }
+  function segsCross(p1,p2,p3,p4){
+    function d(a,b,c){ return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]); }
+    var d1=d(p3,p4,p1), d2=d(p3,p4,p2), d3=d(p1,p2,p3), d4=d(p1,p2,p4);
+    return ((d1>0)!==(d2>0)) && ((d3>0)!==(d4>0));
+  }
+  var PAIR=[[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]];
+  function key(i,j){ return i<j ? ''+i+j : ''+j+i; }
+  function analyse(lines){
+    var P={}, i, j;
+    for(i=0;i<4;i++) for(j=i+1;j<4;j++){
+      var pt=meet(lines[i],lines[j]); if(!pt) return null; P[key(i,j)]=pt;
+    }
+    var out=[];
+    for(var k=0;k<3;k++){
+      var a=PAIR[k][0][0], b=PAIR[k][0][1], c=PAIR[k][1][0], d=PAIR[k][1][1];
+      var A=P[key(a,b)], B=P[key(c,d)];
+      var Q=[P[key(a,c)],P[key(a,d)],P[key(b,d)],P[key(b,c)]];
+      var sideLines=[a,d,b,c];             // Q0Q1 on a, Q1Q2 on d, Q2Q3 on b, Q3Q0 on c
+      var gap=lineFrom2(A,B);
+      var X=meet(gap,lineFrom2(Q[0],Q[2])), Y=meet(gap,lineFrom2(Q[1],Q[3]));
+      if(!X||!Y) return null;
+      var simple = !segsCross(Q[0],Q[1],Q[2],Q[3]) && !segsCross(Q[1],Q[2],Q[3],Q[0]);
+      var sg=Q.map(function(p){ return (gap[0]*p[0]+gap[1]*p[1]+gap[2])>0 ? 1 : -1; });
+      var nPos=0; sg.forEach(function(s){ if(s>0) nPos++; });
+      var minor=Math.min(nPos,4-nPos);
+      // orient so "near" is the majority side (purely cosmetic, keeps colors stable)
+      var majority = nPos>=2 ? 1 : -1;
+      out.push({A:A,B:B,Q:Q,gap:gap,X:X,Y:Y,sides:sg,majority:majority,sideLines:sideLines,
+                simple:simple, split:minor, oneSide:(minor===0),
+                cr:crossRatio(A,B,X,Y)});
+    }
+    return {P:P, pairings:out};
+  }
+  function trichotomyOK(res){
+    if(!res) return false;
+    var s=res.pairings.map(function(p){ return p.split; }).slice().sort();
+    return s[0]===0 && s[1]===1 && s[2]===2;
+  }
+  // the three vertices of the diagonal triangle: pairwise meets of the gap lines
+  function diagVertices(res){
+    if(!res) return null;
+    var g=res.pairings.map(function(p){ return p.gap; });
+    var M=[meet(g[0],g[1]), meet(g[0],g[2]), meet(g[1],g[2])];
+    return M.every(function(m){ return !!m; }) ? M : null;
+  }
+  // all nine points of the system: 6 crossings + 3 diagonal-triangle vertices
+  function ninePoints(res){
+    if(!res) return null;
+    var D=diagVertices(res); if(!D) return null;
+    var six=[]; for(var k in res.P) six.push(res.P[k]);
+    return {six:six, diag:D, all:six.concat(D)};
+  }
+  // fit a point set into a W x H frame. Returns {cx,cy,k,clamped}.
+  // kFloor guards the pathological case: when two gap lines run nearly parallel
+  // their meet flies off, and fitting all nine would shrink the figure to nothing.
+  function fitView(pts, W, H, pad, floorPts, floorFrac){
+    if(!pts||!pts.length) return null;
+    function bbox(a){
+      var x0=1e18,y0=1e18,x1=-1e18,y1=-1e18;
+      a.forEach(function(p){ x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]);
+                             x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); });
+      return [x0,y0,x1,y1];
+    }
+    function kFor(b){
+      var w=Math.max(b[2]-b[0],1e-6), h=Math.max(b[3]-b[1],1e-6);
+      return Math.min((W-2*pad)/w, (H-2*pad)/h);
+    }
+    var bAll=bbox(pts), kAll=kFor(bAll);
+    var clamped=false, k=kAll, b=bAll;
+    if(floorPts&&floorPts.length){
+      var kFloor=kFor(bbox(floorPts))*floorFrac;
+      if(kAll<kFloor){ k=kFloor; b=bbox(floorPts); clamped=true; }
+    }
+    k=Math.min(k, 4);
+    return {cx:(b[0]+b[2])/2, cy:(b[1]+b[3])/2, k:k, clamped:clamped};
+  }
+  return {lineFrom2:lineFrom2, meet:meet, crossRatio:crossRatio, segsCross:segsCross,
+          analyse:analyse, trichotomyOK:trichotomyOK,
+          diagVertices:diagVertices, ninePoints:ninePoints, fitView:fitView};
+})();
+if (typeof module!=='undefined') module.exports = GEO;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg', svg=document.getElementById('board');
+var W=900,H=600;
+var C={line:'#3f3d36', gap:'#2456C8', near:'#2B9EA8', far:'#7C4BA0',
+       simple:'#C43A2B', crossed:'#C99A2E', ghost:'#8E8C80', cut:'#2E9E4B'};
+var sel=0, showHarm=false, showGhost=false;
+// view transform: screen = (world - c) * k + centre.  Identity by default.
+var view={cx:W/2, cy:H/2, k:1, clamped:false, framed:false, forced:false};
+function V(p){ return [(p[0]-view.cx)*view.k + W/2, (p[1]-view.cy)*view.k + H/2]; }
+function Vinv(s){ return [(s[0]-W/2)/view.k + view.cx, (s[1]-H/2)/view.k + view.cy]; }
+function onScreen(s,m){ m=m||0; return s[0]>=m&&s[0]<=W-m&&s[1]>=m&&s[1]<=H-m; }
+
+var handles=[
+  [[348,104],[824,692]],
+  [[190,322],[702,493]],
+  [[608,313],[-177,550]],
+  [[398,75],[53,518]]
+];
+function lines(){ return handles.map(function(h){ return GEO.lineFrom2(h[0],h[1]); }); }
+
+// clip the line through two WORLD points to the screen rectangle, after mapping
+function clipThrough(p,q){
+  var a=V(p), b=V(q);
+  if(Math.hypot(b[0]-a[0],b[1]-a[1])<1e-9) return null;
+  var l=GEO.lineFrom2(a,b), pts=[], eps=1e-7;
+  var edges=[[[0,0],[W,0]],[[W,0],[W,H]],[[W,H],[0,H]],[[0,H],[0,0]]];
+  edges.forEach(function(e){
+    var p2=GEO.meet(l,GEO.lineFrom2(e[0],e[1]));
+    if(!p2) return;
+    if(p2[0]>=-eps&&p2[0]<=W+eps&&p2[1]>=-eps&&p2[1]<=H+eps){
+      for(var i=0;i<pts.length;i++) if(Math.hypot(pts[i][0]-p2[0],pts[i][1]-p2[1])<1e-6) return;
+      pts.push(p2);
+    }
+  });
+  return pts.length>=2 ? [pts[0],pts[1]] : null;
+}
+// marker at the frame edge pointing toward an off-screen point
+function edgeMarker(sp,label,col){
+  var c=[W/2,H/2], d=[sp[0]-c[0], sp[1]-c[1]], n=Math.hypot(d[0],d[1]);
+  if(n<1e-9) return;
+  d=[d[0]/n,d[1]/n];
+  var t=1e18, m=26;
+  if(Math.abs(d[0])>1e-9) t=Math.min(t, ((d[0]>0?W-m:m)-c[0])/d[0]);
+  if(Math.abs(d[1])>1e-9) t=Math.min(t, ((d[1]>0?H-m:m)-c[1])/d[1]);
+  var e=[c[0]+d[0]*t, c[1]+d[1]*t];
+  var ang=Math.atan2(d[1],d[0])*180/Math.PI;
+  var g=document.createElementNS(NS,'g');
+  g.setAttribute('transform','translate('+e[0]+','+e[1]+') rotate('+ang+')');
+  var tri=document.createElementNS(NS,'polygon');
+  tri.setAttribute('points','0,0 -14,-7 -14,7');
+  tri.setAttribute('fill',col);
+  g.appendChild(tri);
+  svg.appendChild(g);
+  var dist=(Math.hypot(sp[0]-c[0],sp[1]-c[1])/W).toFixed(1);
+  txt(e[0]-d[0]*30, e[1]-d[1]*30+5, label+' · '+dist+'w', col, 13);
+}
+function el(name,attrs){
+  var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  svg.appendChild(e); return e;
+}
+function txt(x,y,s,fill,size,anchor){
+  var t=el('text',{x:x,y:y,fill:fill||'#151310','font-size':size||15,
+    'font-family':'Helvetica, Arial, sans-serif','font-weight':'700','text-anchor':anchor||'middle',
+    'paint-order':'stroke',stroke:'#CFCDC1','stroke-width':4});
+  t.textContent=s; return t;
+}
+function inBox(p){ return p[0]>-160&&p[0]<W+160&&p[1]>-160&&p[1]<H+160; }
+
+var lastGood=null;
+function render(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var L=lines(), res=GEO.analyse(L);
+  var bad = !res || !GEO.trichotomyOK(res);
+  if(!bad) lastGood=res;
+  var R = bad ? lastGood : res;
+
+  // the four given lines, clipped in screen space
+  handles.forEach(function(hh){
+    var c=clipThrough(hh[0],hh[1]);
+    if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+      stroke:C.line,'stroke-width':2.4,'stroke-linecap':'round'});
+  });
+
+  if(R){
+    var g=R.pairings[sel];
+    var D=GEO.diagVertices(R);
+
+    if(showGhost){
+      R.pairings.forEach(function(p,i){
+        if(i===sel) return;
+        var c=clipThrough(p.A,p.B);
+        if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+          stroke:C.ghost,'stroke-width':1.6,'stroke-dasharray':'3 7'});
+      });
+    }
+
+    // quadrilateral
+    var qcol = g.simple ? C.simple : C.crossed;
+    el('polygon',{points:g.Q.map(function(p){var s=V(p);return s[0]+','+s[1];}).join(' '),
+      fill: g.simple ? 'rgba(196,58,43,0.10)' : 'rgba(201,154,46,0.13)',
+      stroke:qcol,'stroke-width':4,'stroke-linejoin':'round'});
+
+    // gap line
+    var c=clipThrough(g.A,g.B);
+    if(c) el('line',{x1:c[0][0],y1:c[0][1],x2:c[1][0],y2:c[1][1],
+      stroke:C.gap,'stroke-width':2.6,'stroke-dasharray':'9 7'});
+
+    // harmonic cuts
+    if(showHarm){
+      var q0=V(g.Q[0]), q2=V(g.Q[2]), q1=V(g.Q[1]), q3=V(g.Q[3]);
+      el('line',{x1:q0[0],y1:q0[1],x2:q2[0],y2:q2[1],stroke:C.cut,'stroke-width':2.6});
+      el('line',{x1:q1[0],y1:q1[1],x2:q3[0],y2:q3[1],stroke:C.cut,'stroke-width':2.6});
+      [[g.X,'X'],[g.Y,'Y']].forEach(function(pr){
+        var s=V(pr[0]);
+        if(onScreen(s,6)) el('circle',{cx:s[0],cy:s[1],r:6,fill:C.cut});
+        else edgeMarker(s,pr[1],C.cut);
+      });
+    }
+
+    // the three diagonal-triangle vertices
+    if(showGhost && D){
+      D.forEach(function(m){
+        var s=V(m);
+        if(onScreen(s,8)) el('circle',{cx:s[0],cy:s[1],r:8,fill:'none',stroke:C.cut,'stroke-width':2.5});
+        else edgeMarker(s,'△',C.cut);
+      });
+    }
+
+    // the four remaining vertices, coloured by side
+    g.Q.forEach(function(p,i){
+      var s=V(p), near = g.sides[i]===g.majority;
+      el('circle',{cx:s[0],cy:s[1],r:8.5,fill: near?C.near:C.far,stroke:'#151310','stroke-width':1.2});
+    });
+
+    // gap pair
+    [[g.A,'A'],[g.B,'B']].forEach(function(ab){
+      var s=V(ab[0]);
+      if(onScreen(s,8)){
+        el('circle',{cx:s[0],cy:s[1],r:7.5,fill:C.gap});
+        txt(s[0]+15,s[1]-11,ab[1],C.gap,16);
+      } else edgeMarker(s,ab[1],C.gap);
+    });
+
+    // remaining crossings
+    for(var k in R.P){
+      var p=R.P[k], used=false;
+      g.Q.concat([g.A,g.B]).forEach(function(q){ if(Math.hypot(q[0]-p[0],q[1]-p[1])<1e-6) used=true; });
+      if(!used){ var s=V(p); if(onScreen(s,4)) el('circle',{cx:s[0],cy:s[1],r:4,fill:'#151310'}); }
+    }
+  }
+
+  handles.forEach(function(hh,li){
+    hh.forEach(function(p,pi){
+      var s=V(p);
+      if(!onScreen(s,-40)) return;
+      var cc=el('circle',{cx:s[0],cy:s[1],r:9,fill:'#DCDAD0',stroke:'#6b695f','stroke-width':1.5,
+        cursor:'grab','data-l':li,'data-p':pi});
+      cc.style.touchAction='none';
+    });
+  });
+
+  updateTabs(R);
+  updateText(R, bad);
+}
+
+function frameNine(){
+  var R=GEO.analyse(lines());
+  if(!R||!GEO.trichotomyOK(R)) return;
+  var N=GEO.ninePoints(R);
+  if(!N) return;
+  // First press: fit the nine, but never shrink the six crossings below 22% of
+  // their own best fit — a diagonal-triangle vertex can sit ten frames away when
+  // two gap lines run nearly parallel, and fitting it literally would erase the
+  // figure. Press again in that case to force all nine in, however small.
+  var force = view.framed && view.clamped;
+  var f=GEO.fitView(N.all, W, H, 54, force ? null : N.six, 0.22);
+  if(!f) return;
+  view.cx=f.cx; view.cy=f.cy; view.k=f.k;
+  view.clamped=f.clamped; view.framed=true; view.forced=force;
+  render();
+}
+function resetView(){
+  view={cx:W/2, cy:H/2, k:1, clamped:false, framed:false, forced:false};
+  render();
+}
+
+var SPLIT_LABEL=['0 – 4','1 – 3','2 – 2'];
+function updateTabs(R){
+  document.querySelectorAll('.tab').forEach(function(b){
+    var k=+b.getAttribute('data-k');
+    var sp=b.querySelector('[data-sp]'), vd=b.querySelector('[data-vd]');
+    if(!R){ sp.textContent='–'; vd.textContent='–'; return; }
+    var p=R.pairings[k];
+    sp.textContent=SPLIT_LABEL[p.split];
+    vd.textContent=(p.oneSide?'ONE SIDE · ':'')+(p.simple?'SIMPLE':'CROSSED');
+    b.classList.toggle('on', k===sel);
+  });
+}
+
+var CAPS={
+ 0:'<b>Split 0&#8202;&ndash;&#8202;4 &mdash; the one-side pairing.</b> The gap line passes clear of the other four '+
+   'vertices, leaving all of them on one side. It crosses the gap without cutting through the figure. '+
+   'The quadrilateral it looks across is <b>simple</b>. This is the pairing the construction wants, and the '+
+   'property that singles it out.',
+ 1:'<b>Split 1&#8202;&ndash;&#8202;3 &mdash; also simple.</b> The gap line now cuts through the arrangement, peeling '+
+   'one vertex off from the other three, yet the quadrilateral still closes without crossing itself. This is '+
+   'the case that broke my first claim: it is simple, but it is not the one you want. Simplicity cannot tell '+
+   'it from the 0&#8202;&ndash;&#8202;4 case.',
+ 2:'<b>Split 2&#8202;&ndash;&#8202;2 &mdash; the bowtie.</b> The gap line separates the four vertices evenly, and the '+
+   'quadrilateral crosses itself. Verified in 2000/2000 arrangements: the even split and the crossed figure '+
+   'are the same case. The cross-ratio on this diagonal is still exactly &minus;1 &mdash; the harmonic result '+
+   'never depended on which figure you draw.'
+};
+function updateText(R,bad){
+  document.getElementById('cap').innerHTML = R ? CAPS[R.pairings[sel].split] : '';
+  var ro=document.getElementById('ro');
+  if(bad){
+    ro.innerHTML='<span class="warn">degenerate arrangement — two lines near-parallel or three near-concurrent.\n'+
+      'Drag on; showing the last valid configuration.</span>';
+    return;
+  }
+  var rows=['pairing      split      figure     cr(A,B;X,Y)      |cr+1|'];
+  var worst=0, splits=[];
+  R.pairings.forEach(function(p,i){
+    worst=Math.max(worst,Math.abs(p.cr+1)); splits.push(p.split);
+    rows.push(
+      (i===sel?'▶ ':'  ')+'  '+(i+1)+'      '+
+      SPLIT_LABEL[p.split]+(p.oneSide?' ✓':'  ')+'     '+
+      (p.simple?'simple ':'crossed')+'    '+
+      (p.cr>=0?' ':'')+p.cr.toFixed(9)+'    '+Math.abs(p.cr+1).toExponential(2));
+  });
+  var sorted=splits.slice().sort();
+  var triOK = sorted[0]===0&&sorted[1]===1&&sorted[2]===2;
+  var crossedIs2 = R.pairings.every(function(p){ return p.simple === (p.split!==2); });
+  rows.push('');
+  var N=GEO.ninePoints(R), nOff=0;
+  if(N) N.all.forEach(function(p){ if(!onScreen(V(p),0)) nOff++; });
+  var state = !view.framed ? 'unframed'
+            : view.forced ? 'forced — all nine in view'
+            : view.clamped ? 'framed, floor reached — press again to force all nine in'
+            : 'framed to the nine';
+  rows.push('view         scale '+view.k.toFixed(3)+' × '+state+
+    '   ·   '+(nOff===0?'all 9 points on screen':nOff+' of 9 off screen (arrows mark them)'));
+  rows.push(((triOK&&crossedIs2&&worst<1e-6)?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    '   splits = {'+sorted.join(', ')+'} · crossed ⇔ split 2 · all three harmonic, worst '+worst.toExponential(2));
+  ro.innerHTML=rows.join('\n');
+}
+
+// interaction
+var drag=null;
+svg.addEventListener('pointerdown',function(ev){
+  var t=ev.target;
+  if(t.tagName==='circle'&&t.hasAttribute('data-l')){
+    drag={l:+t.getAttribute('data-l'),p:+t.getAttribute('data-p')};
+    svg.setPointerCapture(ev.pointerId); ev.preventDefault();
+  }
+});
+svg.addEventListener('pointermove',function(ev){
+  if(!drag) return;
+  var r=svg.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*W/r.width, y=(ev.clientY-r.top)*H/r.height;
+  x=Math.max(8,Math.min(W-8,x)); y=Math.max(8,Math.min(H-8,y));
+  handles[drag.l][drag.p]=Vinv([x,y]);
+  render();
+});
+svg.addEventListener('pointerup',function(){ drag=null; });
+svg.addEventListener('pointercancel',function(){ drag=null; });
+
+document.querySelectorAll('.tab').forEach(function(b){
+  b.addEventListener('click',function(){ sel=+b.getAttribute('data-k'); render(); });
+});
+document.getElementById('harm').addEventListener('click',function(){
+  showHarm=!showHarm; this.classList.toggle('on',showHarm); render();
+});
+document.getElementById('ghost').addEventListener('click',function(){
+  showGhost=!showGhost; this.classList.toggle('on',showGhost); render();
+});
+document.getElementById('frame').addEventListener('click',function(){
+  showHarm=true; document.getElementById('harm').classList.add('on');
+  showGhost=true; document.getElementById('ghost').classList.add('on');
+  frameNine();
+});
+document.getElementById('reset').addEventListener('click',resetView);
+document.getElementById('rnd').addEventListener('click',function(){
+  for(var t=0;t<60;t++){
+    var hs=[];
+    for(var i=0;i<4;i++){
+      var cx=200+Math.random()*500, cy=160+Math.random()*300;
+      var ang=Math.random()*Math.PI, r=190+Math.random()*110;
+      hs.push([[cx-r*Math.cos(ang),cy-r*Math.sin(ang)],[cx+r*Math.cos(ang),cy+r*Math.sin(ang)]]);
+    }
+    var save=handles; handles=hs;
+    var ok=GEO.trichotomyOK(GEO.analyse(lines()));
+    if(ok) break; else handles=save;
+  }
+  resetView();
+});
+
+render();
+})();
+</script>
+</body>
+</html>
