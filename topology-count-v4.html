@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topology / Count v4 — straight rulings, curving diagonals</title>
+<style>
+  :root{
+    --paper:#faf7f0; --ink:#1c1c1c;
+    --red:#d93a2b; --blue:#2b4fd7; --purple:#8e44c8; --aqua:#35b8b8; --gray:#8f8f8f; --green:#3a9e3a;
+    --hand:"Chalkboard SE","Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--hand);}
+  header{padding:14px 18px 4px;}
+  .eyebrow{font-size:12px; letter-spacing:.22em; color:var(--red); text-transform:uppercase;}
+  h1{margin:2px 0 0; font-size:clamp(20px,4.5vw,30px); letter-spacing:.04em; text-transform:uppercase;}
+  .caption{margin:4px 0 0; font-size:12.5px; color:#555; line-height:1.5;}
+  .caption b{font-weight:600;}
+  .swatch{display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin-right:2px;}
+
+  #controls{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:10px 18px;}
+  .grp{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:4px 8px; border:2px solid #2222; border-radius:12px;}
+  .grp-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#777; margin-right:2px;}
+  button.chip{
+    font-family:var(--hand); font-size:13px; padding:5px 11px; border-radius:10px;
+    border:2px solid var(--ink); background:var(--paper); color:var(--ink); cursor:pointer;
+    transform:rotate(-.4deg);
+  }
+  button.chip:nth-child(even){transform:rotate(.5deg);}
+  button.chip[aria-pressed="true"]{background:var(--ink); color:var(--paper);}
+  button.chip:focus-visible{outline:3px solid var(--blue); outline-offset:2px;}
+  .stepper{display:flex; align-items:center; gap:6px; font-size:13px;}
+  .stepper button{width:30px; height:30px; border-radius:9px; border:2px solid var(--ink); background:var(--paper); font-family:var(--hand); font-size:16px; cursor:pointer;}
+  input[type=range]{width:110px; accent-color:var(--ink);}
+  .slider{display:flex; align-items:center; gap:6px; font-size:12px; color:#555;}
+
+  #stage{position:relative; margin:0 10px 14px; border:2px solid #2223; border-radius:14px; overflow:hidden; background:
+    radial-gradient(circle at 30% 20%, #fffdf7 0%, var(--paper) 70%);}
+  svg{display:block; width:100%; height:auto; touch-action:none; cursor:grab;}
+  svg:active{cursor:grabbing;}
+
+  #ledger{
+    position:absolute; left:10px; bottom:10px; max-width:min(66vw,330px);
+    background:#fffefa; border:2px solid var(--ink); border-radius:10px;
+    padding:8px 12px; font-size:12px; line-height:1.55; transform:rotate(-.6deg);
+    box-shadow:2px 3px 0 #0002;
+  }
+  #ledger .lh{font-size:11px; letter-spacing:.18em; text-transform:uppercase; border-bottom:1.5px solid var(--ink); margin-bottom:4px; padding-bottom:2px;}
+  #ledger .row{display:flex; justify-content:space-between; gap:12px;}
+  #ledger .cube{margin-top:5px; padding-top:4px; border-top:1.5px dashed #999; color:#666; font-size:11.5px;}
+  #ledger .verdict{color:var(--blue);}
+  #ledger .greenv{color:var(--green);}
+  #ledger .sub{color:#888; font-size:11px;}
+  #hint{position:absolute; right:12px; bottom:10px; font-size:11px; color:#8a8a8a; text-align:right; line-height:1.4; max-width:34vw;}
+  @media (max-width:640px){ #hint{display:none;} #ledger{font-size:11px;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Topology / Count · v4</div>
+  <h1>Straight rulings, curving diagonals</h1>
+  <p class="caption">
+    Lines straightened: rings and depth lines are now drawn as the two ruling families of each side panel — straight by construction.
+    The new <b><span class="swatch" style="background:var(--green)"></span>diagonals</b> layer draws the diagonals <i>on the surface</i>:
+    they bow (Type A, doubly ruled) with sagitta exactly |T|/4, where T is the cell's twist defect. On the flat near face they stay straight (Type B).
+  </p>
+</header>
+
+<div id="controls">
+  <div class="grp" role="group" aria-label="Panel presets">
+    <span class="grp-label">Panel</span>
+    <button class="chip" data-preset="1">1 · plane</button>
+    <button class="chip" data-preset="2">2 · edge depth</button>
+    <button class="chip" data-preset="3">3 · + between</button>
+    <button class="chip" data-preset="4">4 · composite</button>
+  </div>
+  <div class="grp" role="group" aria-label="Layers">
+    <span class="grp-label">Layers</span>
+    <button class="chip" data-layer="plane">picture plane</button>
+    <button class="chip" data-layer="depth">edge depth</button>
+    <button class="chip" data-layer="between">between edges</button>
+    <button class="chip" data-layer="diag">diagonals</button>
+    <button class="chip" data-layer="dots">points</button>
+  </div>
+  <div class="grp" role="group" aria-label="Vanishing">
+    <span class="grp-label">Vanishing</span>
+    <button class="chip" id="collector" aria-pressed="false">collector ⊙</button>
+    <button class="chip" id="check" aria-pressed="false">check λ</button>
+  </div>
+  <div class="grp">
+    <span class="grp-label">Count n</span>
+    <div class="stepper">
+      <button id="nMinus" aria-label="decrease subdivision">−</button>
+      <span id="nVal">3</span>
+      <button id="nPlus" aria-label="increase subdivision">+</button>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="grp-label">Hand</span>
+    <div class="slider"><input id="hand" type="range" min="0" max="7" step="0.1" value="0" aria-label="hand wobble amount"></div>
+  </div>
+  <button class="chip" id="reset">reset</button>
+</div>
+
+<div id="stage">
+  <svg id="svg" viewBox="0 0 1000 780" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/780">
+    <g id="world">
+      <g id="Lcheck"></g>
+      <g id="Ldiag"></g>
+      <g id="Lbetween"></g>
+      <g id="Ldepth"></g>
+      <g id="Lplane"></g>
+      <g id="Lframe"></g>
+      <g id="Ldots"></g>
+      <g id="Lhandles"></g>
+    </g>
+  </svg>
+  <div id="ledger" aria-live="polite"></div>
+  <div id="hint">rulings straight · diagonals ride the surface<br>red = near corners · black = far corners<br>pan / pinch as before</div>
+</div>
+
+<script>
+(function(){
+  const SVG = document.getElementById('svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const G = id => document.getElementById(id);
+  const layers = {check:G('Lcheck'), diag:G('Ldiag'), between:G('Lbetween'), depth:G('Ldepth'), plane:G('Lplane'), frame:G('Lframe'), dots:G('Ldots'), handles:G('Lhandles')};
+
+  const NEAR0 = [{x:295,y:175},{x:735,y:140},{x:775,y:615},{x:235,y:640}]; // TL TR BR BL
+  const Z0 = {x:520,y:410};
+  const FAR0 = NEAR0.map((p,i)=>{
+    const q={x:p.x+(Z0.x-p.x)*0.82, y:p.y+(Z0.y-p.y)*0.82};
+    const nudge=[{x:-22,y:10},{x:18,y:-14},{x:12,y:20},{x:-16,y:-18}][i];
+    return {x:q.x+nudge.x, y:q.y+nudge.y};
+  });
+
+  const state = {
+    near: NEAR0.map(p=>({...p})),
+    far:  FAR0.map(p=>({...p})),
+    center: {...Z0},
+    view: {x:0,y:0,w:1000,h:780},
+    n:3, hand:0, fSnap:0.82,
+    collector:false, check:false,
+    show:{plane:true, depth:true, between:false, diag:true, dots:true}
+  };
+
+  /* ---------- math kit ---------- */
+  const frac = x => x - Math.floor(x);
+  function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967295;}
+  const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t});
+
+  function farEff(){
+    return state.collector
+      ? state.near.map(p=>lerp(p,state.center,state.fSnap))
+      : state.far;
+  }
+  function bilOf(c){ return (u,v)=>{
+    const [a,b,cc,d]=c;
+    return {x:(1-u)*(1-v)*a.x + u*(1-v)*b.x + u*v*cc.x + (1-u)*v*d.x,
+            y:(1-u)*(1-v)*a.y + u*(1-v)*b.y + u*v*cc.y + (1-u)*v*d.y};
+  };}
+
+  /* straight-line rendering: linear densify (for optional wobble), no spline */
+  function densify(pts, closed, per){
+    const out=[]; const n=pts.length;
+    const segs = closed ? n : n-1;
+    for(let i=0;i<segs;i++){
+      const a=pts[i], b=pts[(i+1)%n];
+      for(let j=0;j<per;j++) out.push(lerp(a,b,j/per));
+    }
+    if(!closed) out.push({...pts[pts.length-1]});
+    else out.push({...pts[0]});
+    return out;
+  }
+  function wobble(samples, closed, seedStr, amp){
+    if(amp<=0) return samples;
+    const L=samples.length, s=hash(seedStr);
+    const s1=frac(s*13.7)*6.2832, s2=frac(s*71.3)*6.2832, s3=frac(s*37.1)*6.2832;
+    const out=[];
+    for(let i=0;i<L;i++){
+      const t = closed ? i/L : i/(L-1);
+      let a,b;
+      if(closed){ a=samples[(i-1+L)%L]; b=samples[(i+1)%L]; }
+      else { a=samples[Math.max(0,i-1)]; b=samples[Math.min(L-1,i+1)]; }
+      const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      const nx=-dy/len, ny=dx/len;
+      const taper = closed ? 1 : Math.sin(Math.PI*t);
+      const w=(Math.sin(2*6.2832*t+s1)*.55+Math.sin(3*6.2832*t+s2)*.3+Math.sin(5*6.2832*t+s3)*.15)*amp*taper;
+      out.push({x:samples[i].x+nx*w, y:samples[i].y+ny*w});
+    }
+    return out;
+  }
+  function pathEl(parent, samples, closed, stroke, width, extra){
+    let d='M'+samples.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join('L');
+    if(closed) d+='Z';
+    const el=document.createElementNS(NS,'path');
+    el.setAttribute('d',d); el.setAttribute('fill','none');
+    el.setAttribute('stroke',stroke); el.setAttribute('stroke-width',width);
+    el.setAttribute('stroke-linecap','round'); el.setAttribute('stroke-linejoin','round');
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+  function dot(parent, p, r, fill, extra){
+    const el=document.createElementNS(NS,'circle');
+    el.setAttribute('cx',p.x.toFixed(1)); el.setAttribute('cy',p.y.toFixed(1));
+    el.setAttribute('r',r); el.setAttribute('fill',fill);
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+
+  /* ---------- geometry model ---------- */
+  function boundaryPairs(n){
+    const nb=bilOf(state.near), fb=bilOf(farEff());
+    const params=[];
+    for(let k=0;k<n;k++) params.push([k/n,0]);
+    for(let k=0;k<n;k++) params.push([1,k/n]);
+    for(let k=0;k<n;k++) params.push([1-k/n,1]);
+    for(let k=0;k<n;k++) params.push([0,1-k/n]);
+    return params.map(([u,v],i)=>({near:nb(u,v), far:fb(u,v), corner:i%n===0}));
+  }
+
+  /* ---------- doubly-ruled diagnostics ----------
+     Each side panel between adjacent depth lines is a bilinear cell
+     Q(s,t) = A + (B−A)s + (D−A)t + T·st, twist T = A−B+C−D.
+     Rulings (s=const, t=const) are straight; the on-surface diagonals
+     Q(s,s) and Q(s,1−s) bow off their chords by T·s(s−1) — sagitta
+     exactly |T|/4 (verified 3e−14 over 2000 random cells). T = 0 ⇔
+     the cell is a parallelogram ⇔ the panel is flat.               */
+  function cellDiagonals(A,B,C,D,samples){
+    const T={x:A.x-B.x+C.x-D.x, y:A.y-B.y+C.y-D.y};
+    const Q=(s,t)=>({x:A.x+(B.x-A.x)*s+(D.x-A.x)*t+T.x*s*t,
+                     y:A.y+(B.y-A.y)*s+(D.y-A.y)*t+T.y*s*t});
+    const d1=[], d2=[];
+    for(let j=0;j<=samples;j++){ const s=j/samples; d1.push(Q(s,s)); d2.push(Q(s,1-s)); }
+    return {d1, d2, bow:Math.hypot(T.x,T.y)/4};
+  }
+
+  /* ---------- concurrence as cross-ratio (from v3) ---------- */
+  function sectionParam(P,D,A,B){
+    const Ex=B.x-A.x, Ey=B.y-A.y;
+    const det=Ex*D.y - Ey*D.x;
+    if(Math.abs(det)<1e-9) return null;
+    return ((P.x-A.x)*D.y-(P.y-A.y)*D.x)/det;
+  }
+  function crossRatio(x){
+    const num=(x[0]-x[2])*(x[1]-x[3]), den=(x[0]-x[3])*(x[1]-x[2]);
+    if(Math.abs(den)<1e-12) return null;
+    return num/den;
+  }
+  function checkConcurrence(){
+    const F=farEff();
+    const lines=state.near.map((p,i)=>({P:p, D:{x:F[i].x-p.x, y:F[i].y-p.y}}));
+    const pts=[]; let parallel=false;
+    for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+      const A=lines[i], B=lines[j];
+      const det=A.D.x*B.D.y - A.D.y*B.D.x;
+      if(Math.abs(det)<1e-6){ parallel=true; continue; }
+      const t=((B.P.x-A.P.x)*B.D.y-(B.P.y-A.P.y)*B.D.x)/det;
+      const q={x:A.P.x+t*A.D.x, y:A.P.y+t*A.D.y};
+      if(Math.hypot(q.x-500,q.y-390)<6000) pts.push(q);
+    }
+    let spread=null;
+    if(pts.length>=2){ spread=0;
+      for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
+        spread=Math.max(spread, Math.hypot(pts[i].x-pts[j].x, pts[i].y-pts[j].y));
+    }
+    const N=state.near;
+    const cuts=[[N[0],N[2]],[N[1],N[3]],[F[0],F[2]],[F[1],F[3]]];
+    const sections=cuts.map(([A,B])=>{
+      const ss=lines.map(l=>sectionParam(l.P,l.D,A,B));
+      if(ss.some(s=>s===null)) return {A,B,ss:null,lambda:null};
+      return {A,B,ss,lambda:crossRatio(ss)};
+    });
+    const ls=sections.map(s=>s.lambda).filter(l=>l!==null && isFinite(l));
+    let dLambda=null;
+    if(ls.length>=2){ dLambda=0;
+      for(let i=0;i<ls.length;i++)for(let j=i+1;j<ls.length;j++)
+        dLambda=Math.max(dLambda, Math.abs(ls[i]-ls[j]));
+    }
+    return {lines, pts, spread, parallel, sections, ls, dLambda};
+  }
+
+  /* ---------- render ---------- */
+  const counts={}; let lastCheck=null, maxBow=0;
+  function render(){
+    for(const k of ['check','diag','between','depth','plane','frame','dots']) layers[k].replaceChildren();
+    const n=state.n, amp=state.hand;
+    const pairs=boundaryPairs(n);
+    const N=pairs.length;
+    const nb=bilOf(state.near);
+    counts.frame={lines:4, pts:N};
+    counts.plane={lines:0, pts:0};
+    counts.depth={lines:0, pts:0};
+    counts.between={lines:0, pts:0};
+    counts.diag={lines:0};
+
+    const ringPt=(pair,f)=>lerp(pair.near, pair.far, f);
+    const fFull=[]; for(let k=1;k<=n;k++) fFull.push(k/n);
+    const fHalf=[]; for(let k=1;k<=n;k++) fHalf.push((k-0.5)/n);
+
+    // check overlay
+    lastCheck = checkConcurrence();
+    if(state.check){
+      const F=farEff();
+      state.near.forEach((p,i)=>{
+        const d={x:F[i].x-p.x, y:F[i].y-p.y}; const len=Math.hypot(d.x,d.y)||1;
+        const e={x:F[i].x+d.x/len*1500, y:F[i].y+d.y/len*1500};
+        pathEl(layers.check, [F[i],e], false, 'var(--blue)', 1.4, {'stroke-dasharray':'5 6','opacity':.45});
+      });
+      lastCheck.pts.forEach(q=>{
+        dot(layers.check, q, 4.5, 'none', {stroke:'var(--blue)','stroke-width':2,'opacity':.8});
+      });
+      lastCheck.sections.forEach(sec=>{
+        const {A,B}=sec;
+        const a=lerp(A,B,-0.18), b=lerp(A,B,1.18);
+        pathEl(layers.check, [a,b], false, '#777', 1.2, {'stroke-dasharray':'2 5','opacity':.5});
+        if(sec.ss){
+          sec.ss.forEach(s=>{
+            const q=lerp(A,B,s);
+            if(Math.hypot(q.x-500,q.y-390)<2200) dot(layers.check, q, 2.6, '#555', {'opacity':.8});
+          });
+        }
+      });
+    }
+
+    // ---- diagonals layer ----
+    maxBow=0;
+    if(state.show.diag){
+      // on-surface diagonals of each depth cell (Type A: they bow)
+      const tArr=[0, ...fFull];
+      for(let i=0;i<N;i++){
+        const pr0=pairs[i], pr1=pairs[(i+1)%N];
+        for(let k=0;k<tArr.length-1;k++){
+          const t0=tArr[k], t1=tArr[k+1];
+          const A=ringPt(pr0,t0), B=ringPt(pr1,t0), C=ringPt(pr1,t1), D=ringPt(pr0,t1);
+          const {d1,d2,bow}=cellDiagonals(A,B,C,D,12);
+          maxBow=Math.max(maxBow,bow);
+          pathEl(layers.diag, d1, false, 'var(--green)', 1.6, {opacity:.8});
+          pathEl(layers.diag, d2, false, 'var(--green)', 1.6, {opacity:.8});
+          counts.diag.lines+=2;
+        }
+      }
+      // straight diagonals of the flat near-face cells (Type B), when visible
+      if(state.show.plane){
+        for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+          const A=nb(i/n,j/n), B=nb((i+1)/n,j/n), C=nb((i+1)/n,(j+1)/n), D=nb(i/n,(j+1)/n);
+          pathEl(layers.diag, [A,C], false, 'var(--green)', 1.1, {opacity:.45});
+          pathEl(layers.diag, [D,B], false, 'var(--green)', 1.1, {opacity:.45});
+          counts.diag.lines+=2;
+        }
+      }
+    }
+
+    // frame — straight edges of the near face
+    const edgeIdx=[[0,1],[1,2],[2,3],[3,0]];
+    edgeIdx.forEach(([a,b],i)=>{
+      const s=densify([state.near[a],state.near[b]],false,13);
+      pathEl(layers.frame, wobble(s,false,'edge'+i,amp*1.25), false, 'var(--red)', 4.5);
+    });
+
+    // picture-plane grid (bilinear iso-lines: straight)
+    if(state.show.plane){
+      for(let i=1;i<n;i++){
+        pathEl(layers.plane, wobble(densify([nb(i/n,0),nb(i/n,1)],false,13),false,'gu'+i,amp), false, 'var(--red)', 3);
+        pathEl(layers.plane, wobble(densify([nb(0,i/n),nb(1,i/n)],false,13),false,'gv'+i,amp), false, 'var(--red)', 3);
+        counts.plane.lines+=2;
+      }
+      counts.plane.pts=(n-1)*(n-1);
+    }
+
+    // between-edges: straight gray rulings + polygonal half-rings
+    if(state.show.between){
+      fHalf.forEach((f,k)=>{
+        const pts=pairs.map(pr=>ringPt(pr,f));
+        pathEl(layers.between, wobble(densify(pts,true,6),true,'hr'+k,amp*.7), true, 'var(--gray)', 1.4, {'opacity':.75});
+      });
+      counts.between.lines+=fHalf.length;
+      pairs.forEach((pr,i)=>{
+        if(pr.corner) return;
+        pathEl(layers.between, wobble(densify([pr.near,pr.far],false,13),false,'bd'+i,amp*.6), false, 'var(--gray)', 1.8);
+        counts.between.lines++;
+      });
+    }
+
+    // edge depth: polygonal rings (straight ruling chords) + straight blue depth edges
+    if(state.show.depth){
+      fFull.forEach((f,k)=>{
+        const pts=pairs.map(pr=>ringPt(pr,f));
+        const last = k===fFull.length-1;
+        const color = last ? '#151515' : (k%2===0 ? 'var(--purple)' : 'var(--aqua)');
+        pathEl(layers.depth, wobble(densify(pts,true,6),true,'ring'+k,amp), true, color, last?4.5:3);
+        counts.depth.lines++;
+      });
+      pairs.forEach((pr,i)=>{
+        if(!pr.corner) return;
+        pathEl(layers.depth, wobble(densify([pr.near,pr.far],false,13),false,'cd'+i,amp*.8), false, 'var(--blue)', 4);
+        counts.depth.lines++;
+      });
+    }
+
+    // points
+    if(state.show.dots){
+      pairs.forEach(pr=> dot(layers.dots, pr.near, pr.corner?7:5, pr.corner?'#151515':'var(--red)'));
+      if(state.show.plane){
+        for(let i=1;i<n;i++)for(let j=1;j<n;j++) dot(layers.dots, nb(i/n,j/n), 5, 'var(--red)');
+      }
+      if(state.show.depth){
+        pairs.forEach(pr=>{ if(pr.corner) fFull.forEach(f=> dot(layers.dots, ringPt(pr,f), 3, '#151515')); });
+        counts.depth.pts = 4*fFull.length;
+      }
+      if(state.show.between){
+        pairs.forEach(pr=>{ if(!pr.corner) fFull.forEach(f=> dot(layers.dots, ringPt(pr,f), 2.2, '#151515')); });
+        counts.between.pts = (N-4)*fFull.length;
+      }
+    }
+
+    renderHandles();
+    renderLedger();
+  }
+
+  /* ---------- handles ---------- */
+  let handleEls=null;
+  function renderHandles(){
+    if(!handleEls){
+      handleEls={near:[],far:[],center:null};
+      const mk=(kind)=>{
+        const g=document.createElementNS(NS,'g');
+        const hit=document.createElementNS(NS,'circle');
+        hit.setAttribute('r',22); hit.setAttribute('fill','transparent'); hit.dataset.h='1';
+        const vis=document.createElementNS(NS,'circle');
+        vis.dataset.h='1';
+        if(kind==='near'){ vis.setAttribute('r',8.5); vis.setAttribute('fill','var(--red)'); vis.setAttribute('stroke','#fff'); vis.setAttribute('stroke-width',2);}
+        else if(kind==='far'){ vis.setAttribute('r',8); vis.setAttribute('fill','#151515'); vis.setAttribute('stroke','var(--paper)'); vis.setAttribute('stroke-width',2);}
+        else { vis.setAttribute('r',7.5); vis.setAttribute('fill','var(--paper)'); vis.setAttribute('stroke','#151515'); vis.setAttribute('stroke-width',2.5); vis.setAttribute('stroke-dasharray','2 3'); }
+        g.appendChild(hit); g.appendChild(vis); g.style.cursor='move';
+        layers.handles.appendChild(g);
+        return g;
+      };
+      for(let i=0;i<4;i++){
+        const g=mk('near'); handleEls.near.push(g);
+        attachDrag(g, p=>{ state.near[i].x=p.x; state.near[i].y=p.y; render(); });
+      }
+      for(let i=0;i<4;i++){
+        const g=mk('far'); handleEls.far.push(g);
+        attachDrag(g, p=>{ state.far[i].x=p.x; state.far[i].y=p.y; render(); });
+      }
+      handleEls.center=mk('center');
+      attachDrag(handleEls.center, p=>{ state.center.x=p.x; state.center.y=p.y; render(); });
+    }
+    const F=farEff();
+    handleEls.near.forEach((g,i)=>{
+      g.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.near[i].x); c.setAttribute('cy',state.near[i].y);});
+    });
+    handleEls.far.forEach((g,i)=>{
+      g.style.display = state.collector ? 'none' : '';
+      g.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',F[i].x); c.setAttribute('cy',F[i].y);});
+    });
+    handleEls.center.style.display = state.collector ? '' : 'none';
+    handleEls.center.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.center.x); c.setAttribute('cy',state.center.y);});
+  }
+
+  function clientToWorld(cx,cy){
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    return {x:state.view.x+(cx-r.left)*k, y:state.view.y+(cy-r.top)*k};
+  }
+  function attachDrag(el, onMove){
+    el.addEventListener('pointerdown', e=>{
+      e.stopPropagation(); el.setPointerCapture(e.pointerId);
+      const move=ev=>{ const p=clientToWorld(ev.clientX,ev.clientY); onMove(p); };
+      const up=()=>{ el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); };
+      el.addEventListener('pointermove',move);
+      el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+    });
+  }
+
+  /* ---------- pan & pinch ---------- */
+  const pointers=new Map();
+  function applyView(){ SVG.setAttribute('viewBox',`${state.view.x} ${state.view.y} ${state.view.w} ${state.view.h}`); }
+  SVG.addEventListener('pointerdown', e=>{
+    if(e.target.dataset && e.target.dataset.h) return;
+    SVG.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  });
+  SVG.addEventListener('pointermove', e=>{
+    if(!pointers.has(e.pointerId)) return;
+    const prev=pointers.get(e.pointerId);
+    const cur={x:e.clientX,y:e.clientY};
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    if(pointers.size===1){
+      state.view.x-=(cur.x-prev.x)*k;
+      state.view.y-=(cur.y-prev.y)*k;
+      applyView();
+    } else if(pointers.size===2){
+      const ids=[...pointers.keys()];
+      const other=pointers.get(ids[0]===e.pointerId?ids[1]:ids[0]);
+      const d0=Math.hypot(prev.x-other.x,prev.y-other.y);
+      const d1=Math.hypot(cur.x-other.x,cur.y-other.y);
+      if(d0>4&&d1>4){
+        const s=d0/d1;
+        const midC={x:(cur.x+other.x)/2,y:(cur.y+other.y)/2};
+        const midW=clientToWorld(midC.x,midC.y);
+        let w=Math.min(3200,Math.max(320,state.view.w*s));
+        const scale=w/state.view.w;
+        state.view.w=w; state.view.h*=scale;
+        state.view.x=midW.x-(midC.x-r.left)*(state.view.w/r.width);
+        state.view.y=midW.y-(midC.y-r.top)*(state.view.w/r.width);
+        applyView();
+      }
+    }
+    pointers.set(e.pointerId,cur);
+  });
+  const endP=e=>pointers.delete(e.pointerId);
+  SVG.addEventListener('pointerup',endP); SVG.addEventListener('pointercancel',endP);
+  SVG.addEventListener('wheel', e=>{ e.preventDefault();
+    const r=SVG.getBoundingClientRect();
+    const before=clientToWorld(e.clientX,e.clientY);
+    const s=Math.exp(e.deltaY*0.0015);
+    state.view.w=Math.min(3200,Math.max(320,state.view.w*s));
+    state.view.h=state.view.w*780/1000;
+    state.view.x=before.x-(e.clientX-r.left)*(state.view.w/r.width);
+    state.view.y=before.y-(e.clientY-r.top)*(state.view.w/r.width);
+    applyView();
+  }, {passive:false});
+
+  /* ---------- ledger ---------- */
+  function renderLedger(){
+    const L=G('ledger');
+    const rows=[];
+    rows.push(row('frame', counts.frame.lines+' edges', state.show.dots ? counts.frame.pts+' marks':'—'));
+    if(state.show.plane)  rows.push(row('picture plane', counts.plane.lines+' lines', state.show.dots ? counts.plane.pts+' crossings':'—'));
+    if(state.show.depth)  rows.push(row('edge depth', counts.depth.lines+' lines', state.show.dots ? counts.depth.pts+' marks':'—'));
+    if(state.show.between)rows.push(row('between edges', counts.between.lines+' lines', state.show.dots ? counts.between.pts+' marks':'—'));
+    if(state.show.diag){
+      rows.push(row('diagonals', counts.diag.lines+' arcs', ''));
+      rows.push(`<div class="row"><span>max bow |T|/4</span><span class="greenv">${maxBow.toFixed(1)} px</span></div>`);
+      rows.push(`<div class="row sub"><span></span><span>0 ⇔ flat panel (∥-ogram cell)</span></div>`);
+    }
+    rows.push(row('mode', state.collector?'collector ⊙':'general position',''));
+    if(state.check && lastCheck){
+      const c=lastCheck;
+      if(c.dLambda===null){
+        rows.push(`<div class="row"><span>check</span><span class="verdict">${c.parallel?'∥ pair':'cuts degenerate'}</span></div>`);
+      } else if(c.dLambda<1e-3){
+        rows.push(`<div class="row"><span>check</span><span class="verdict">pencil · λ = ${c.ls[0].toFixed(3)}</span></div>`);
+      } else {
+        rows.push(`<div class="row"><span>check</span><span class="verdict">Δλ = ${c.dLambda.toFixed(3)}</span></div>`);
+        const mn=Math.min(...c.ls), mx=Math.max(...c.ls);
+        rows.push(`<div class="row sub"><span>λ over ${c.ls.length} cuts</span><span>${mn.toFixed(3)} … ${mx.toFixed(3)}</span></div>`);
+      }
+    }
+    L.innerHTML='<div class="lh">Count · n = '+state.n+'</div>'+rows.join('')+
+      '<div class="cube">underlying cube — V 8 · E 12 · F 6 · side panels: bilinear, doubly ruled</div>';
+    function row(a,b,c){return `<div class="row"><span>${a}</span><span>${b}${c?' · '+c:''}</span></div>`;}
+  }
+
+  /* ---------- controls ---------- */
+  function syncChips(){
+    document.querySelectorAll('[data-layer]').forEach(b=>{
+      b.setAttribute('aria-pressed', String(!!state.show[b.dataset.layer]));
+    });
+    G('collector').setAttribute('aria-pressed', String(state.collector));
+    G('check').setAttribute('aria-pressed', String(state.check));
+  }
+  document.querySelectorAll('[data-layer]').forEach(b=>{
+    b.addEventListener('click',()=>{ state.show[b.dataset.layer]=!state.show[b.dataset.layer]; syncChips(); render(); });
+  });
+  document.querySelectorAll('[data-preset]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const p=b.dataset.preset;
+      if(p==='1') Object.assign(state.show,{plane:true, depth:false, between:false, diag:false});
+      if(p==='2') Object.assign(state.show,{plane:false, depth:true, between:false, diag:false});
+      if(p==='3') Object.assign(state.show,{plane:false, depth:true, between:true, diag:false});
+      if(p==='4') Object.assign(state.show,{plane:true, depth:true, between:true, diag:true});
+      state.show.dots=true;
+      syncChips(); render();
+    });
+  });
+  G('collector').addEventListener('click',()=>{
+    if(state.collector){
+      state.far = farEff().map(p=>({...p}));
+      state.collector=false;
+    } else {
+      state.collector=true;
+    }
+    syncChips(); render();
+  });
+  G('check').addEventListener('click',()=>{ state.check=!state.check; syncChips(); render(); });
+  G('nMinus').addEventListener('click',()=>{ state.n=Math.max(2,state.n-1); G('nVal').textContent=state.n; render(); });
+  G('nPlus').addEventListener('click',()=>{ state.n=Math.min(5,state.n+1); G('nVal').textContent=state.n; render(); });
+  G('hand').addEventListener('input',e=>{ state.hand=parseFloat(e.target.value); render(); });
+  G('reset').addEventListener('click',()=>{
+    state.near=NEAR0.map(p=>({...p}));
+    state.far=FAR0.map(p=>({...p}));
+    state.center={...Z0};
+    state.view={x:0,y:0,w:1000,h:780};
+    applyView(); render();
+  });
+
+  syncChips(); applyView(); render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Shape of the Suite — as an instrument</title>
+<style>
+  :root{
+    --paper:#faf7f0; --ink:#1c1c1c;
+    --red:#d93a2b; --blue:#2b4fd7; --purple:#8e44c8; --aqua:#35b8b8; --gray:#8f8f8f; --green:#3a9e3a;
+    --hand:"Chalkboard SE","Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--hand);}
+  header{padding:16px 20px 6px;}
+  .eyebrow{font-size:12px; letter-spacing:.22em; color:var(--red); text-transform:uppercase;}
+  h1{margin:2px 0 0; font-size:clamp(20px,4.5vw,30px); letter-spacing:.04em; text-transform:uppercase;}
+  .caption{margin:6px 0 0; font-size:13px; color:#555; line-height:1.55; max-width:840px;}
+  #controls{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:10px 20px;}
+  .grp{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:4px 8px; border:2px solid #2222; border-radius:12px;}
+  .grp-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#777; margin-right:2px;}
+  button.chip{
+    font-family:var(--hand); font-size:13px; padding:5px 11px; border-radius:10px;
+    border:2px solid var(--ink); background:var(--paper); color:var(--ink); cursor:pointer;
+    transform:rotate(-.4deg);
+  }
+  button.chip:nth-child(even){transform:rotate(.5deg);}
+  button.chip:focus-visible{outline:3px solid var(--blue); outline-offset:2px;}
+  #stage{margin:4px 10px 6px; border:2px solid #2223; border-radius:14px; overflow:hidden; background:
+    radial-gradient(circle at 30% 20%, #fffdf7 0%, var(--paper) 70%);}
+  svg{display:block; width:100%; height:auto; touch-action:none;}
+  text{font-family:var(--hand);}
+  #explain{margin:6px 20px 24px; max-width:860px; font-size:14px; line-height:1.7; color:#333;}
+  #explain h2{font-size:14px; letter-spacing:.18em; text-transform:uppercase; color:var(--red); border-bottom:1.5px solid var(--ink); padding-bottom:3px; margin:22px 0 8px;}
+  #explain p{margin:8px 0;}
+  #explain .term{font-weight:600;}
+  #explain .g{color:var(--green);} #explain .b{color:var(--blue);} #explain .r{color:var(--red);}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Topology / Count &amp; The Pencil Dial</div>
+  <h1>The Shape of the Suite — as an instrument</h1>
+  <p class="caption">
+    The map is now live. One configuration — nine handles in the panel below — drives all five stations at once.
+    Drag anything and the whole arc answers: spread, Δλ, bow, and the pencil's λ recompute together.
+    The explanation of the wiring is at the bottom of the page.
+  </p>
+</header>
+
+<div id="controls">
+  <div class="grp" role="group" aria-label="Test signals">
+    <span class="grp-label">Signal</span>
+    <button class="chip" data-sig="twist">twist (default)</button>
+    <button class="chip" data-sig="pinhole">pinhole</button>
+    <button class="chip" data-sig="prism">prism</button>
+    <button class="chip" data-sig="harmonic">harmonic</button>
+  </div>
+</div>
+
+<div id="stage">
+<svg id="svg" viewBox="0 0 1000 770" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/770" role="img"
+     aria-label="Live map of the diagram suite: four stations along an arc, a pencil-dial branch, and a master configuration panel with nine draggable handles">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto">
+      <path d="M0,0L8,3L0,6Z" fill="#1c1c1c"/>
+    </marker>
+    <marker id="arrg" markerWidth="10" markerHeight="8" refX="8" refY="3" orient="auto">
+      <path d="M0,0L8,3L0,6Z" fill="#3a9e3a"/>
+    </marker>
+    <clipPath id="cp1"><rect x="12" y="56" width="176" height="82" rx="6"/></clipPath>
+    <clipPath id="cp2"><rect x="12" y="56" width="176" height="82" rx="6"/></clipPath>
+    <clipPath id="cp3"><rect x="12" y="56" width="176" height="82" rx="6"/></clipPath>
+    <clipPath id="cp4"><rect x="12" y="56" width="176" height="82" rx="6"/></clipPath>
+  </defs>
+
+  <!-- connectors (drawn under cards) -->
+  <path d="M220,255 C240,250 244,209 258,206" fill="none" stroke="#1c1c1c" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M462,205 C482,200 486,161 500,158" fill="none" stroke="#1c1c1c" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M704,157 C724,152 728,115 742,112" fill="none" stroke="#1c1c1c" stroke-width="2" marker-end="url(#arr)"/>
+  <path d="M604,242 C610,320 655,415 712,464" fill="none" stroke="#3a9e3a" stroke-width="2.2" marker-end="url(#arrg)"/>
+  <text x="650" y="368" font-size="12" fill="#3a9e3a" transform="rotate(56 650 368)">the cross-ratio takes over</text>
+
+  <!-- ribbon -->
+  <path d="M40,368 L960,368" stroke="#e2ded4" stroke-width="2"/>
+  <g font-size="11.5" fill="#a9a49a" text-anchor="middle" letter-spacing="2">
+    <text x="120" y="392">ASSUMPTION</text>
+    <text x="362" y="392">FREEDOM</text>
+    <text x="604" y="392">INVARIANT</text>
+    <text x="846" y="392">SURFACE</text>
+  </g>
+
+  <!-- v1 -->
+  <g transform="translate(20,170) rotate(-0.5 100 85)">
+    <rect width="200" height="170" rx="12" fill="#fffefa" stroke="#1c1c1c" stroke-width="2"/>
+    <text x="14" y="26" font-size="13" fill="#d93a2b">v1</text>
+    <text x="14" y="47" font-size="16.5" fill="#1c1c1c">Assumed pinhole</text>
+    <g id="g1" clip-path="url(#cp1)"></g>
+    <text id="m1" x="14" y="161" font-size="11.5" fill="#555"></text>
+  </g>
+  <!-- v2 -->
+  <g transform="translate(262,120) rotate(0.5 100 85)">
+    <rect width="200" height="170" rx="12" fill="#fffefa" stroke="#1c1c1c" stroke-width="2"/>
+    <text x="14" y="26" font-size="13" fill="#d93a2b">v2</text>
+    <text x="14" y="47" font-size="16.5" fill="#1c1c1c">General position</text>
+    <g id="g2" clip-path="url(#cp2)"></g>
+    <text id="m2" x="14" y="161" font-size="11.5" fill="#555"></text>
+  </g>
+  <!-- v3 -->
+  <g transform="translate(504,72) rotate(-0.5 100 85)">
+    <rect width="200" height="170" rx="12" fill="#fffefa" stroke="#1c1c1c" stroke-width="2"/>
+    <text x="14" y="26" font-size="13" fill="#d93a2b">v3</text>
+    <text x="14" y="47" font-size="16.5" fill="#1c1c1c">The invariant</text>
+    <g id="g3" clip-path="url(#cp3)"></g>
+    <text id="m3" x="14" y="161" font-size="11.5" fill="#555"></text>
+  </g>
+  <!-- v4 -->
+  <g transform="translate(746,26) rotate(0.5 100 85)">
+    <rect width="200" height="170" rx="12" fill="#fffefa" stroke="#1c1c1c" stroke-width="2"/>
+    <text x="14" y="26" font-size="13" fill="#d93a2b">v4</text>
+    <text x="14" y="47" font-size="16.5" fill="#1c1c1c">Ruled surface</text>
+    <g id="g4" clip-path="url(#cp4)"></g>
+    <text id="m4" x="14" y="161" font-size="11.5" fill="#555"></text>
+  </g>
+
+  <!-- master configuration panel -->
+  <g>
+    <rect x="30" y="415" width="440" height="330" rx="12" fill="#fffdf6" stroke="#1c1c1c" stroke-width="2" stroke-dasharray="none"/>
+    <text x="46" y="441" font-size="12" letter-spacing="2" fill="#777">THE CONFIGURATION — DRAG THE NINE HANDLES</text>
+    <g id="master"></g>
+    <g id="handles"></g>
+  </g>
+
+  <!-- dial branch card -->
+  <g transform="translate(600,470) rotate(-0.6 125 90)">
+    <rect width="250" height="180" rx="12" fill="#fffefa" stroke="#3a9e3a" stroke-width="2.5"/>
+    <text x="14" y="26" font-size="13" fill="#3a9e3a">branch</text>
+    <text x="14" y="47" font-size="16.5" fill="#1c1c1c">The pencil dial</text>
+    <g id="gd"></g>
+    <text id="md" x="14" y="169" font-size="11.5" fill="#555"></text>
+  </g>
+</svg>
+</div>
+
+<section id="explain">
+  <h2>How the instrument works</h2>
+  <p>
+    There is one shared configuration: four <span class="term r">red</span> near corners, four <span class="term">black</span> far corners,
+    and the dashed <span class="term">⊙</span>, all draggable in the panel at lower left. Every station on the arc reads this same state and
+    recomputes its glyph and its measure on every drag. The map of the suite has become a synoptic gauge: one input, five simultaneous readings.
+  </p>
+  <p>
+    The wiring encodes the suite's argument. Stations v2, v3, and v4 read the black corners exactly as they stand — general position.
+    Stations v1 and the dial are the pinhole readings: they ignore the black corners and instead snap the far face toward ⊙ at ratio 0.82,
+    because that is what each of those pages assumes. So dragging a black corner moves three stations and leaves two untouched, while
+    dragging ⊙ does the reverse — the split between assumption and freedom is drawn as circuitry, not stated as a caption.
+  </p>
+  <h2>The three measures</h2>
+  <p>
+    <span class="term b">⊙ spread</span> (v2) extends the four depth edges to lines and takes the maximum pairwise distance among their six meets
+    — a metric quantity, in pixels. When the edges are parallel the meets vanish and the best it can say is ∥.
+  </p>
+  <p>
+    <span class="term">Δλ</span> (v3) sections the four depth edges with the four face diagonals — both diagonals of the near face and both of the far —
+    and takes the cross-ratio of each cut in the fixed order (TL, TR; BR, BL). A pencil has a single λ on every transversal (verified to 2×10⁻¹⁵),
+    so Δλ, the maximum pairwise difference across the four cuts, measures how badly that invariant splinters. Note the order convention matters:
+    relabeling the edges sends λ through its six-member anharmonic orbit, which is exactly where the dial picks it up.
+  </p>
+  <p>
+    <span class="term g">bow</span> (v4) treats each side panel as the bilinear cell Q(s,t) = A + (B−A)s + (D−A)t + T·st with twist
+    T = A−B+C−D. The rulings (rings and depth lines) are straight; the on-surface diagonals Q(s,s) and Q(s,1−s) bow off their chords with
+    sagitta exactly |T|/4 (verified to 3×10⁻¹⁴ over 2000 random cells). T = 0 precisely when the cell is a parallelogram, i.e. the panel is flat —
+    the Type A / Type B line from the third sketch sheet. The glyph draws the two green surface diagonals of each of the four panels.
+  </p>
+  <p>
+    <span class="term">λ</span> (the dial) is the cross-ratio of the pinhole pencil itself, computed at ⊙ from the direction vectors to the four
+    near corners: λ = (d₀×d₂)(d₁×d₃) / (d₀×d₃)(d₁×d₂). Its six orbit members {λ, τλ, ρλ, σλ, ωλ, ω²λ} ride the mini-axis in the role colors;
+    the verdict flips to HARMONIC when λ lands in {−1, 2, ½}.
+  </p>
+  <h2>The test signals</h2>
+  <p>
+    <span class="term">twist</span> restores the default general position — far face deliberately knocked off the collector configuration, all three
+    measures nonzero. <span class="term">pinhole</span> snaps the black corners onto the ⊙ ray at ratio 0.82: spread collapses to 0, Δλ to 0, and the
+    arc's readings all agree with the dial. <span class="term">prism</span> translates the far face rigidly, making the four depth edges parallel: the
+    metric check fails outright (∥, no meets) while Δλ still settles to 0 — verified to 10⁻¹⁶ — because parallels are a pencil through an ideal point;
+    and the bow drops to exactly 0, since translated panels are parallelograms. This one preset is the whole argument for changing currency: the
+    projective reading survives where the metric one dies, and the affine reading (bow) flags the flatness. <span class="term">harmonic</span> searches
+    the panel for a point of a Chasles conic and moves ⊙ onto it, snapping the far face along — the pencil's λ lands in the harmonic orbit and the
+    dial says so.
+  </p>
+  <h2>Pricing</h2>
+  <p>
+    Spread is metric-grade and dies at infinity. Δλ is projective-grade and survives; its vanishing on four cuts is necessary for concurrency and, by
+    pencil invariance, the honest sampled form of the full criterion. Bow is affine-grade — it measures the twist defect, not incidence. Chasles
+    (fixed cross-ratio ⇒ ⊙ on a conic through the corners) is theorem-grade and is what the harmonic signal exploits. The arc of the suite is these
+    three currencies in ascending order of what they survive, and the dial branch is what becomes measurable once the currency is cross-ratio.
+  </p>
+</section>
+
+<script>
+(function(){
+  const SVG=document.getElementById('svg');
+  const NS='http://www.w3.org/2000/svg';
+  const G=id=>document.getElementById(id);
+
+  /* master-panel initial configuration (svg coords) */
+  const NEAR0=[{x:95,y:485},{x:345,y:465},{x:380,y:700},{x:75,y:715}];
+  const Z0={x:230,y:595};
+  const NUDGE=[{x:-14,y:7},{x:11,y:-9},{x:8,y:12},{x:-10,y:-11}];
+  const snapOf=(near,Z)=>near.map(p=>({x:p.x+(Z.x-p.x)*0.82, y:p.y+(Z.y-p.y)*0.82}));
+  const FAR0=snapOf(NEAR0,Z0).map((q,i)=>({x:q.x+NUDGE[i].x, y:q.y+NUDGE[i].y}));
+
+  const state={ near:NEAR0.map(p=>({...p})), far:FAR0.map(p=>({...p})), Z:{...Z0} };
+
+  const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t});
+  const cross2=(a,b)=>a.x*b.y-a.y*b.x;
+
+  /* ---------- measures (same math as the suite pages) ---------- */
+  function meets(near,far){
+    const lines=near.map((p,i)=>({P:p,D:{x:far[i].x-p.x,y:far[i].y-p.y}}));
+    const pts=[]; let par=false;
+    for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+      const A=lines[i],B=lines[j];
+      const det=A.D.x*B.D.y-A.D.y*B.D.x;
+      if(Math.abs(det)<1e-7){par=true;continue;}
+      const t=((B.P.x-A.P.x)*B.D.y-(B.P.y-A.P.y)*B.D.x)/det;
+      pts.push({x:A.P.x+t*A.D.x,y:A.P.y+t*A.D.y});
+    }
+    let spread=null;
+    if(pts.length>=2){spread=0;
+      for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
+        spread=Math.max(spread,Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y));}
+    return {pts,spread,par,lines};
+  }
+  function sec(P,D,A,B){
+    const Ex=B.x-A.x,Ey=B.y-A.y;
+    const det=Ex*D.y-Ey*D.x;
+    if(Math.abs(det)<1e-9)return null;
+    return ((P.x-A.x)*D.y-(P.y-A.y)*D.x)/det;
+  }
+  function crOf(x){
+    const den=(x[0]-x[3])*(x[1]-x[2]);
+    if(Math.abs(den)<1e-12)return null;
+    return (x[0]-x[2])*(x[1]-x[3])/den;
+  }
+  function deltaLambda(near,far){
+    const lines=near.map((p,i)=>({P:p,D:{x:far[i].x-p.x,y:far[i].y-p.y}}));
+    const cuts=[[near[0],near[2]],[near[1],near[3]],[far[0],far[2]],[far[1],far[3]]];
+    const secs=cuts.map(([A,B])=>{
+      const ss=lines.map(l=>sec(l.P,l.D,A,B));
+      return {A,B,ss:(ss.some(s=>s===null)?null:ss),
+              lambda:(ss.some(s=>s===null)?null:crOf(ss))};
+    });
+    const ls=secs.map(s=>s.lambda).filter(l=>l!==null&&isFinite(l));
+    let d=null;
+    if(ls.length>=2){d=0;
+      for(let i=0;i<ls.length;i++)for(let j=i+1;j<ls.length;j++)
+        d=Math.max(d,Math.abs(ls[i]-ls[j]));}
+    return {secs,ls,d};
+  }
+  function panelBows(near,far){
+    let mx=0; const arcs=[];
+    for(let i=0;i<4;i++){
+      const j=(i+1)%4;
+      const A=near[i],B=near[j],C=far[j],D=far[i];
+      const T={x:A.x-B.x+C.x-D.x, y:A.y-B.y+C.y-D.y};
+      mx=Math.max(mx,Math.hypot(T.x,T.y)/4);
+      const Q=(s,t)=>({x:A.x+(B.x-A.x)*s+(D.x-A.x)*t+T.x*s*t,
+                       y:A.y+(B.y-A.y)*s+(D.y-A.y)*t+T.y*s*t});
+      const d1=[],d2=[];
+      for(let k=0;k<=12;k++){const s=k/12; d1.push(Q(s,s)); d2.push(Q(s,1-s));}
+      arcs.push(d1,arcs2fix(d2));
+    }
+    function arcs2fix(a){return a;}
+    return {mx,arcs};
+  }
+  function pencilLambda(near,Z){
+    const d=near.map(N=>({x:N.x-Z.x,y:N.y-Z.y}));
+    const b=cross2(d[0],d[3])*cross2(d[1],d[2]);
+    if(Math.abs(b)<1e-9)return Infinity;
+    return cross2(d[0],d[2])*cross2(d[1],d[3])/b;
+  }
+
+  /* ---------- drawing helpers ---------- */
+  function el(parent,tag,attrs){
+    const e=document.createElementNS(NS,tag);
+    for(const k in attrs)e.setAttribute(k,attrs[k]);
+    parent.appendChild(e); return e;
+  }
+  function poly(parent,pts,closed,stroke,w,extra){
+    let d='M'+pts.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join('L');
+    if(closed)d+='Z';
+    el(parent,'path',Object.assign({d,fill:'none',stroke,'stroke-width':w,
+      'stroke-linecap':'round','stroke-linejoin':'round'},extra||{}));
+  }
+  function fitBox(points, bx, by, bw, bh){
+    let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    points.forEach(p=>{x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y);});
+    const w=Math.max(1,x1-x0), h=Math.max(1,y1-y0);
+    const s=Math.min(bw/w,bh/h);
+    const ox=bx+(bw-w*s)/2, oy=by+(bh-h*s)/2;
+    return p=>({x:ox+(p.x-x0)*s, y:oy+(p.y-y0)*s});
+  }
+
+  /* ---------- stations ---------- */
+  function stationV1(){
+    const g=G('g1'); g.replaceChildren();
+    const snap=snapOf(state.near,state.Z);
+    const F=fitBox([...state.near,...snap,state.Z],20,60,160,72);
+    const N=state.near.map(F), S=snap.map(F), Zp=F(state.Z);
+    N.forEach((p,i)=>poly(g,[p,Zp],false,'var(--blue)',1.6));
+    poly(g,N,true,'var(--red)',2.5);
+    poly(g,S,true,'#151515',2);
+    el(g,'circle',{cx:Zp.x,cy:Zp.y,r:3.2,fill:'none',stroke:'#1c1c1c','stroke-width':1.6,'stroke-dasharray':'1.5 2'});
+    G('m1').textContent='⊙ spread = 0 · by assumption';
+  }
+  function stationV2(){
+    const g=G('g2'); g.replaceChildren();
+    const {pts,spread,par}=meets(state.near,state.far);
+    const F=fitBox([...state.near,...state.far],20,60,160,72);
+    const N=state.near.map(F), FA=state.far.map(F);
+    N.forEach((p,i)=>{
+      poly(g,[p,FA[i]],false,'var(--blue)',1.8);
+      const d={x:FA[i].x-p.x,y:FA[i].y-p.y}, L=Math.hypot(d.x,d.y)||1;
+      poly(g,[FA[i],{x:FA[i].x+d.x/L*22,y:FA[i].y+d.y/L*22}],false,'var(--blue)',1.1,{'stroke-dasharray':'3 3',opacity:.55});
+    });
+    poly(g,N,true,'var(--red)',2.5);
+    poly(g,FA,true,'#151515',2);
+    pts.forEach(q=>{const m=F(q);
+      el(g,'circle',{cx:m.x.toFixed(1),cy:m.y.toFixed(1),r:2.6,fill:'none',stroke:'var(--blue)','stroke-width':1.6,opacity:.85});});
+    G('m2').textContent = par&&pts.length<2 ? '⊙ spread — ∥ (no meets)'
+      : spread===null ? '⊙ spread — ∥'
+      : spread<1 ? '⊙ spread = 0 (concurrent)'
+      : '⊙ spread = '+spread.toFixed(0)+' px';
+  }
+  function stationV3(){
+    const g=G('g3'); g.replaceChildren();
+    const {secs,ls,d}=deltaLambda(state.near,state.far);
+    const F=fitBox([...state.near,...state.far],20,60,160,72);
+    const N=state.near.map(F), FA=state.far.map(F);
+    N.forEach((p,i)=>poly(g,[p,FA[i]],false,'var(--blue)',1.8));
+    poly(g,N,true,'var(--red)',2.5);
+    poly(g,FA,true,'#151515',2);
+    secs.forEach(sc=>{
+      const A=F(sc.A),B=F(sc.B);
+      poly(g,[lerp(A,B,-0.1),lerp(A,B,1.1)],false,'#777',0.9,{'stroke-dasharray':'2 4',opacity:.55});
+      if(sc.ss)sc.ss.forEach(s=>{
+        const q=lerp(A,B,s);
+        el(g,'circle',{cx:q.x.toFixed(1),cy:q.y.toFixed(1),r:1.8,fill:'#555',opacity:.85});});
+    });
+    G('m3').textContent = d===null ? 'Δλ — cuts degenerate'
+      : d<1e-3 ? 'Δλ = 0 · pencil, λ = '+ls[0].toFixed(3)
+      : 'Δλ = '+d.toFixed(3);
+  }
+  function stationV4(){
+    const g=G('g4'); g.replaceChildren();
+    const {mx,arcs}=panelBows(state.near,state.far);
+    const F=fitBox([...state.near,...state.far],20,60,160,72);
+    const N=state.near.map(F), FA=state.far.map(F);
+    N.forEach((p,i)=>poly(g,[p,FA[i]],false,'var(--blue)',1.8));
+    arcs.forEach(a=>poly(g,a.map(F),false,'var(--green)',1.6,{opacity:.85}));
+    poly(g,N,true,'var(--red)',2.5);
+    poly(g,FA,true,'#151515',2);
+    G('m4').textContent='max bow |T|/4 = '+(mx<0.05?'0':mx.toFixed(1))+' px';
+  }
+  const uOf=x=>!isFinite(x)?(x>0?0.98:-0.98):x/(1+Math.abs(x));
+  function stationDial(){
+    const g=G('gd'); g.replaceChildren();
+    const lam=pencilLambda(state.near,state.Z);
+    const axY=108, mid=125, halfW=98;
+    const SX=u=>mid+u*halfW;
+    poly(g,[{x:SX(-1),y:axY},{x:SX(1),y:axY}],false,'#999',2);
+    [[-1,'−1'],[0,'0'],[0.5,'½'],[1,'1'],[2,'2']].forEach(([v,s])=>{
+      const x=SX(uOf(v));
+      poly(g,[{x,y:axY-7},{x,y:axY+7}],false,'#777',1.6);
+      el(g,'text',{x,y:axY+22,'font-size':11,fill:'#777','text-anchor':'middle'}).textContent=s;
+    });
+    const orbit=[[l=>l,'#151515',6],[l=>1-l,'#d93a2b',4],[l=>1/l,'#2b4fd7',4],
+                 [l=>l/(l-1),'#8e44c8',4],[l=>1/(1-l),'#35b8b8',4],[l=>(l-1)/l,'#8f8f8f',4]];
+    orbit.forEach(([f,c,r])=>{
+      const x=SX(uOf(f(lam)));
+      el(g,'circle',{cx:x.toFixed(1),cy:axY,r,fill:c,stroke:r>4?'#fff':'none','stroke-width':r>4?1.5:0});
+    });
+    el(g,'text',{x:mid,y:74,'font-size':14,fill:'#1c1c1c','text-anchor':'middle'}).textContent=
+      'λ = '+(isFinite(lam)?lam.toFixed(3):'∞');
+    let verdict='';
+    if(!isFinite(lam)||Math.min(Math.abs(lam),Math.abs(lam-1))<0.02||Math.abs(lam)>25) verdict='degenerate';
+    else{ for(const [v,s] of [[-1,'−1'],[2,'2'],[0.5,'½']]) if(Math.abs(lam-v)<0.04) verdict='HARMONIC · λ = '+s; }
+    G('md').textContent = verdict ? verdict+' · orbit of six' : 'λ orbit of six · reads ⊙, ignores black corners';
+  }
+
+  /* ---------- master panel ---------- */
+  function renderMaster(){
+    const g=G('master'); g.replaceChildren();
+    const snap=snapOf(state.near,state.Z);
+    [1/3,2/3].forEach((f,k)=>{
+      const ring=state.near.map((p,i)=>lerp(p,state.far[i],f));
+      poly(g,ring,true,k===0?'var(--purple)':'var(--aqua)',1.5,{opacity:.55});
+    });
+    state.near.forEach((p,i)=>poly(g,[p,state.far[i]],false,'var(--blue)',3));
+    poly(g,state.near,true,'var(--red)',4);
+    poly(g,state.far,true,'#151515',3);
+    poly(g,snap,true,'#151515',1,{'stroke-dasharray':'3 4',opacity:.35});
+  }
+
+  /* ---------- handles ---------- */
+  let handleEls=null;
+  function clientToWorld(cx,cy){
+    const r=SVG.getBoundingClientRect();
+    const k=1000/r.width;
+    return {x:(cx-r.left)*k, y:(cy-r.top)*k};
+  }
+  function attachDrag(elm,onMove){
+    elm.addEventListener('pointerdown',e=>{
+      e.stopPropagation(); elm.setPointerCapture(e.pointerId);
+      const mv=ev=>onMove(clamp(clientToWorld(ev.clientX,ev.clientY)));
+      const up=()=>{elm.removeEventListener('pointermove',mv);elm.removeEventListener('pointerup',up);elm.removeEventListener('pointercancel',up);};
+      elm.addEventListener('pointermove',mv);
+      elm.addEventListener('pointerup',up); elm.addEventListener('pointercancel',up);
+    });
+    const clamp=p=>({x:Math.max(45,Math.min(455,p.x)), y:Math.max(455,Math.min(735,p.y))});
+  }
+  function renderHandles(){
+    if(!handleEls){
+      handleEls={near:[],far:[],Z:null};
+      const mk=kind=>{
+        const grp=el(G('handles'),'g',{cursor:'move'});
+        el(grp,'circle',{r:18,fill:'transparent'});
+        const vis=el(grp,'circle',
+          kind==='near'?{r:8,fill:'var(--red)',stroke:'#fff','stroke-width':2}:
+          kind==='far' ?{r:7.5,fill:'#151515',stroke:'var(--paper)','stroke-width':2}:
+                        {r:7,fill:'var(--paper)',stroke:'#151515','stroke-width':2.4,'stroke-dasharray':'2 3'});
+        return grp;
+      };
+      for(let i=0;i<4;i++){const h=mk('near');handleEls.near.push(h);
+        attachDrag(h,p=>{state.near[i]=p;renderAll();});}
+      for(let i=0;i<4;i++){const h=mk('far');handleEls.far.push(h);
+        attachDrag(h,p=>{state.far[i]=p;renderAll();});}
+      handleEls.Z=mk('Z');
+      attachDrag(handleEls.Z,p=>{state.Z=p;renderAll();});
+    }
+    handleEls.near.forEach((h,i)=>h.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.near[i].x);c.setAttribute('cy',state.near[i].y);}));
+    handleEls.far.forEach((h,i)=>h.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.far[i].x);c.setAttribute('cy',state.far[i].y);}));
+    handleEls.Z.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.Z.x);c.setAttribute('cy',state.Z.y);});
+  }
+
+  function renderAll(){
+    renderMaster(); renderHandles();
+    stationV1(); stationV2(); stationV3(); stationV4(); stationDial();
+  }
+
+  /* ---------- test signals ---------- */
+  function findHarmonicZ(){
+    const cx=state.near.reduce((s,p)=>s+p.x,0)/4, cy=state.near.reduce((s,p)=>s+p.y,0)/4;
+    const fields=[
+      Z=>{const d=state.near.map(N=>({x:N.x-Z.x,y:N.y-Z.y}));
+          const a=cross2(d[0],d[2])*cross2(d[1],d[3]), b=cross2(d[0],d[3])*cross2(d[1],d[2]);
+          return {f1:a+b, f3:a-2*b, f2:2*a-b};}
+    ][0];
+    for(const key of ['f1','f3','f2']){
+      let best=null;
+      const NXg=44,NYg=34;
+      for(let j=0;j<NYg;j++)for(let i=0;i<NXg-1;i++){
+        const x0=50+(450-50)*i/(NXg-1), x1=50+(450-50)*(i+1)/(NXg-1);
+        const y=460+(730-460)*j/(NYg-1);
+        const v0=fields({x:x0,y})[key], v1=fields({x:x1,y})[key];
+        if((v0<0)!==(v1<0)){
+          const mx=(x0+x1)/2, dist=Math.hypot(mx-cx,y-cy);
+          if(!best||dist<best.dist)best={x0,x1,y,dist};
+        }
+      }
+      if(best){
+        let lo=best.x0,hi=best.x1;
+        for(let k=0;k<55;k++){
+          const m=(lo+hi)/2;
+          if((fields({x:lo,y:best.y})[key]<0)!==(fields({x:m,y:best.y})[key]<0))hi=m;else lo=m;
+        }
+        return {x:(lo+hi)/2,y:best.y};
+      }
+    }
+    return null;
+  }
+  document.querySelectorAll('[data-sig]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const s=b.dataset.sig;
+      if(s==='twist'){ state.near=NEAR0.map(p=>({...p})); state.Z={...Z0}; state.far=FAR0.map(p=>({...p})); }
+      if(s==='pinhole'){ state.far=snapOf(state.near,state.Z); }
+      if(s==='prism'){ state.far=state.near.map(p=>({x:p.x+48,y:p.y+26})); }
+      if(s==='harmonic'){ const Zh=findHarmonicZ(); if(Zh){ state.Z=Zh; state.far=snapOf(state.near,Zh); } }
+      renderAll();
+    });
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

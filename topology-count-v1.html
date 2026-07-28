@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topology / Count — edges image of cube</title>
+<style>
+  :root{
+    --paper:#faf7f0; --ink:#1c1c1c;
+    --red:#d93a2b; --blue:#2b4fd7; --purple:#8e44c8; --aqua:#35b8b8; --gray:#8f8f8f;
+    --hand:"Chalkboard SE","Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--hand);}
+  header{padding:14px 18px 4px;}
+  .eyebrow{font-size:12px; letter-spacing:.22em; color:var(--red); text-transform:uppercase;}
+  h1{margin:2px 0 0; font-size:clamp(20px,4.5vw,30px); letter-spacing:.04em; text-transform:uppercase;}
+  .caption{margin:4px 0 0; font-size:12.5px; color:#555; line-height:1.5;}
+  .caption b{font-weight:600;}
+  .swatch{display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin-right:2px;}
+
+  #controls{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:10px 18px;}
+  .grp{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:4px 8px; border:2px solid #2222; border-radius:12px;}
+  .grp-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#777; margin-right:2px;}
+  button.chip{
+    font-family:var(--hand); font-size:13px; padding:5px 11px; border-radius:10px;
+    border:2px solid var(--ink); background:var(--paper); color:var(--ink); cursor:pointer;
+    transform:rotate(-.4deg);
+  }
+  button.chip:nth-child(even){transform:rotate(.5deg);}
+  button.chip[aria-pressed="true"]{background:var(--ink); color:var(--paper);}
+  button.chip:focus-visible{outline:3px solid var(--blue); outline-offset:2px;}
+  .stepper{display:flex; align-items:center; gap:6px; font-size:13px;}
+  .stepper button{width:30px; height:30px; border-radius:9px; border:2px solid var(--ink); background:var(--paper); font-family:var(--hand); font-size:16px; cursor:pointer;}
+  input[type=range]{width:110px; accent-color:var(--ink);}
+  .slider{display:flex; align-items:center; gap:6px; font-size:12px; color:#555;}
+
+  #stage{position:relative; margin:0 10px 14px; border:2px solid #2223; border-radius:14px; overflow:hidden; background:
+    radial-gradient(circle at 30% 20%, #fffdf7 0%, var(--paper) 70%);}
+  svg{display:block; width:100%; height:auto; touch-action:none; cursor:grab;}
+  svg:active{cursor:grabbing;}
+
+  #ledger{
+    position:absolute; left:10px; bottom:10px; max-width:min(62vw,300px);
+    background:#fffefa; border:2px solid var(--ink); border-radius:10px;
+    padding:8px 12px; font-size:12px; line-height:1.55; transform:rotate(-.6deg);
+    box-shadow:2px 3px 0 #0002;
+  }
+  #ledger .lh{font-size:11px; letter-spacing:.18em; text-transform:uppercase; border-bottom:1.5px solid var(--ink); margin-bottom:4px; padding-bottom:2px;}
+  #ledger .row{display:flex; justify-content:space-between; gap:12px;}
+  #ledger .cube{margin-top:5px; padding-top:4px; border-top:1.5px dashed #999; color:#666; font-size:11.5px;}
+  #hint{position:absolute; right:12px; bottom:10px; font-size:11px; color:#8a8a8a; text-align:right; line-height:1.4; max-width:34vw;}
+  @media (max-width:640px){ #hint{display:none;} #ledger{font-size:11px;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Topology / Count</div>
+  <h1>Edges image of cube</h1>
+  <p class="caption">
+    <b><span class="swatch" style="background:var(--red)"></span>red</b> near face, true size &amp; shape in the picture plane &nbsp;·&nbsp;
+    <b><span class="swatch" style="background:var(--blue)"></span>blue</b> the four depth edges &nbsp;·&nbsp;
+    <b><span class="swatch" style="background:var(--purple)"></span><span class="swatch" style="background:var(--aqua)"></span>rings</b> equal-depth sections &nbsp;·&nbsp;
+    <b><span class="swatch" style="background:#151515"></span>black</b> far face &nbsp;·&nbsp;
+    <b><span class="swatch" style="background:var(--gray)"></span>gray</b> depth lines between edges
+  </p>
+</header>
+
+<div id="controls">
+  <div class="grp" role="group" aria-label="Panel presets">
+    <span class="grp-label">Panel</span>
+    <button class="chip" data-preset="1">1 · plane</button>
+    <button class="chip" data-preset="2">2 · edge depth</button>
+    <button class="chip" data-preset="3">3 · + between</button>
+    <button class="chip" data-preset="4">4 · composite</button>
+  </div>
+  <div class="grp" role="group" aria-label="Layers">
+    <span class="grp-label">Layers</span>
+    <button class="chip" data-layer="plane">picture plane</button>
+    <button class="chip" data-layer="depth">edge depth</button>
+    <button class="chip" data-layer="between">between edges</button>
+    <button class="chip" data-layer="dots">points</button>
+  </div>
+  <div class="grp">
+    <span class="grp-label">Count n</span>
+    <div class="stepper">
+      <button id="nMinus" aria-label="decrease subdivision">−</button>
+      <span id="nVal">3</span>
+      <button id="nPlus" aria-label="increase subdivision">+</button>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="grp-label">Hand</span>
+    <div class="slider"><input id="hand" type="range" min="0" max="7" step="0.1" value="3.2" aria-label="hand wobble amount"></div>
+  </div>
+  <button class="chip" id="reset">reset</button>
+</div>
+
+<div id="stage">
+  <svg id="svg" viewBox="0 0 1000 780" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/780">
+    <g id="world">
+      <g id="Lbetween"></g>
+      <g id="Ldepth"></g>
+      <g id="Lplane"></g>
+      <g id="Lframe"></g>
+      <g id="Ldots"></g>
+      <g id="Lhandles"></g>
+    </g>
+  </svg>
+  <div id="ledger" aria-live="polite"></div>
+  <div id="hint">drag red corners &amp; the ⊙ deep point<br>one finger pans · pinch zooms</div>
+</div>
+
+<script>
+(function(){
+  const SVG = document.getElementById('svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const G = id => document.getElementById(id);
+  const layers = {between:G('Lbetween'), depth:G('Ldepth'), plane:G('Lplane'), frame:G('Lframe'), dots:G('Ldots'), handles:G('Lhandles')};
+
+  const DEFAULTS = {
+    corners:[{x:295,y:175},{x:735,y:140},{x:775,y:615},{x:235,y:640}], // TL TR BR BL
+    center:{x:520,y:410},
+    view:{x:0,y:0,w:1000,h:780}
+  };
+  const state = {
+    corners: DEFAULTS.corners.map(p=>({...p})),
+    center: {...DEFAULTS.center},
+    view: {...DEFAULTS.view},
+    n:3, hand:3.2, fMax:0.82,
+    show:{plane:true, depth:false, between:false, dots:true}
+  };
+
+  /* ---------- small math kit ---------- */
+  const frac = x => x - Math.floor(x);
+  function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967295;}
+  const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t});
+
+  function bil(u,v){ // bilinear over the four corners; u along top, v downward
+    const [a,b,c,d]=state.corners;
+    return {x:(1-u)*(1-v)*a.x + u*(1-v)*b.x + u*v*c.x + (1-u)*v*d.x,
+            y:(1-u)*(1-v)*a.y + u*(1-v)*b.y + u*v*c.y + (1-u)*v*d.y};
+  }
+
+  function crSample(pts, closed, per){ // Catmull-Rom through pts
+    const n=pts.length, out=[];
+    const get=i=> closed ? pts[((i%n)+n)%n] : pts[Math.max(0,Math.min(n-1,i))];
+    const segs = closed ? n : n-1;
+    for(let i=0;i<segs;i++){
+      const p0=get(i-1),p1=get(i),p2=get(i+1),p3=get(i+2);
+      for(let j=0;j<per;j++){
+        const t=j/per,t2=t*t,t3=t2*t;
+        out.push({
+          x:.5*((2*p1.x)+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+          y:.5*((2*p1.y)+(-p0.y+p2.y)*t+(2*p0.y-5*p1.y+4*p2.y-p3.y)*t2+(-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
+        });
+      }
+    }
+    if(!closed) out.push({...pts[n-1]});
+    return out;
+  }
+
+  function wobble(samples, closed, seedStr, amp){
+    const L=samples.length, s=hash(seedStr);
+    const s1=frac(s*13.7)*6.2832, s2=frac(s*71.3)*6.2832, s3=frac(s*37.1)*6.2832;
+    const out=[];
+    for(let i=0;i<L;i++){
+      const t = closed ? i/L : i/(L-1);
+      let a,b;
+      if(closed){ a=samples[(i-1+L)%L]; b=samples[(i+1)%L]; }
+      else { a=samples[Math.max(0,i-1)]; b=samples[Math.min(L-1,i+1)]; }
+      const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      const nx=-dy/len, ny=dx/len;
+      const taper = closed ? 1 : Math.sin(Math.PI*t);      // open lines keep their endpoints
+      const w=(Math.sin(2*6.2832*t+s1)*.55+Math.sin(3*6.2832*t+s2)*.3+Math.sin(5*6.2832*t+s3)*.15)*amp*taper;
+      out.push({x:samples[i].x+nx*w, y:samples[i].y+ny*w});
+    }
+    return out;
+  }
+
+  function pathEl(parent, samples, closed, stroke, width, extra){
+    let d='M'+samples.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join('L');
+    if(closed) d+='Z';
+    const el=document.createElementNS(NS,'path');
+    el.setAttribute('d',d); el.setAttribute('fill','none');
+    el.setAttribute('stroke',stroke); el.setAttribute('stroke-width',width);
+    el.setAttribute('stroke-linecap','round'); el.setAttribute('stroke-linejoin','round');
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+  function dot(parent, p, r, fill){
+    const el=document.createElementNS(NS,'circle');
+    el.setAttribute('cx',p.x.toFixed(1)); el.setAttribute('cy',p.y.toFixed(1));
+    el.setAttribute('r',r); el.setAttribute('fill',fill);
+    parent.appendChild(el);
+  }
+
+  /* ---------- geometry model ---------- */
+  // boundary nodes clockwise: top (u:0→1), right (v:0→1), bottom (u:1→0), left (v:1→0)
+  function boundaryNodes(n){
+    const nodes=[];
+    for(let k=0;k<n;k++) nodes.push({p:bil(k/n,0), corner:k===0});
+    for(let k=0;k<n;k++) nodes.push({p:bil(1,k/n), corner:k===0});
+    for(let k=0;k<n;k++) nodes.push({p:bil(1-k/n,1), corner:k===0});
+    for(let k=0;k<n;k++) nodes.push({p:bil(0,1-k/n), corner:k===0});
+    return nodes;
+  }
+  const ringPt=(node,f)=>lerp(node,state.center,f);
+
+  /* ---------- render ---------- */
+  const counts={};
+  function render(){
+    for(const k of ['between','depth','plane','frame','dots']) layers[k].replaceChildren();
+    const n=state.n, amp=state.hand, fMax=state.fMax;
+    const nodes=boundaryNodes(n);
+    const N=nodes.length;
+    counts.frame={lines:4, pts:N};
+    counts.plane={lines:0, pts:0};
+    counts.depth={lines:0, pts:0};
+    counts.between={lines:0, pts:0};
+
+    // ---- frame: four boundary edges, red, always on ----
+    const M=26;
+    const edgeParams=[
+      t=>bil(t,0), t=>bil(1,t), t=>bil(1-t,1), t=>bil(0,1-t)
+    ];
+    edgeParams.forEach((fn,i)=>{
+      const s=[]; for(let j=0;j<=M;j++) s.push(fn(j/M));
+      pathEl(layers.frame, wobble(s,false,'edge'+i,amp*1.25), false, 'var(--red)', 4.5);
+    });
+
+    // ---- picture-plane grid (red interior lines) ----
+    if(state.show.plane){
+      for(let i=1;i<n;i++){
+        const su=[]; for(let j=0;j<=M;j++) su.push(bil(i/n, j/M));
+        pathEl(layers.plane, wobble(su,false,'gu'+i,amp), false, 'var(--red)', 3);
+        const sv=[]; for(let j=0;j<=M;j++) sv.push(bil(j/M, i/n));
+        pathEl(layers.plane, wobble(sv,false,'gv'+i,amp), false, 'var(--red)', 3);
+        counts.plane.lines+=2;
+      }
+      counts.plane.pts=(n-1)*(n-1);
+    }
+
+    // ring fractions
+    const fFull=[]; for(let k=1;k<=n;k++) fFull.push(fMax*k/n);
+    const fHalf=[]; for(let k=1;k<=n;k++) fHalf.push(fMax*(k-0.5)/n);
+
+    // ---- between-edges layer: gray depth lines from non-corner nodes + thin half-rings ----
+    if(state.show.between){
+      fHalf.forEach((f,k)=>{
+        const pts=nodes.map(nd=>ringPt(nd.p,f));
+        pathEl(layers.between, wobble(crSample(pts,true,8),true,'hr'+k,amp*.7), true, 'var(--gray)', 1.4, {'opacity':.75});
+      });
+      counts.between.lines+=fHalf.length;
+      nodes.forEach((nd,i)=>{
+        if(nd.corner) return;
+        const pts=[nd.p, ...fFull.map(f=>ringPt(nd.p,f))];
+        pathEl(layers.between, wobble(crSample(pts,false,8),false,'bd'+i,amp*.6), false, 'var(--gray)', 1.8);
+        counts.between.lines++;
+      });
+    }
+
+    // ---- edge-depth layer: colored rings + four blue corner depth lines ----
+    if(state.show.depth){
+      fFull.forEach((f,k)=>{
+        const pts=nodes.map(nd=>ringPt(nd.p,f));
+        const last = k===fFull.length-1;
+        const color = last ? '#151515' : (k%2===0 ? 'var(--purple)' : 'var(--aqua)');
+        pathEl(layers.depth, wobble(crSample(pts,true,8),true,'ring'+k,amp), true, color, last?4:3);
+        counts.depth.lines++;
+      });
+      nodes.forEach((nd,i)=>{
+        if(!nd.corner) return;
+        const pts=[nd.p, ...fFull.map(f=>ringPt(nd.p,f))];
+        pathEl(layers.depth, wobble(crSample(pts,false,8),false,'cd'+i,amp*.8), false, 'var(--blue)', 4);
+        counts.depth.lines++;
+      });
+    }
+
+    // ---- points ----
+    if(state.show.dots){
+      // frame marks
+      nodes.forEach(nd=> dot(layers.dots, nd.p, nd.corner?7:5, nd.corner?'#151515':'var(--red)'));
+      if(state.show.plane){
+        for(let i=1;i<n;i++)for(let j=1;j<n;j++) dot(layers.dots, bil(i/n,j/n), 5, 'var(--red)');
+      }
+      if(state.show.depth){
+        nodes.forEach(nd=>{ if(nd.corner) fFull.forEach(f=> dot(layers.dots, ringPt(nd.p,f), 3, '#151515')); });
+        counts.depth.pts = 4*fFull.length;
+      }
+      if(state.show.between){
+        nodes.forEach(nd=>{ if(!nd.corner) fFull.forEach(f=> dot(layers.dots, ringPt(nd.p,f), 2.2, '#151515')); });
+        counts.between.pts = (N-4)*fFull.length;
+      }
+    } else {
+      counts.depth.pts=0; counts.between.pts=0; counts.plane.pts=0; counts.frame.pts=0;
+    }
+
+    renderHandles();
+    renderLedger();
+  }
+
+  /* ---------- handles ---------- */
+  let handleEls=null;
+  function renderHandles(){
+    if(!handleEls){
+      handleEls={corners:[],center:null};
+      const mk=(cls)=>{
+        const g=document.createElementNS(NS,'g');
+        const hit=document.createElementNS(NS,'circle');
+        hit.setAttribute('r',22); hit.setAttribute('fill','transparent'); hit.dataset.h='1';
+        const vis=document.createElementNS(NS,'circle');
+        vis.dataset.h='1';
+        if(cls==='corner'){ vis.setAttribute('r',8.5); vis.setAttribute('fill','var(--red)'); vis.setAttribute('stroke','#fff'); vis.setAttribute('stroke-width',2);}
+        else { vis.setAttribute('r',7.5); vis.setAttribute('fill','var(--paper)'); vis.setAttribute('stroke','#151515'); vis.setAttribute('stroke-width',2.5); vis.setAttribute('stroke-dasharray','2 3'); }
+        g.appendChild(hit); g.appendChild(vis); g.style.cursor='move';
+        layers.handles.appendChild(g);
+        return g;
+      };
+      for(let i=0;i<4;i++){
+        const g=mk('corner'); handleEls.corners.push(g);
+        attachDrag(g, p=>{ state.corners[i].x=p.x; state.corners[i].y=p.y; render(); });
+      }
+      handleEls.center=mk('center');
+      attachDrag(handleEls.center, p=>{ state.center.x=p.x; state.center.y=p.y; render(); });
+    }
+    handleEls.corners.forEach((g,i)=>{
+      g.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.corners[i].x); c.setAttribute('cy',state.corners[i].y);});
+    });
+    handleEls.center.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.center.x); c.setAttribute('cy',state.center.y);});
+  }
+
+  function clientToWorld(cx,cy){
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    return {x:state.view.x+(cx-r.left)*k, y:state.view.y+(cy-r.top)*k};
+  }
+  function attachDrag(el, onMove){
+    el.addEventListener('pointerdown', e=>{
+      e.stopPropagation(); el.setPointerCapture(e.pointerId);
+      const move=ev=>{ const p=clientToWorld(ev.clientX,ev.clientY); onMove(p); };
+      const up=()=>{ el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); };
+      el.addEventListener('pointermove',move);
+      el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+    });
+  }
+
+  /* ---------- pan & pinch ---------- */
+  const pointers=new Map();
+  function applyView(){ SVG.setAttribute('viewBox',`${state.view.x} ${state.view.y} ${state.view.w} ${state.view.h}`); }
+  SVG.addEventListener('pointerdown', e=>{
+    if(e.target.dataset && e.target.dataset.h) return;
+    SVG.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  });
+  SVG.addEventListener('pointermove', e=>{
+    if(!pointers.has(e.pointerId)) return;
+    const prev=pointers.get(e.pointerId);
+    const cur={x:e.clientX,y:e.clientY};
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    if(pointers.size===1){
+      state.view.x-=(cur.x-prev.x)*k;
+      state.view.y-=(cur.y-prev.y)*k;
+      applyView();
+    } else if(pointers.size===2){
+      const ids=[...pointers.keys()];
+      const other=pointers.get(ids[0]===e.pointerId?ids[1]:ids[0]);
+      const d0=Math.hypot(prev.x-other.x,prev.y-other.y);
+      const d1=Math.hypot(cur.x-other.x,cur.y-other.y);
+      if(d0>4&&d1>4){
+        const s=d0/d1;
+        const midC={x:(cur.x+other.x)/2,y:(cur.y+other.y)/2};
+        const midW=clientToWorld(midC.x,midC.y);
+        let w=Math.min(3200,Math.max(320,state.view.w*s));
+        const scale=w/state.view.w;
+        state.view.w=w; state.view.h*=scale;
+        state.view.x=midW.x-(midC.x-r.left)*(state.view.w/r.width);
+        state.view.y=midW.y-(midC.y-r.top)*(state.view.w/r.width);
+        applyView();
+      }
+    }
+    pointers.set(e.pointerId,cur);
+  });
+  const endP=e=>pointers.delete(e.pointerId);
+  SVG.addEventListener('pointerup',endP); SVG.addEventListener('pointercancel',endP);
+  SVG.addEventListener('wheel', e=>{ e.preventDefault();
+    const r=SVG.getBoundingClientRect();
+    const before=clientToWorld(e.clientX,e.clientY);
+    const s=Math.exp(e.deltaY*0.0015);
+    state.view.w=Math.min(3200,Math.max(320,state.view.w*s));
+    state.view.h=state.view.w*780/1000;
+    state.view.x=before.x-(e.clientX-r.left)*(state.view.w/r.width);
+    state.view.y=before.y-(e.clientY-r.top)*(state.view.w/r.width);
+    applyView();
+  }, {passive:false});
+
+  /* ---------- ledger ---------- */
+  function renderLedger(){
+    const L=G('ledger');
+    const rows=[];
+    rows.push(row('frame', counts.frame.lines+' edges', state.show.dots ? counts.frame.pts+' marks':'—'));
+    if(state.show.plane)  rows.push(row('picture plane', counts.plane.lines+' lines', state.show.dots ? counts.plane.pts+' crossings':'—'));
+    if(state.show.depth)  rows.push(row('edge depth', counts.depth.lines+' lines', state.show.dots ? counts.depth.pts+' marks':'—'));
+    if(state.show.between)rows.push(row('between edges', counts.between.lines+' lines', state.show.dots ? counts.between.pts+' marks':'—'));
+    L.innerHTML='<div class="lh">Count · n = '+state.n+'</div>'+rows.join('')+
+      '<div class="cube">underlying cube — V 8 · E 12 · F 6</div>';
+    function row(a,b,c){return `<div class="row"><span>${a}</span><span>${b} · ${c}</span></div>`;}
+  }
+
+  /* ---------- controls ---------- */
+  function syncChips(){
+    document.querySelectorAll('[data-layer]').forEach(b=>{
+      b.setAttribute('aria-pressed', String(!!state.show[b.dataset.layer]));
+    });
+  }
+  document.querySelectorAll('[data-layer]').forEach(b=>{
+    b.addEventListener('click',()=>{ state.show[b.dataset.layer]=!state.show[b.dataset.layer]; syncChips(); render(); });
+  });
+  document.querySelectorAll('[data-preset]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const p=b.dataset.preset;
+      if(p==='1') Object.assign(state.show,{plane:true, depth:false, between:false});
+      if(p==='2') Object.assign(state.show,{plane:false, depth:true, between:false});
+      if(p==='3') Object.assign(state.show,{plane:false, depth:true, between:true});
+      if(p==='4') Object.assign(state.show,{plane:true, depth:true, between:true});
+      state.show.dots=true;
+      syncChips(); render();
+    });
+  });
+  G('nMinus').addEventListener('click',()=>{ state.n=Math.max(2,state.n-1); G('nVal').textContent=state.n; render(); });
+  G('nPlus').addEventListener('click',()=>{ state.n=Math.min(5,state.n+1); G('nVal').textContent=state.n; render(); });
+  G('hand').addEventListener('input',e=>{ state.hand=parseFloat(e.target.value); render(); });
+  G('reset').addEventListener('click',()=>{
+    state.corners=DEFAULTS.corners.map(p=>({...p}));
+    state.center={...DEFAULTS.center};
+    state.view={...DEFAULTS.view};
+    applyView(); render();
+  });
+
+  syncChips(); applyView(); render();
+})();
+</script>
+</body>
+</html>

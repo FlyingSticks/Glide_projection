@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pencil Dial — harmonic depth pencils</title>
+<style>
+  :root{
+    --paper:#faf7f0; --ink:#1c1c1c;
+    --red:#d93a2b; --blue:#2b4fd7; --purple:#8e44c8; --aqua:#35b8b8; --gray:#8f8f8f; --green:#3a9e3a;
+    --hand:"Chalkboard SE","Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--hand);}
+  header{padding:14px 18px 4px;}
+  .eyebrow{font-size:12px; letter-spacing:.22em; color:var(--green); text-transform:uppercase;}
+  h1{margin:2px 0 0; font-size:clamp(20px,4.5vw,30px); letter-spacing:.04em; text-transform:uppercase;}
+  .caption{margin:4px 0 0; font-size:12.5px; color:#555; line-height:1.5;}
+  .caption b{font-weight:600;}
+  .swatch{display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin-right:2px;}
+
+  #controls{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:10px 18px;}
+  .grp{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:4px 8px; border:2px solid #2222; border-radius:12px;}
+  .grp-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#777; margin-right:2px;}
+  button.chip{
+    font-family:var(--hand); font-size:13px; padding:5px 11px; border-radius:10px;
+    border:2px solid var(--ink); background:var(--paper); color:var(--ink); cursor:pointer;
+    transform:rotate(-.4deg);
+  }
+  button.chip:nth-child(even){transform:rotate(.5deg);}
+  button.chip[aria-pressed="true"]{background:var(--ink); color:var(--paper);}
+  button.chip:focus-visible{outline:3px solid var(--blue); outline-offset:2px;}
+  input[type=range]{width:110px; accent-color:var(--ink);}
+  .slider{display:flex; align-items:center; gap:6px; font-size:12px; color:#555;}
+
+  #stage{position:relative; margin:0 10px 6px; border:2px solid #2223; border-radius:14px; overflow:hidden; background:
+    radial-gradient(circle at 30% 20%, #fffdf7 0%, var(--paper) 70%);}
+  #stage svg{display:block; width:100%; height:auto; touch-action:none; cursor:grab;}
+  #stage svg:active{cursor:grabbing;}
+
+  #dialwrap{margin:0 10px 14px; border:2px solid #2223; border-radius:14px; overflow:hidden; background:#fffdf7;}
+  #dial{display:block; width:100%; height:auto;}
+
+  #ledger{
+    position:absolute; left:10px; bottom:10px; max-width:min(66vw,320px);
+    background:#fffefa; border:2px solid var(--ink); border-radius:10px;
+    padding:8px 12px; font-size:12px; line-height:1.55; transform:rotate(-.6deg);
+    box-shadow:2px 3px 0 #0002;
+  }
+  #ledger .lh{font-size:11px; letter-spacing:.18em; text-transform:uppercase; border-bottom:1.5px solid var(--ink); margin-bottom:4px; padding-bottom:2px;}
+  #ledger .row{display:flex; justify-content:space-between; gap:12px;}
+  #ledger .cube{margin-top:5px; padding-top:4px; border-top:1.5px dashed #999; color:#666; font-size:11.5px;}
+  #ledger .verdict{color:var(--green);}
+  #hint{position:absolute; right:12px; bottom:10px; font-size:11px; color:#8a8a8a; text-align:right; line-height:1.4; max-width:34vw;}
+  @media (max-width:640px){ #hint{display:none;} #ledger{font-size:11px;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">The Pencil Dial</div>
+  <h1>Which cube images carry a harmonic depth pencil?</h1>
+  <p class="caption">
+    Collector mode throughout: the four <b><span class="swatch" style="background:var(--blue)"></span>depth edges</b> concur at ⊙, so they form a pencil with one cross-ratio λ.
+    The <b><span class="swatch" style="background:var(--green)"></span>green curves</b> are the Chasles loci — place ⊙ on one and the pencil is harmonic:
+    solid λ=−1, dashed λ=2, dotted λ=½. The dial below shows λ's full six-member orbit.
+  </p>
+</header>
+
+<div id="controls">
+  <div class="grp" role="group" aria-label="Layers">
+    <span class="grp-label">Show</span>
+    <button class="chip" data-layer="locus" aria-pressed="true">harmonic locus</button>
+    <button class="chip" data-layer="plane" aria-pressed="false">picture plane</button>
+    <button class="chip" data-layer="dots" aria-pressed="true">points</button>
+  </div>
+  <div class="grp">
+    <span class="grp-label">Hand</span>
+    <div class="slider"><input id="hand" type="range" min="0" max="7" step="0.1" value="3.2" aria-label="hand wobble amount"></div>
+  </div>
+  <button class="chip" id="reset">reset</button>
+</div>
+
+<div id="stage">
+  <svg id="svg" viewBox="0 0 1000 660" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/660">
+    <g id="world">
+      <g id="Llocus"></g>
+      <g id="Ldepth"></g>
+      <g id="Lplane"></g>
+      <g id="Lframe"></g>
+      <g id="Ldots"></g>
+      <g id="Lhandles"></g>
+    </g>
+  </svg>
+  <div id="ledger" aria-live="polite"></div>
+  <div id="hint">drag red corners &amp; ⊙<br>green = harmonic eye positions<br>pan / pinch as before</div>
+</div>
+
+<div id="dialwrap">
+  <svg id="dial" viewBox="0 0 1000 250" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:1000/250"></svg>
+</div>
+
+<script>
+(function(){
+  const SVG = document.getElementById('svg');
+  const DIAL = document.getElementById('dial');
+  const NS = 'http://www.w3.org/2000/svg';
+  const G = id => document.getElementById(id);
+  const layers = {locus:G('Llocus'), depth:G('Ldepth'), plane:G('Lplane'), frame:G('Lframe'), dots:G('Ldots'), handles:G('Lhandles')};
+
+  const NEAR0 = [{x:295,y:165},{x:735,y:130},{x:775,y:565},{x:235,y:590}]; // TL TR BR BL
+  const Z0 = {x:520,y:380};
+
+  const state = {
+    near: NEAR0.map(p=>({...p})),
+    center: {...Z0},
+    view: {x:0,y:0,w:1000,h:660},
+    n:3, hand:3.2, fSnap:0.82,
+    show:{locus:true, plane:false, dots:true}
+  };
+
+  /* ---------- math kit ---------- */
+  const frac = x => x - Math.floor(x);
+  function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967295;}
+  const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t});
+  const cross2=(a,b)=>a.x*b.y-a.y*b.x;
+
+  function farEff(){ return state.near.map(p=>lerp(p,state.center,state.fSnap)); }
+  function bilOf(c){ return (u,v)=>{
+    const [a,b,cc,d]=c;
+    return {x:(1-u)*(1-v)*a.x + u*(1-v)*b.x + u*v*cc.x + (1-u)*v*d.x,
+            y:(1-u)*(1-v)*a.y + u*(1-v)*b.y + u*v*cc.y + (1-u)*v*d.y};
+  };}
+
+  /* pencil cross-ratio at vertex Zp, order (L0,L1;L2,L3) = (TL,TR;BR,BL)
+     λ = (d0×d2)(d1×d3) / (d0×d3)(d1×d2)  — verified against the v3
+     transversal sections to 12 decimals */
+  function pencilAB(Zp){
+    const d=state.near.map(N=>({x:N.x-Zp.x, y:N.y-Zp.y}));
+    return { a: cross2(d[0],d[2])*cross2(d[1],d[3]),
+             b: cross2(d[0],d[3])*cross2(d[1],d[2]) };
+  }
+  function pencilLambda(Zp){
+    const {a,b}=pencilAB(Zp);
+    return Math.abs(b)<1e-9 ? Infinity : a/b;
+  }
+
+  function crSample(pts, closed, per){
+    const n=pts.length, out=[];
+    const get=i=> closed ? pts[((i%n)+n)%n] : pts[Math.max(0,Math.min(n-1,i))];
+    const segs = closed ? n : n-1;
+    for(let i=0;i<segs;i++){
+      const p0=get(i-1),p1=get(i),p2=get(i+1),p3=get(i+2);
+      for(let j=0;j<per;j++){
+        const t=j/per,t2=t*t,t3=t2*t;
+        out.push({
+          x:.5*((2*p1.x)+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+          y:.5*((2*p1.y)+(-p0.y+p2.y)*t+(2*p0.y-5*p1.y+4*p2.y-p3.y)*t2+(-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
+        });
+      }
+    }
+    if(!closed) out.push({...pts[n-1]});
+    return out;
+  }
+  function wobble(samples, closed, seedStr, amp){
+    const L=samples.length, s=hash(seedStr);
+    const s1=frac(s*13.7)*6.2832, s2=frac(s*71.3)*6.2832, s3=frac(s*37.1)*6.2832;
+    const out=[];
+    for(let i=0;i<L;i++){
+      const t = closed ? i/L : i/(L-1);
+      let a,b;
+      if(closed){ a=samples[(i-1+L)%L]; b=samples[(i+1)%L]; }
+      else { a=samples[Math.max(0,i-1)]; b=samples[Math.min(L-1,i+1)]; }
+      const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      const nx=-dy/len, ny=dx/len;
+      const taper = closed ? 1 : Math.sin(Math.PI*t);
+      const w=(Math.sin(2*6.2832*t+s1)*.55+Math.sin(3*6.2832*t+s2)*.3+Math.sin(5*6.2832*t+s3)*.15)*amp*taper;
+      out.push({x:samples[i].x+nx*w, y:samples[i].y+ny*w});
+    }
+    return out;
+  }
+  function pathEl(parent, samples, closed, stroke, width, extra){
+    let d='M'+samples.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join('L');
+    if(closed) d+='Z';
+    const el=document.createElementNS(NS,'path');
+    el.setAttribute('d',d); el.setAttribute('fill','none');
+    el.setAttribute('stroke',stroke); el.setAttribute('stroke-width',width);
+    el.setAttribute('stroke-linecap','round'); el.setAttribute('stroke-linejoin','round');
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+  function rawPath(parent, d, stroke, width, extra){
+    const el=document.createElementNS(NS,'path');
+    el.setAttribute('d',d); el.setAttribute('fill','none');
+    el.setAttribute('stroke',stroke); el.setAttribute('stroke-width',width);
+    el.setAttribute('stroke-linecap','round');
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+  function dot(parent, p, r, fill, extra){
+    const el=document.createElementNS(NS,'circle');
+    el.setAttribute('cx',p.x.toFixed(1)); el.setAttribute('cy',p.y.toFixed(1));
+    el.setAttribute('r',r); el.setAttribute('fill',fill);
+    if(extra) for(const k in extra) el.setAttribute(k,extra[k]);
+    parent.appendChild(el);
+  }
+  function txt(parent, x, y, s, size, fill, anchor){
+    const el=document.createElementNS(NS,'text');
+    el.setAttribute('x',x); el.setAttribute('y',y);
+    el.setAttribute('font-size',size); el.setAttribute('fill',fill||'var(--ink)');
+    el.setAttribute('font-family','var(--hand)');
+    el.setAttribute('text-anchor',anchor||'middle');
+    el.textContent=s; parent.appendChild(el);
+  }
+
+  /* ---------- geometry model (collector mode always) ---------- */
+  function boundaryPairs(n){
+    const nb=bilOf(state.near), fb=bilOf(farEff());
+    const params=[];
+    for(let k=0;k<n;k++) params.push([k/n,0]);
+    for(let k=0;k<n;k++) params.push([1,k/n]);
+    for(let k=0;k<n;k++) params.push([1-k/n,1]);
+    for(let k=0;k<n;k++) params.push([0,1-k/n]);
+    return params.map(([u,v],i)=>({near:nb(u,v), far:fb(u,v), corner:i%n===0}));
+  }
+
+  /* ---------- harmonic loci: marching squares on three conic fields ----------
+     λ = a/b with a,b quadratic in Z (verified: field zeros land on
+     λ = −1, ½, 2 to 9 decimals). Chasles: each locus is a conic
+     through the four corners.
+       F1 = a + b   ⇔ λ = −1   (solid)
+       F2 = 2a − b  ⇔ λ = ½    (dotted)
+       F3 = a − 2b  ⇔ λ = 2    (dashed)                                */
+  function locusPaths(){
+    const xs=state.near.map(p=>p.x).concat([state.center.x]);
+    const ys=state.near.map(p=>p.y).concat([state.center.y]);
+    const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+    const padX=(x1-x0)*0.45+40, padY=(y1-y0)*0.45+40;
+    const gx0=x0-padX, gx1=x1+padX, gy0=y0-padY, gy1=y1+padY;
+    const NX=72, NY=58;
+    const fld=[[],[],[]];
+    for(let j=0;j<=NY;j++){
+      const row=[[],[],[]];
+      for(let i=0;i<=NX;i++){
+        const {a,b}=pencilAB({x:gx0+(gx1-gx0)*i/NX, y:gy0+(gy1-gy0)*j/NY});
+        row[0].push(a+b); row[1].push(2*a-b); row[2].push(a-2*b);
+      }
+      for(let k=0;k<3;k++) fld[k].push(row[k]);
+    }
+    const X=i=>gx0+(gx1-gx0)*i/NX, Y=j=>gy0+(gy1-gy0)*j/NY;
+    const ds=['','',''];
+    for(let k=0;k<3;k++){
+      let d='';
+      for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){
+        const v00=fld[k][j][i], v10=fld[k][j][i+1], v11=fld[k][j+1][i+1], v01=fld[k][j+1][i];
+        const pts=[];
+        const cut=(va,vb,pa,pb)=>{ if((va<0)!==(vb<0)){ const t=va/(va-vb); pts.push({x:pa.x+(pb.x-pa.x)*t, y:pa.y+(pb.y-pa.y)*t}); } };
+        cut(v00,v10,{x:X(i),y:Y(j)},{x:X(i+1),y:Y(j)});
+        cut(v10,v11,{x:X(i+1),y:Y(j)},{x:X(i+1),y:Y(j+1)});
+        cut(v01,v11,{x:X(i),y:Y(j+1)},{x:X(i+1),y:Y(j+1)});
+        cut(v00,v01,{x:X(i),y:Y(j)},{x:X(i),y:Y(j+1)});
+        if(pts.length===2) d+=`M${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}L${pts[1].x.toFixed(1)} ${pts[1].y.toFixed(1)}`;
+        else if(pts.length===4){ d+=`M${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}L${pts[3].x.toFixed(1)} ${pts[3].y.toFixed(1)}`;
+                                 d+=`M${pts[1].x.toFixed(1)} ${pts[1].y.toFixed(1)}L${pts[2].x.toFixed(1)} ${pts[2].y.toFixed(1)}`; }
+      }
+      ds[k]=d;
+    }
+    return ds;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    for(const k of ['locus','depth','plane','frame','dots']) layers[k].replaceChildren();
+    const n=state.n, amp=state.hand;
+    const pairs=boundaryPairs(n);
+    const nb=bilOf(state.near);
+    const ringPt=(pair,f)=>lerp(pair.near, pair.far, f);
+    const fFull=[]; for(let k=1;k<=n;k++) fFull.push(k/n);
+
+    // harmonic loci
+    if(state.show.locus){
+      const [d1,d2,d3]=locusPaths();
+      rawPath(layers.locus, d1, 'var(--green)', 2.4, {opacity:.85});                                  // λ=−1 solid
+      rawPath(layers.locus, d3, 'var(--green)', 2.0, {'stroke-dasharray':'9 7', opacity:.8});         // λ=2 dashed
+      rawPath(layers.locus, d2, 'var(--green)', 2.0, {'stroke-dasharray':'2 6', opacity:.8});         // λ=½ dotted
+    }
+
+    // frame
+    const M=26;
+    const edgeParams=[t=>nb(t,0), t=>nb(1,t), t=>nb(1-t,1), t=>nb(0,1-t)];
+    edgeParams.forEach((fn,i)=>{
+      const s=[]; for(let j=0;j<=M;j++) s.push(fn(j/M));
+      pathEl(layers.frame, wobble(s,false,'edge'+i,amp*1.25), false, 'var(--red)', 4.5);
+    });
+
+    // picture-plane grid
+    if(state.show.plane){
+      for(let i=1;i<n;i++){
+        const su=[]; for(let j=0;j<=M;j++) su.push(nb(i/n, j/M));
+        pathEl(layers.plane, wobble(su,false,'gu'+i,amp), false, 'var(--red)', 3);
+        const sv=[]; for(let j=0;j<=M;j++) sv.push(nb(j/M, i/n));
+        pathEl(layers.plane, wobble(sv,false,'gv'+i,amp), false, 'var(--red)', 3);
+      }
+    }
+
+    // depth structure
+    fFull.forEach((f,k)=>{
+      const pts=pairs.map(pr=>ringPt(pr,f));
+      const last = k===fFull.length-1;
+      const color = last ? '#151515' : (k%2===0 ? 'var(--purple)' : 'var(--aqua)');
+      pathEl(layers.depth, wobble(crSample(pts,true,8),true,'ring'+k,amp), true, color, last?4.5:3);
+    });
+    pairs.forEach((pr,i)=>{
+      if(!pr.corner) return;
+      const pts=[pr.near, ...fFull.map(f=>ringPt(pr,f))];
+      pathEl(layers.depth, wobble(crSample(pts,false,8),false,'cd'+i,amp*.8), false, 'var(--blue)', 4);
+    });
+
+    // points
+    if(state.show.dots){
+      pairs.forEach(pr=> dot(layers.dots, pr.near, pr.corner?7:5, pr.corner?'#151515':'var(--red)'));
+      if(state.show.plane){
+        for(let i=1;i<n;i++)for(let j=1;j<n;j++) dot(layers.dots, nb(i/n,j/n), 5, 'var(--red)');
+      }
+      pairs.forEach(pr=>{ if(pr.corner) fFull.forEach(f=> dot(layers.dots, ringPt(pr,f), 3, '#151515')); });
+    }
+
+    renderHandles();
+    const lam=pencilLambda(state.center);
+    renderDial(lam);
+    renderLedger(lam);
+  }
+
+  /* ---------- the dial ---------- */
+  const ORBIT=[
+    {name:'λ',   f:l=>l,          color:'#151515', big:true},
+    {name:'τλ',  f:l=>1-l,        color:'var(--red)'},
+    {name:'ρλ',  f:l=>1/l,        color:'var(--blue)'},
+    {name:'σλ',  f:l=>l/(l-1),    color:'var(--purple)'},
+    {name:'ωλ',  f:l=>1/(1-l),    color:'var(--aqua)'},
+    {name:'ω²λ', f:l=>(l-1)/l,    color:'var(--gray)'}
+  ];
+  const SPECIALS=[-1,0,0.5,1,2];
+  function uOf(x){ if(!isFinite(x)) return x>0?0.995:-0.995; return x/(1+Math.abs(x)); }
+
+  function verdictFor(lam){
+    if(!isFinite(lam) || Math.min(Math.abs(lam),Math.abs(lam-1))<0.02 || Math.abs(lam)>25)
+      return {t:'degenerate — ⊙ near a diagonal', c:'#b06a00'};
+    const H=[[-1,'−1'],[2,'2'],[0.5,'½']];
+    for(const [v,s] of H) if(Math.abs(lam-v)<0.04) return {t:'HARMONIC · λ = '+s, c:'var(--green)'};
+    if(Math.abs(lam*lam-lam+1)<0.05) return {t:'near equianharmonic?? λ is real — impossible; check', c:'#b06a00'};
+    return null;
+  }
+
+  function renderDial(lam){
+    DIAL.replaceChildren();
+    const axY=95, mid=380, halfW=330;
+    const SX=u=>mid+u*halfW;
+    // axis
+    rawPath(DIAL, `M${SX(-1)} ${axY}L${SX(1)} ${axY}`, '#999', 2);
+    txt(DIAL, SX(-1)-18, axY+5, '∞', 15, '#999');
+    txt(DIAL, SX(1)+18, axY+5, '∞', 15, '#999');
+    SPECIALS.forEach(v=>{
+      const x=SX(uOf(v));
+      rawPath(DIAL, `M${x} ${axY-9}L${x} ${axY+9}`, '#777', 2);
+      txt(DIAL, x, axY+28, v===0.5?'½':String(v), 15, '#777');
+    });
+    // orbit markers
+    ORBIT.forEach((o,i)=>{
+      const v=o.f(lam);
+      const x=SX(uOf(v));
+      dot(DIAL, {x, y:axY}, o.big?7.5:5.5, o.color, o.big?{stroke:'#fff','stroke-width':2}:null);
+      const above=i%2===0;
+      txt(DIAL, x, above?axY-16-(o.big?4:0):axY+46, o.name, 14, o.color);
+    });
+    // verdict
+    const lamStr = isFinite(lam) ? lam.toFixed(3) : '∞';
+    const vd=verdictFor(lam);
+    txt(DIAL, mid, 175, 'pencil λ = '+lamStr+(vd?'  ·  '+vd.t:''), 19, vd?vd.c:'var(--ink)');
+    // locus legend
+    txt(DIAL, 60, 215, 'locus:', 13, '#777', 'start');
+    rawPath(DIAL, 'M115 210L150 210', 'var(--green)', 2.4);           txt(DIAL, 160, 215, '−1', 13, 'var(--green)', 'start');
+    rawPath(DIAL, 'M195 210L230 210', 'var(--green)', 2, {'stroke-dasharray':'9 7'}); txt(DIAL, 240, 215, '2', 13, 'var(--green)', 'start');
+    rawPath(DIAL, 'M270 210L305 210', 'var(--green)', 2, {'stroke-dasharray':'2 6'}); txt(DIAL, 315, 215, '½', 13, 'var(--green)', 'start');
+    // complex inset: equianharmonic off the real line
+    const ix0=760, iy0=30, iw=210, ih=190;
+    const cx=v=> ix0 + (v+1.2)/3.4*iw;
+    const cy=v=> iy0+ih/2 - v/2.4*ih;
+    rawPath(DIAL, `M${ix0} ${iy0}h${iw}v${ih}h${-iw}Z`, '#ccc', 1.5);
+    rawPath(DIAL, `M${cx(-1.2)} ${cy(0)}L${cx(2.2)} ${cy(0)}`, '#bbb', 1.2);
+    [0,1].forEach(v=>{ rawPath(DIAL, `M${cx(v)} ${cy(0)-4}L${cx(v)} ${cy(0)+4}`, '#999', 1.5); });
+    const eq=Math.sqrt(3)/2;
+    dot(DIAL, {x:cx(0.5),y:cy(eq)}, 4.5, 'none', {stroke:'var(--purple)','stroke-width':2});
+    dot(DIAL, {x:cx(0.5),y:cy(-eq)}, 4.5, 'none', {stroke:'var(--purple)','stroke-width':2});
+    if(isFinite(lam) && lam>-1.2 && lam<2.2) dot(DIAL, {x:cx(lam),y:cy(0)}, 5, '#151515');
+    txt(DIAL, ix0+iw/2, iy0+ih+16, 'e^{±iπ/3} — off the real line', 12, '#888');
+  }
+
+  /* ---------- handles ---------- */
+  let handleEls=null;
+  function renderHandles(){
+    if(!handleEls){
+      handleEls={near:[],center:null};
+      const mk=(kind)=>{
+        const g=document.createElementNS(NS,'g');
+        const hit=document.createElementNS(NS,'circle');
+        hit.setAttribute('r',22); hit.setAttribute('fill','transparent'); hit.dataset.h='1';
+        const vis=document.createElementNS(NS,'circle');
+        vis.dataset.h='1';
+        if(kind==='near'){ vis.setAttribute('r',8.5); vis.setAttribute('fill','var(--red)'); vis.setAttribute('stroke','#fff'); vis.setAttribute('stroke-width',2);}
+        else { vis.setAttribute('r',7.5); vis.setAttribute('fill','var(--paper)'); vis.setAttribute('stroke','#151515'); vis.setAttribute('stroke-width',2.5); vis.setAttribute('stroke-dasharray','2 3'); }
+        g.appendChild(hit); g.appendChild(vis); g.style.cursor='move';
+        layers.handles.appendChild(g);
+        return g;
+      };
+      for(let i=0;i<4;i++){
+        const g=mk('near'); handleEls.near.push(g);
+        attachDrag(g, p=>{ state.near[i].x=p.x; state.near[i].y=p.y; render(); });
+      }
+      handleEls.center=mk('center');
+      attachDrag(handleEls.center, p=>{ state.center.x=p.x; state.center.y=p.y; render(); });
+    }
+    handleEls.near.forEach((g,i)=>{
+      g.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.near[i].x); c.setAttribute('cy',state.near[i].y);});
+    });
+    handleEls.center.querySelectorAll('circle').forEach(c=>{c.setAttribute('cx',state.center.x); c.setAttribute('cy',state.center.y);});
+  }
+
+  function clientToWorld(cx,cy){
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    return {x:state.view.x+(cx-r.left)*k, y:state.view.y+(cy-r.top)*k};
+  }
+  function attachDrag(el, onMove){
+    el.addEventListener('pointerdown', e=>{
+      e.stopPropagation(); el.setPointerCapture(e.pointerId);
+      const move=ev=>{ const p=clientToWorld(ev.clientX,ev.clientY); onMove(p); };
+      const up=()=>{ el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); };
+      el.addEventListener('pointermove',move);
+      el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+    });
+  }
+
+  /* ---------- pan & pinch ---------- */
+  const pointers=new Map();
+  function applyView(){ SVG.setAttribute('viewBox',`${state.view.x} ${state.view.y} ${state.view.w} ${state.view.h}`); }
+  SVG.addEventListener('pointerdown', e=>{
+    if(e.target.dataset && e.target.dataset.h) return;
+    SVG.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  });
+  SVG.addEventListener('pointermove', e=>{
+    if(!pointers.has(e.pointerId)) return;
+    const prev=pointers.get(e.pointerId);
+    const cur={x:e.clientX,y:e.clientY};
+    const r=SVG.getBoundingClientRect();
+    const k=state.view.w/r.width;
+    if(pointers.size===1){
+      state.view.x-=(cur.x-prev.x)*k;
+      state.view.y-=(cur.y-prev.y)*k;
+      applyView();
+    } else if(pointers.size===2){
+      const ids=[...pointers.keys()];
+      const other=pointers.get(ids[0]===e.pointerId?ids[1]:ids[0]);
+      const d0=Math.hypot(prev.x-other.x,prev.y-other.y);
+      const d1=Math.hypot(cur.x-other.x,cur.y-other.y);
+      if(d0>4&&d1>4){
+        const s=d0/d1;
+        const midC={x:(cur.x+other.x)/2,y:(cur.y+other.y)/2};
+        const midW=clientToWorld(midC.x,midC.y);
+        let w=Math.min(3200,Math.max(320,state.view.w*s));
+        const scale=w/state.view.w;
+        state.view.w=w; state.view.h*=scale;
+        state.view.x=midW.x-(midC.x-r.left)*(state.view.w/r.width);
+        state.view.y=midW.y-(midC.y-r.top)*(state.view.w/r.width);
+        applyView();
+      }
+    }
+    pointers.set(e.pointerId,cur);
+  });
+  const endP=e=>pointers.delete(e.pointerId);
+  SVG.addEventListener('pointerup',endP); SVG.addEventListener('pointercancel',endP);
+  SVG.addEventListener('wheel', e=>{ e.preventDefault();
+    const r=SVG.getBoundingClientRect();
+    const before=clientToWorld(e.clientX,e.clientY);
+    const s=Math.exp(e.deltaY*0.0015);
+    state.view.w=Math.min(3200,Math.max(320,state.view.w*s));
+    state.view.h=state.view.w*660/1000;
+    state.view.x=before.x-(e.clientX-r.left)*(state.view.w/r.width);
+    state.view.y=before.y-(e.clientY-r.top)*(state.view.w/r.width);
+    applyView();
+  }, {passive:false});
+
+  /* ---------- ledger ---------- */
+  function renderLedger(lam){
+    const L=G('ledger');
+    const rows=[];
+    rows.push(`<div class="row"><span>mode</span><span>collector ⊙ (pencil)</span></div>`);
+    rows.push(`<div class="row"><span>pencil λ</span><span>${isFinite(lam)?lam.toFixed(4):'∞'}</span></div>`);
+    const vd=verdictFor(lam);
+    if(vd) rows.push(`<div class="row"><span>verdict</span><span class="verdict" style="color:${vd.c}">${vd.t}</span></div>`);
+    L.innerHTML='<div class="lh">The Pencil Dial</div>'+rows.join('')+
+      '<div class="cube">Chasles (theorem): fixed cross-ratio ⇒ ⊙ on a conic through the four corners. Order: (TL,TR;BR,BL)</div>';
+  }
+
+  /* ---------- controls ---------- */
+  document.querySelectorAll('[data-layer]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      state.show[b.dataset.layer]=!state.show[b.dataset.layer];
+      b.setAttribute('aria-pressed', String(!!state.show[b.dataset.layer]));
+      render();
+    });
+  });
+  G('hand').addEventListener('input',e=>{ state.hand=parseFloat(e.target.value); render(); });
+  G('reset').addEventListener('click',()=>{
+    state.near=NEAR0.map(p=>({...p}));
+    state.center={...Z0};
+    state.view={x:0,y:0,w:1000,h:660};
+    applyView(); render();
+  });
+
+  applyView(); render();
+})();
+</script>
+</body>
+</html>
