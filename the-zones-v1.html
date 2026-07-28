@@ -40,6 +40,9 @@
     <p class="ph">MAGNIFICATION AGAINST DEPTH<span class="cnt" id="cntZ"></span></p>
     <svg id="plot" viewBox="0 0 900 380" aria-label="Magnification of each channel against depth, with the two slits as asymptotes"></svg>
     <div class="controls">
+      <button class="mode on" data-m="channels">channels</button>
+      <button class="mode" data-m="shape">face shape</button>
+      <span style="width:14px"></span>
       <button class="zone on" data-z="A">in front of both slits</button>
       <button class="zone" data-z="B">between the slits</button>
       <button class="zone" data-z="C">beyond both slits</button>
@@ -49,7 +52,8 @@
     <p class="key"><span class="sw" style="background:#C43A2B"></span>|M<sub>x</sub>| horizontal channel — blows up at the vertical slit
       <span class="sw" style="background:#2456C8"></span>|M<sub>y</sub>| vertical channel — blows up at the horizontal slit
       <span class="sw" style="background:#151310"></span>the cube's depth span
-      <span class="sw" style="background:#7C4BA0"></span>the isotropic depth</p>
+      <span class="sw" style="background:#7C4BA0"></span>the isotropic depth &mdash; and, in face-shape
+      mode, the limiting aspect at infinity</p>
   </div>
 
   <div class="panel">
@@ -75,7 +79,11 @@
   is its own slit; the face counts are 5, 3, 1 in the three zones; and a straight edge images as a
   genuine curve, which is why the receding edges below are drawn bent. check_isotropic.js adds the
   violet marker (5/5): |M<sub>x</sub>| = |M<sub>y</sub>| at the harmonic mean of the slit depths, at that
-  depth only, always between the slits, and (z&#8321;, z&#8322;&#8202;;&#8202;Z<sub>h</sub>, 0) = &minus;1. A physically built cross-slit
+  depth only, always between the slits, and (z&#8321;, z&#8322;&#8202;;&#8202;Z<sub>h</sub>, 0) = &minus;1.
+  check_aspect.js covers the face-shape view (9/9): a square face images square at exactly two depths
+  and nowhere else; the shape degenerates flat at one slit and upright at the other; and the aspect
+  approaches the same limit from both directions &mdash; but that limit is z&#8322;/z&#8321;, a rectangle,
+  not a square. It is a square only when the two slits coincide, which is a pinhole. A physically built cross-slit
   has both slits between scene and sensor, so real hardware works in zone C only &mdash; zones A and B
   are in the family's geometry, not in its operating range.</p>
 </div>
@@ -131,6 +139,12 @@ var XS = (function(){
   // It is the harmonic mean of the slit depths, and (z1, z2 ; Zh, 0) = -1 —
   // the harmonic conjugate of the picture plane with respect to the two slits.
   function isotropicDepth(){ return 2*z1*z2/(z1+z2); }
+  // aspect of the image of a SQUARE face at depth Z
+  function aspect(Z){ return Math.abs(Mx(Z))/Math.abs(My(Z)); }
+  // its limit at infinity, reached from both directions: the slit ratio
+  function farAspect(){ return z2/z1; }
+  // the only two depths where a square images square
+  function squareDepths(){ return [0, isotropicDepth()]; }
   function crossRatio(a,b,c,d){ return ((c-a)/(c-b))/((d-a)/(d-b)); }
   function isotropicCheck(){
     var Zh=isotropicDepth();
@@ -141,7 +155,8 @@ var XS = (function(){
   }
   return {z1:z1, z2:z2, Mx:Mx, My:My, image:image, zoneOf:zoneOf,
           cubeAt:cubeAt, faces:faces, recedingEdge:recedingEdge, sag:sag,
-          isotropicDepth:isotropicDepth, crossRatio:crossRatio, isotropicCheck:isotropicCheck};
+          isotropicDepth:isotropicDepth, crossRatio:crossRatio, isotropicCheck:isotropicCheck,
+          aspect:aspect, farAspect:farAspect, squareDepths:squareDepths};
 })();
 if (typeof module!=='undefined') module.exports = XS;
 </script>
@@ -153,7 +168,7 @@ var NS='http://www.w3.org/2000/svg';
 var C={x:'#C43A2B', y:'#2456C8', cube:'#151310', slit:'#C99A2E', iso:'#7C4BA0',
        zA:'rgba(46,158,75,0.13)', zB:'rgba(201,154,46,0.13)', zC:'rgba(36,86,200,0.08)',
        wall:'#2B9EA8', face:'#151310', dim:'#8E8C80'};
-var zone='A', pos=0.45;
+var zone='A', pos=0.45, plotMode='channels';
 
 function el(svg,n,a){ var e=document.createElementNS(NS,n);
   for(var k in a) e.setAttribute(k,a[k]); svg.appendChild(e); return e; }
@@ -174,7 +189,7 @@ function py(M){
   var a=Math.log(Math.min(Math.max(Math.abs(M),Mlo),Mhi)/Mlo)/Math.log(Mhi/Mlo);
   return (PH-PB) - a*(PH-PB-PT);
 }
-function renderPlot(){
+function renderPlotChannels(){
   clear(plot);
   var cube=XS.cubeAt(zone,pos);
   // zone bands
@@ -250,6 +265,91 @@ function renderPlot(){
     'Z = '+cube.Zn.toFixed(2)+' … '+cube.Zf.toFixed(2)+'   ·   zone '+XS.zoneOf(cube.Zn);
   return cube;
 }
+
+// ---------------- panel 1b: face shape against depth ----------------
+var Alo=0.05, Ahi=20;
+function ay(A){
+  var v=Math.min(Math.max(A,Alo),Ahi);
+  return (PH-PB) - (Math.log(v/Alo)/Math.log(Ahi/Alo))*(PH-PB-PT);
+}
+function renderPlotShape(){
+  clear(plot);
+  var cube=XS.cubeAt(zone,pos);
+  var lim=XS.farAspect(), Zh=XS.isotropicDepth();
+  // zone bands
+  el(plot,'rect',{x:px(0),y:PT,width:px(XS.z1)-px(0),height:PH-PB-PT,fill:C.zA});
+  el(plot,'rect',{x:px(XS.z1),y:PT,width:px(XS.z2)-px(XS.z1),height:PH-PB-PT,fill:C.zB});
+  el(plot,'rect',{x:px(XS.z2),y:PT,width:px(Zmax)-px(XS.z2),height:PH-PB-PT,fill:C.zC});
+  // axes
+  el(plot,'line',{x1:PL,y1:PH-PB,x2:PW-PR,y2:PH-PB,stroke:'#6b695f','stroke-width':1.4});
+  [0.1,1,10].forEach(function(v){
+    el(plot,'line',{x1:PL-5,y1:ay(v),x2:PW-PR,y2:ay(v),stroke:'#9a988c','stroke-width':1,
+      'stroke-dasharray': v===1?'none':'2 5', opacity: v===1?0.9:0.6});
+    txt(plot,PL-12,ay(v)+4,(v===1?'1:1':(v<1?'0.1':'10')),'#6b695f',11,'end','400');
+  });
+  txt(plot,PL-12,PT+4,'w:h','#6b695f',12,'end');
+  [0,2,4,6,8,10,12].forEach(function(z){
+    el(plot,'line',{x1:px(z),y1:PH-PB,x2:px(z),y2:PH-PB+5,stroke:'#6b695f','stroke-width':1});
+    txt(plot,px(z),PH-PB+19,String(z),'#6b695f',11,'middle','400');
+  });
+  txt(plot,(PW-PR+PL)/2,PH-10,'depth  Z   ( picture plane at 0 )','#4a473f',12);
+  // the slits
+  [XS.z1,XS.z2].forEach(function(z){
+    el(plot,'line',{x1:px(z),y1:PT,x2:px(z),y2:PH-PB,stroke:C.slit,'stroke-width':2.4,
+      'stroke-dasharray':'7 5'});
+  });
+  txt(plot,px(XS.z1),PH-PB-8,'flat here',C.slit,12);
+  txt(plot,px(XS.z2),PH-PB-8,'upright here',C.slit,12);
+  // the limiting aspect at infinity — reached from BOTH directions
+  el(plot,'line',{x1:PL,y1:ay(lim),x2:PW-PR,y2:ay(lim),stroke:C.iso,'stroke-width':2,
+    'stroke-dasharray':'9 6'});
+  txt(plot,PW-PR-96,ay(lim)-9,'limit at infinity  '+lim.toFixed(2)+':1',C.iso,12);
+  // the aspect curve, broken at the slits
+  (function(){
+    var seg=[], N=1800;
+    function flush(){ if(seg.length>1)
+      el(plot,'polyline',{points:seg.join(' '),fill:'none',stroke:'#151310','stroke-width':2.8});
+      seg=[]; }
+    for(var i=0;i<=N;i++){
+      var Z=i*Zmax/N;
+      if(Math.abs(Z-XS.z1)<0.03||Math.abs(Z-XS.z2)<0.03){ flush(); continue; }
+      var A=XS.aspect(Z);
+      if(A<Alo||A>Ahi){ flush(); continue; }
+      seg.push(px(Z)+','+ay(A));
+    }
+    flush();
+  })();
+  // the two depths where a square stays square
+  XS.squareDepths().forEach(function(Z,i){
+    el(plot,'circle',{cx:px(Z),cy:ay(1),r:9,fill:'none',stroke:C.iso,'stroke-width':3});
+    txt(plot,px(Z),ay(1)+26,i===0?'picture plane':'Zh',C.iso,12);
+  });
+  // the cube window
+  el(plot,'rect',{x:px(cube.Zn),y:PT+34,width:px(cube.Zf)-px(cube.Zn),height:PH-PB-PT-34,
+    fill:'rgba(21,19,16,0.09)',stroke:C.cube,'stroke-width':2});
+  [cube.Zn,cube.Zf].forEach(function(Z){
+    var A=XS.aspect(Z);
+    if(A>=Alo&&A<=Ahi) el(plot,'circle',{cx:px(Z),cy:ay(A),r:5,fill:C.cube});
+  });
+  // shape thumbnails along the top, constant area so only shape varies
+  var samples=[0.35,1.3,1.85,2.35,Zh,3.6,4.6,5.5,7.5,11.2];
+  samples.forEach(function(Z){
+    var A=XS.aspect(Z);
+    var s=13, w=s*Math.sqrt(Math.min(Math.max(A,0.12),8)), hh=s*s/w;
+    el(plot,'rect',{x:px(Z)-w/2,y:PT+14-hh/2,width:w,height:hh,
+      fill:'none',stroke: Math.abs(A-1)<1e-9?C.iso:'#4a473f','stroke-width':Math.abs(A-1)<1e-9?2.4:1.6});
+  });
+  // and the limit shape, drawn at the right edge
+  (function(){
+    var s=13, w=s*Math.sqrt(lim), hh=s*s/w, X=PW-PR-14;
+    el(plot,'rect',{x:X-w/2,y:PT+14-hh/2,width:w,height:hh,fill:'none',stroke:C.iso,'stroke-width':2.4});
+    txt(plot,X,PT+14-hh/2-7,'∞',C.iso,13);
+  })();
+  document.getElementById('cntZ').textContent =
+    'square at Z = 0 and Z = '+Zh.toFixed(3)+'   ·   at infinity '+lim.toFixed(2)+':1, not square';
+}
+function renderPlot(){ return plotMode==='shape' ? (renderPlotShape(), XS.cubeAt(zone,pos))
+                                                 : renderPlotChannels(); }
 
 // ---------------- panel 2: the front view ----------------
 var front=document.getElementById('front');
@@ -348,6 +448,11 @@ function renderReadout(cube,f){
   rows.push('             the cube '+((Zn<=ic.Zh&&ic.Zh<=Zf)?'STRADDLES it — a square face images square here'
                                                             :'does not span it'));
   rows.push('');
+  rows.push('face aspect  near '+XS.aspect(Zn).toFixed(4)+' : 1     far '+XS.aspect(Zf).toFixed(4)+
+    ' : 1     at infinity '+XS.farAspect().toFixed(4)+' : 1  ( = z2/z1, NOT square )');
+  rows.push('             square at exactly two depths: Z = 0 and Z = '+ic.Zh.toFixed(4)+
+    ' — nowhere else on the axis');
+  rows.push('');
   var z=XS.zoneOf(Zn);
   var expect={A:5,B:3,C:1}[z];
   rows.push('zone '+z+'  →  '+f.n+' faces visible'+(f.n===expect?'':'  ??')+
@@ -380,6 +485,13 @@ function renderAll(){
   document.getElementById('cap').innerHTML=CAPS[zone];
   renderReadout(cube,f);
 }
+document.querySelectorAll('button.mode').forEach(function(b){
+  b.addEventListener('click',function(){
+    plotMode=b.getAttribute('data-m');
+    document.querySelectorAll('button.mode').forEach(function(x){ x.classList.toggle('on',x===b); });
+    renderAll();
+  });
+});
 document.querySelectorAll('button.zone').forEach(function(b){
   b.addEventListener('click',function(){
     zone=b.getAttribute('data-z');
