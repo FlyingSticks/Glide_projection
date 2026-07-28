@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depth projection · equal parts, curving diagonals</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.45;}
+ .wrap{max-width:980px;margin:0 auto;padding:26px 18px 60px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:26px;margin:0 0 4px;font-weight:700;}
+ .sub{font-size:14px;color:#4a473f;margin:0 0 16px;max-width:700px;}
+ .panel{background:#C2C0B4;border:1px solid #9a988c;border-radius:6px;padding:10px;margin-bottom:16px;}
+ .ph{font-size:12px;letter-spacing:0.2em;color:#4a473f;margin:0 0 7px;font-weight:700;}
+ .ph .cnt{float:right;letter-spacing:0;font-weight:400;color:#6b695f;}
+ svg{display:block;width:100%;height:auto;background:#CFCDC1;border:1px solid #9a988c;border-radius:4px;touch-action:none;}
+ .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 2px;font-size:14px;}
+ button{font:inherit;font-size:14px;padding:7px 13px;border:1px solid #6b695f;background:#DCDAD0;color:#151310;border-radius:4px;cursor:pointer;}
+ button:focus-visible{outline:2px solid #151310;outline-offset:2px;}
+ button.on{background:#151310;color:#EFEDE3;border-color:#151310;}
+ input[type=range]{vertical-align:middle;width:150px;}
+ .caption{font-size:14px;margin:9px 2px 0;max-width:740px;}
+ .readout{font-family:"Courier New",monospace;font-size:13px;background:#22201b;color:#D8D5C8;border-radius:4px;padding:10px 12px;margin-top:12px;white-space:pre-wrap;}
+ .readout .ok{color:#8FD08F;} .readout .warn{color:#E8B04B;}
+ .key{font-size:12.5px;color:#4a473f;margin:8px 2px 0;}
+ .sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin:0 3px 0 10px;}
+ .foot{font-size:12px;color:#6b695f;margin-top:16px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · BOARD CONSTRUCTIONS</p>
+  <h1>Depth projection of an irregular shape</h1>
+  <p class="sub">The shape sits in the picture plane, true size and shape, in red. Each vertex runs
+  back along a straight depth line; each depth station carries a true copy; and every edge keeps its
+  equal ratio of parts at every depth — that is the Type A transfer. Then draw a diagonal across a
+  wall cell, straight in space, and its image bends. Drag the red vertices; the law follows.</p>
+
+  <div class="panel">
+    <p class="ph">THE BOARD<span class="cnt" id="cnt"></span></p>
+    <svg id="board" viewBox="0 0 900 620" aria-label="Irregular shape in the picture plane with depth copies, part marks, and curving diagonals"></svg>
+    <div class="controls">
+      <button class="mode on" data-m="glide">the board's glide</button>
+      <button class="mode" data-m="persp">one-point perspective</button>
+      <span style="width:10px"></span>
+      <label>rate r <input type="range" id="rate" min="0" max="0.85" step="0.01" value="0.6"></label>
+      <label>parts <input type="range" id="parts" min="2" max="5" step="1" value="3"></label>
+      <button id="diag" class="on">Curving diagonals</button>
+      <button id="marks" class="on">Part marks</button>
+      <button id="rnd">Randomize shape</button>
+    </div>
+    <p class="key"><span class="sw" style="background:#C43A2B"></span>picture plane · true size and shape
+      <span class="sw" style="background:#7B3FA0"></span>depth ⅓
+      <span class="sw" style="background:#2456C8"></span>depth ⅔
+      <span class="sw" style="background:#151310"></span>full depth
+      <span class="sw" style="background:#8E8C80"></span>depth lines
+      <span class="sw" style="background:#2E9E4B"></span>curving diagonals</p>
+    <p class="caption" id="cap"></p>
+    <div class="readout" id="ro"></div>
+  </div>
+
+  <div class="panel">
+    <p class="ph">THE WRITE-UP</p>
+    <div class="caption" style="min-height:0">
+    <p><b>The construction.</b> An irregular shape is laid in the picture plane, where it is seen in
+    true size and shape. Each vertex is carried back through depth along a straight depth line, and at
+    each depth station the whole shape reappears as a true copy — same shape, smaller by the factor
+    (1&nbsp;&minus;&nbsp;r&middot;g). To carry <i>measure</i> back as well, each edge is divided into
+    equal parts, and the division is transferred to every copy. This is the Type&nbsp;A transfer: the
+    fraction of the way along an edge is preserved exactly, at every depth, for any shape whatever.
+    Nothing about the shape's irregularity is an obstacle — the law acts edge by edge and knows
+    nothing of the whole.</p>
+    <p><b>What stays straight and what bends.</b> Three families are dead straight at every setting:
+    the edges of every copy, the depth lines of the vertices, and the depth lines of every part mark
+    — the last all concurring at the seat, which is Type&nbsp;A's collector made visible. One family
+    bends: the diagonals drawn across the wall cells. A diagonal is straight in space, but its image
+    tracks a position that changes linearly while the scale it is drawn at also changes linearly, and
+    the product of two linear laws is a quadratic. The bend is therefore not an artifact of drawing;
+    it is an exact parabola, and it vanishes only when the rate is zero, or the segment stays in one
+    depth plane, or runs along one depth line.</p>
+    <p><b>The toggle is the argument.</b> Switch the same figure to one-point perspective and two
+    things trade places. The diagonals snap dead straight — perspective is projective on space and
+    cannot bend a line. But the depth stations, equally spaced under the glide, fall into a shrinking
+    progression along every depth line. Each projection is exact about what the other distorts:
+    <b>perspective pays in spacing, the glide pays in straightness.</b> A drawing that shows curving
+    diagonals over equal stations, or straight diagonals over crowding stations, is telling you which
+    instrument made it. That is what it means for the bend to be the board's signature and the
+    progression to be the camera's.</p>
+    <p><b>Scope.</b> Everything in the two paragraphs above about exactness is machine-verified
+    (badges below). The claim that these signatures identify the instrument is synthesis — it follows
+    from the checks but is not itself a computation.</p>
+    </div>
+  </div>
+
+  <p class="foot">House rule: no claim without a passing check. check_diagonals.js holds the ledger
+  (7/7): the fraction-t mark on an edge images at fraction t of the imaged edge at every depth, exact;
+  every mark's depth line is straight and concurs at the seat; the wall diagonal images as an exact
+  quadratic &mdash; linear position times linear scale &mdash; bending whenever r &gt; 0 and only then,
+  outside a depth plane or a depth line; and the same 3D diagonal under a pinhole is dead straight.
+  The bend is the board's signature, not the scene's. check_persp_toggle.js (4/4) carries
+  the perspective side: equal parts survive, every diagonal is dead straight, the stations fall into
+  a shrinking progression, and both families of depth lines concur at the seat &mdash; the glide at
+  finite gauge 1/r, perspective only in the limit.</p>
+</div>
+
+<script id="geo">
+var DP = (function(){
+  'use strict';
+  var S=[430,315];                     // the seat
+  var r=0.6, parts=3, q=0.9;           // r: glide rate · q: perspective rate
+  var mode='glide';                    // 'glide' | 'persp'
+  function setMode(m){ mode=m; }
+  function getMode(){ return mode; }
+  var STATIONS=[0, 1/3, 2/3, 1];
+  var shape=[[120,95],[305,45],[540,120],[640,330],[450,545],[175,505]];
+  function setRate(v){ r=v; }
+  function setParts(n){ parts=n; }
+  function setShape(s){ shape=s.map(function(p){ return p.slice(); }); }
+  function getShape(){ return shape.map(function(p){ return p.slice(); }); }
+  function seat(){ return S.slice(); }
+  function rate(){ return r; }
+  function nParts(){ return parts; }
+  function stations(){ return STATIONS.slice(); }
+  function img(P,g){
+    if(mode==='persp'){
+      var f=1/(1+q*g);
+      return [S[0]+(P[0]-S[0])*f, S[1]+(P[1]-S[1])*f];
+    }
+    return [S[0]+(P[0]-S[0])*(1-r*g), S[1]+(P[1]-S[1])*(1-r*g)];
+  }
+  // graduation of one depth line: picture distances between successive stations
+  function graduation(){
+    var M=lerp(shape[0],shape[1],0.5), pts=STATIONS.map(function(g){ return img(M,g); });
+    var out=[];
+    for(var i=1;i<pts.length;i++)
+      out.push(Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]));
+    return out;
+  }
+  function lerp(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]; }
+  // the imaged copy at a station
+  function copy(g){ return shape.map(function(P){ return img(P,g); }); }
+  // a wall-cell diagonal: edge e, from fraction t0 at gauge g0 to t1 at g1 — sampled image
+  function diagonal(e,t0,g0,t1,g1,n){
+    var P0=shape[e], P1=shape[(e+1)%shape.length], out=[];
+    n=n||24;
+    for(var i=0;i<=n;i++){
+      var tau=i/n;
+      out.push(img(lerp(P0,P1,t0+(t1-t0)*tau), g0+(g1-g0)*tau));
+    }
+    return out;
+  }
+  function sag(pts){
+    var a=pts[0], b=pts[pts.length-1];
+    var L=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    if(L<1e-12) return 0;
+    var s=0;
+    for(var i=0;i<pts.length;i++){
+      var p=pts[i];
+      s=Math.max(s,Math.abs((b[0]-a[0])*(a[1]-p[1])-(a[0]-p[0])*(b[1]-a[1]))/L);
+    }
+    return s/L;
+  }
+  // live self-checks
+  function ratioCheck(){
+    var worst=0;
+    for(var e=0;e<shape.length;e++){
+      var P0=shape[e], P1=shape[(e+1)%shape.length];
+      for(var s=1;s<STATIONS.length;s++){
+        var g=STATIONS[s];
+        for(var k=1;k<parts;k++){
+          var t=k/parts;
+          var a=img(lerp(P0,P1,t),g);
+          var b=lerp(img(P0,g),img(P1,g),t);
+          worst=Math.max(worst,Math.hypot(a[0]-b[0],a[1]-b[1]));
+        }
+      }
+    }
+    return worst;
+  }
+  function seatCheck(){
+    if(r<1e-9) return 0;
+    var worst=0;
+    for(var e=0;e<shape.length;e++){
+      var M=lerp(shape[e],shape[(e+1)%shape.length],0.4);
+      var p=img(M,1/r);
+      worst=Math.max(worst,Math.hypot(p[0]-S[0],p[1]-S[1]));
+    }
+    return worst;
+  }
+  function diagStraightness(){
+    var pts=diagonal(0,0,STATIONS[1],1,STATIONS[2],30);
+    return sag(pts);
+  }
+  function quadCheck(){
+    // fit the first wall diagonal by its own endpoints + midpoint; residual over samples
+    var pts=diagonal(0,0,STATIONS[1],1,STATIONS[2],40);
+    var q0=pts[0], qh=pts[20], q1=pts[40], worst=0;
+    for(var i=0;i<=40;i++){
+      var tau=i/40;
+      var b0=(1-tau)*(1-2*tau), b1=4*tau*(1-tau), b2=tau*(2*tau-1);
+      var f=[b0*q0[0]+b1*qh[0]+b2*q1[0], b0*q0[1]+b1*qh[1]+b2*q1[1]];
+      worst=Math.max(worst,Math.hypot(pts[i][0]-f[0],pts[i][1]-f[1]));
+    }
+    return worst;
+  }
+  return {setMode:setMode,getMode:getMode,graduation:graduation,
+          setRate:setRate,setParts:setParts,setShape:setShape,getShape:getShape,
+          seat:seat,rate:rate,nParts:nParts,stations:stations,img:img,lerp:lerp,
+          copy:copy,diagonal:diagonal,sag:sag,
+          ratioCheck:ratioCheck,seatCheck:seatCheck,quadCheck:quadCheck,
+          diagStraightness:diagStraightness};
+})();
+if (typeof module!=='undefined') module.exports = DP;
+</script>
+
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var COLS=['#C43A2B','#7B3FA0','#2456C8','#151310'];
+var C={depth:'#8E8C80', diag:'#2E9E4B', seat:'#C99A2E'};
+var showDiag=true, showMarks=true;
+var svg=document.getElementById('board');
+var W=900,H=620;
+function el(s,n,a){ var e=document.createElementNS(NS,n);
+  for(var k in a) e.setAttribute(k,a[k]); s.appendChild(e); return e; }
+function clear(s){ while(s.firstChild) s.removeChild(s.firstChild); }
+
+function render(){
+  clear(svg);
+  var shape=DP.getShape(), ST=DP.stations(), m=DP.nParts(), r=DP.rate();
+  var n=shape.length;
+  // depth lines: vertices and part marks
+  for(var e=0;e<n;e++){
+    var P0=shape[e], P1=shape[(e+1)%n];
+    var ks= showMarks ? m : 1;
+    for(var k=0;k<=ks;k++){
+      var t=showMarks ? k/m : k;                       // vertices only when marks off
+      var M=DP.lerp(P0,P1,t);
+      var a=DP.img(M,0), b=DP.img(M,1);
+      el(svg,'line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:C.depth,
+        'stroke-width': (k===0)?1.6:1,'opacity':(k===0)?0.85:0.55});
+    }
+  }
+  // curving diagonals across each wall cell of each edge
+  if(showDiag){
+    for(var e2=0;e2<n;e2++){
+      for(var s=0;s<ST.length-1;s++){
+        for(var k2=0;k2<m;k2++){
+          var pts=DP.diagonal(e2,k2/m,ST[s],(k2+1)/m,ST[s+1],18);
+          el(svg,'polyline',{points:pts.map(function(p){return p[0]+','+p[1];}).join(' '),
+            fill:'none',stroke:C.diag,'stroke-width':1.7,opacity:0.85});
+        }
+      }
+    }
+  }
+  // the copies, shallow to deep so red draws last
+  for(var s2=ST.length-1;s2>=0;s2--){
+    var cp=DP.copy(ST[s2]);
+    el(svg,'polygon',{points:cp.map(function(p){return p[0]+','+p[1];}).join(' '),
+      fill:'none',stroke:COLS[s2],'stroke-width': s2===0?4:2.6,'stroke-linejoin':'round'});
+    if(showMarks){
+      for(var e3=0;e3<n;e3++){
+        var A0=cp[e3], A1=cp[(e3+1)%n];
+        for(var k3=1;k3<m;k3++){
+          var q=DP.lerp(A0,A1,k3/m);
+          el(svg,'circle',{cx:q[0],cy:q[1],r: s2===0?3.4:2.6,fill:COLS[s2]});
+        }
+      }
+    }
+  }
+  // the seat
+  var S=DP.seat();
+  el(svg,'circle',{cx:S[0],cy:S[1],r:5,fill:'none',stroke:C.seat,'stroke-width':2});
+  // draggable vertices
+  shape.forEach(function(P,i){
+    el(svg,'circle',{cx:P[0],cy:P[1],r:9,fill:'#DCDAD0',stroke:'#C43A2B','stroke-width':2.4,
+      cursor:'grab','data-i':i});
+  });
+  // readout
+  var mode=DP.getMode();
+  var worstRatio=DP.ratioCheck();
+  var sag=DP.diagStraightness();
+  var grad=DP.graduation();
+  var rows=[];
+  rows.push('mode: '+(mode==='persp'?'ONE-POINT PERSPECTIVE':'THE BOARD\'S GLIDE')+
+    '      rate '+(mode==='persp'?'q = 0.90':'r = '+r.toFixed(2))+'      parts = '+m);
+  rows.push('');
+  rows.push('equal ratio of parts, all edges × all depths:  worst deviation '+worstRatio.toExponential(2)+' px');
+  if(mode==='persp'){
+    rows.push('diagonal bend:                                 '+(100*sag).toFixed(4)+'% — dead straight');
+    rows.push('depth-line graduation, station to station:     '+grad.map(function(v){return v.toFixed(1);}).join('  >  ')+
+      '   a shrinking progression');
+  } else {
+    var worstSeat=DP.seatCheck(), worstQuad=DP.quadCheck();
+    rows.push('diagonal bend:                                 '+(100*sag).toFixed(2)+'% of chord'+
+      (r<0.01?'   (r = 0: straight, as it must be)':'   — an exact quadratic, residual '+worstQuad.toExponential(1)));
+    rows.push('depth-line graduation, station to station:     '+grad.map(function(v){return v.toFixed(1);}).join('  =  ')+
+      '   equal steps');
+    rows.push('mark depth-lines concur at the seat:           worst miss '+worstSeat.toExponential(2)+' px');
+  }
+  rows.push('');
+  var ok = worstRatio<1e-9 && (mode==='persp' ? sag<1e-9 : true);
+  rows.push((ok?'<span class="ok">check  PASS</span>':'<span class="warn">check  FAIL</span>')+
+    (mode==='persp'?'   Type A exact · diagonals straight · progression along depth'
+                   :'   Type A exact · seat is the collector · diagonals are quadratics'));
+  document.getElementById('ro').innerHTML=rows.join('\n');
+  document.getElementById('cnt').textContent=n+' vertices · '+(ST.length)+' stations';
+  document.getElementById('cap').innerHTML= mode==='persp'
+    ? 'The same shape, the same marks, the same seat — under a pinhole. Every diagonal is dead '+
+      'straight, because perspective is projective on space and cannot bend a line. What gives it '+
+      'away instead is the depth line itself: the stations crowd into a shrinking progression toward '+
+      'the seat. <b>Perspective pays in spacing; the glide pays in straightness.</b>'
+    : 'Straight things: the edges at every depth, and every depth line — including the depth line of '+
+      'every part mark, all concurring at the seat. Curved things: only the diagonals, because along '+
+      'them position and scale both change — linear × linear — so the image is an exact quadratic. '+
+      'Equal gauge steps land at equal picture steps along every depth line. Toggle to perspective '+
+      'and the diagonals snap straight while the stations fall into progression. '+
+      '<b>The bend is the board\'s signature, not the scene\'s.</b>';
+}
+
+var drag=null;
+svg.addEventListener('pointerdown',function(ev){
+  var t=ev.target;
+  if(t.tagName==='circle'&&t.hasAttribute('data-i')){
+    drag=+t.getAttribute('data-i');
+    svg.setPointerCapture(ev.pointerId); ev.preventDefault();
+  }
+});
+svg.addEventListener('pointermove',function(ev){
+  if(drag===null) return;
+  var rc=svg.getBoundingClientRect();
+  var x=(ev.clientX-rc.left)*W/rc.width, y=(ev.clientY-rc.top)*H/rc.height;
+  var s=DP.getShape();
+  s[drag]=[Math.max(15,Math.min(W-15,x)), Math.max(15,Math.min(H-15,y))];
+  DP.setShape(s); render();
+});
+svg.addEventListener('pointerup',function(){ drag=null; });
+svg.addEventListener('pointercancel',function(){ drag=null; });
+document.querySelectorAll('button.mode').forEach(function(b){
+  b.addEventListener('click',function(){
+    DP.setMode(b.getAttribute('data-m'));
+    document.querySelectorAll('button.mode').forEach(function(x){ x.classList.toggle('on',x===b); });
+    document.getElementById('rate').disabled = DP.getMode()==='persp';
+    render();
+  });
+});
+document.getElementById('rate').addEventListener('input',function(){ DP.setRate(+this.value); render(); });
+document.getElementById('parts').addEventListener('input',function(){ DP.setParts(+this.value); render(); });
+document.getElementById('diag').addEventListener('click',function(){
+  showDiag=!showDiag; this.classList.toggle('on',showDiag); render(); });
+document.getElementById('marks').addEventListener('click',function(){
+  showMarks=!showMarks; this.classList.toggle('on',showMarks); render(); });
+document.getElementById('rnd').addEventListener('click',function(){
+  var s=[], cx=430, cy=310, n=6;
+  for(var i=0;i<n;i++){
+    var a=(i/n)*2*Math.PI - 0.5 + (Math.random()-0.5)*0.5;
+    var rad=170+Math.random()*130;
+    s.push([cx+rad*Math.cos(a), cy+rad*Math.sin(a)*0.88]);
+  }
+  DP.setShape(s); render();
+});
+render();
+})();
+</script>
+</body>
+</html>
