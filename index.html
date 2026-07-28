@@ -25,6 +25,9 @@
  .card a.t:hover{background:#EBE9DA;}
  .card p{margin:6px 0 2px;font-size:13px;line-height:1.5;}
  .card .meta{font-size:11px;color:#8E8C80;margin-top:4px;}
+ .card .meta a{color:#8E8C80;border-bottom:1px dotted #8E8C80;text-decoration:none;}
+ .card .meta a:hover{color:#151310;border-bottom-color:#151310;}
+ .foot code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;}
  .cI .card{border-left-color:#9A8248;} .cII .card{border-left-color:#E8792B;}
  .cH .card{border-left-color:#2456B0;} .cE .card{border-left-color:#12A6A6;}
  .cA .card{border-left-color:#8E8C80;}
@@ -102,7 +105,7 @@
 </div>
   <div class="card"><a class="t" href="the-census-v1.html">The census</a>
    <p>The floor under the tower. Counts and incidence survive every drawing mode, including deformations that are no projection at all; cross-ratio survives only the projective ones.</p>
-   <p class="meta">check_census 6/6 · the ladder's zeroth level</p>
+   <p class="meta"><a href="checks/check_census.js">check_census</a> 6/6 · the ladder's zeroth level</p>
 </div>
  </div>
 
@@ -136,15 +139,15 @@
 </div>
   <div class="card"><a class="t" href="the-zones-v1.html">The three zones</a>
    <p>A cross-slit does not blend the ordinary view with the reversed one. It contains both and a third besides, separated by the two slits — five faces, three faces, one face. With the face-shape reading, and the isotropic depth where a square stays square.</p>
-   <p class="meta">check_xslit_zones 9/9 · check_isotropic 5/5 · check_aspect 9/9</p>
+   <p class="meta"><a href="checks/check_xslit_zones.js">check_xslit_zones</a> 9/9 · <a href="checks/check_isotropic.js">check_isotropic</a> 5/5 · <a href="checks/check_aspect.js">check_aspect</a> 9/9 · <a href="checks/check_zones_plate.js">check_zones_plate</a> 16/16</p>
 </div>
   <div class="card"><a class="t" href="the-midplane-v1.html">The midplane</a>
    <p>Slide the picture plane to the midpoint of the slits and the second square depth runs off to infinity and returns from the other side. The square is the harmonic conjugate of the picture plane in the two slits — that is the invariant; the far-field aspect is not.</p>
-   <p class="meta">check_midplane 10/10 · check_invariance 8/8</p>
+   <p class="meta"><a href="checks/check_midplane.js">check_midplane</a> 10/10 · <a href="checks/check_invariance.js">check_invariance</a> 8/8 · <a href="checks/check_midplane_plate.js">check_midplane_plate</a> 19/19</p>
 </div>
   <div class="card"><a class="t" href="the-halfformed-v1.html">Half-formed</a>
    <p>A slit does not dim an image, it settles one coordinate and leaves the other free. Put the picture plane between the slits and every scene point arrives as a stripe, its second coordinate fixed by something the ray has not yet reached.</p>
-   <p class="meta">check_halfformed 9/9</p>
+   <p class="meta"><a href="checks/check_halfformed.js">check_halfformed</a> 9/9 · <a href="checks/check_halfformed_plate.js">check_halfformed_plate</a> 8/8</p>
 </div>
  </div>
 
@@ -170,15 +173,15 @@
 </div>
   <div class="card"><a class="t" href="the-gap-line-v1.html">The gap line</a>
    <p>Four random lines, six crossings, and the harmonic range already latent. The unique unjoined pair, its gap-crossing line, and cr = −1 on all three diagonals.</p>
-   <p class="meta">check_harmonic 10/10 · uniqueness by the one-side test, not simplicity</p>
+   <p class="meta"><a href="checks/check_harmonic.js">check_harmonic</a> 10/10 · <a href="checks/check_gapline_plate.js">check_gapline_plate</a> 4/4 · uniqueness by the one-side test, not simplicity</p>
 </div>
   <div class="card"><a class="t" href="the-trichotomy-v2.html">The trichotomy</a>
    <p>The gap line divides the other four vertices 0–4, 1–3 or 2–2, one of each, every arrangement. The even split is the bowtie. Frames all nine points of the system on request.</p>
-   <p class="meta">check_simple 8/8 · check_straddle 7/7 · check_frame 5/5</p>
+   <p class="meta"><a href="checks/check_simple.js">check_simple</a> 8/8 · <a href="checks/check_straddle.js">check_straddle</a> 7/7 · <a href="checks/check_cuts.js">check_cuts</a> 3/3 · <a href="checks/check_bowtie.js">check_bowtie</a> 6/6 · <a href="checks/check_diagtriangle.js">check_diagtriangle</a> 6/6 · <a href="checks/check_frame.js">check_frame</a> 5/5 · <a href="checks/check_trichotomy_plate.js">check_trichotomy_plate</a> 5/5</p>
 </div>
   <div class="card"><a class="t" href="the-fano-v1.html">Fano</a>
    <p>Your diagonal triangle is a triangle because the plane is not of characteristic 2. In PG(2,2) it collapses to a point and the harmonic conjugate stops being a new point — the axiom the whole undercarriage stands on.</p>
-   <p class="meta">check_fano 5/5</p>
+   <p class="meta"><a href="checks/check_fano.js">check_fano</a> 5/5 · <a href="checks/check_fano_plate.js">check_fano_plate</a> 9/9</p>
 </div>
   <div class="card"><a class="t" href="the-gauge-is-the-group-v1.html">The gauge is the group</a>
    <p>The board does not merely resemble the anharmonic group — it runs it. Six Möbius readings of one scene value, and the three involutions among them are the three constructions already drawn.</p>
@@ -203,10 +206,11 @@
 </div>
   <div class="card"><a class="t" href="the-channel-rates-v1.html">The channel rates</a>
    <p>How the two equations work: one reciprocal foreshortening runs the depth, and each channel takes a fraction of it.</p>
+   <p class="meta"><a href="checks/check_growth.js">check_growth</a> 8/8</p>
 </div>
   <div class="card"><a class="t" href="the-type-ab-v1.html">Type A and Type B</a>
    <p>The drafting board's two length transfers, read off the channel law. Rate zero is the ruled transfer with no collector; every positive rate concurs at gauge 1/r — the seat is the collector.</p>
-   <p class="meta">check_typeab 10/10 · seat = collector verified to 10⁻¹⁶</p>
+   <p class="meta"><a href="checks/check_typeab.js">check_typeab</a> 10/10 · seat = collector verified to 10⁻¹⁶</p>
 </div>
   <div class="card"><a class="t" href="the-directing-organizer-v2.html">The directing-point organizer</a>
    <p>Construction, depth measure and projection in one instrument: the picture plane true-size, the vanishing plane at the eye, and the directing point of each channel yours to place.</p>
@@ -290,7 +294,7 @@
   was first proven in a dependency-free Node script; every interactive re-runs its own checks on each input
   and shows the residuals. The introduction keeps the ledger of what is machine-verified and what is
   synthesis. The construction is grounded in <i>Glide Drawings</i>; the two-slit camera side stands on the
-  classical cross-slit literature; the tower is Klein's.</p>
+  classical cross-slit literature; the tower is Klein's. The scripts are in <a href="https://github.com/FlyingSticks/Glide_projection/tree/main/checks">checks/</a> — run <code>node checks/extract.js &amp;&amp; node checks/run-all.js</code> from the repository root and they report <b>23/23 scripts, 185 assertions</b>. Every badge below that names a script links to it.</p>
   <p class="fine">Board palette throughout · picture red, vanishing violet, directing aqua, mark blue, camera
   orange, gauge gold · index generated against the live repository tree.</p>
  </div>
