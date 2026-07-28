@@ -36,7 +36,23 @@
  .foot{border-top:1.5px solid #151310;margin-top:36px;padding-top:16px;font-size:12.5px;color:#151310;max-width:72ch;line-height:1.6;}
  .foot .fine{color:#8E8C80;font-size:11.5px;margin-top:10px;}
  a{color:#151310;}
-</style>
+
+ .hero{display:block;background:#CFCDC1;border:1px solid #9a988c;border-radius:6px;
+   margin:6px 0 10px;text-decoration:none;color:inherit;}
+ .hero svg{display:block;width:100%;height:auto;border:none;background:none;}
+ .herocap{font-size:13px;color:#4a473f;padding:8px 12px 10px;}
+ .herocap b{color:#151310;}
+ .claim{background:#C2C0B4;border:1px solid #9a988c;border-left:4px solid #151310;
+   border-radius:6px;padding:12px 16px;margin:0 0 18px;font-size:14.5px;max-width:820px;}
+ .claim b{letter-spacing:0.04em;}
+ ul.shelf{list-style:none;padding:0;margin:6px 0 0;}
+ ul.shelf li{padding:7px 2px;border-bottom:1px solid #a8a69a;font-size:14px;line-height:1.5;}
+ ul.shelf li a.t2{font-weight:700;color:#151310;text-decoration:none;border-bottom:1px dotted #6b695f;}
+ ul.shelf li a.t2:hover{border-bottom-style:solid;}
+ ul.shelf .ck{font-size:11.5px;color:#8E8C80;white-space:nowrap;}
+ ul.shelf .ck a{color:#8E8C80;border-bottom:1px dotted #8E8C80;text-decoration:none;}
+ ul.shelf .ck a:hover{color:#151310;border-bottom-color:#151310;}
+ </style>
 </head>
 <body>
 <div class="wrap">
@@ -59,235 +75,126 @@
  Nothing here is asserted on trust: every page re-runs its own machine checks as you drag.</p>
  <p class="budget">The spine below is about an hour. Everything else is there when you want it.</p>
 
-  <h2>THE SPINE — start here, in order</h2>
- <p class="secnote">About an hour, in this order. Everything below is there when you want it.</p>
+ 
+ <a class="hero" href="the-depth-projection-v1.html" aria-label="Open the depth-projection plate">
+  <svg id="hero" viewBox="0 0 900 430" role="img" aria-label="An irregular shape carried through depth, alternating between the board's glide and one-point perspective"></svg>
+  <p class="herocap"><span id="heromode"><b>THE BOARD'S GLIDE</b> — equal stations, and the diagonals bend</span>
+  &nbsp;·&nbsp; the same shape, the same marks, two instruments &nbsp;·&nbsp; <b>tap to open the plate</b></p>
+ </a>
+ <script>
+ (function(){
+ 'use strict';
+ var NS='http://www.w3.org/2000/svg';
+ var svg=document.getElementById('hero'); if(!svg) return;
+ var S=[450,205], r=0.6, q=0.9, ST=[0,1/3,2/3,1], m=3;
+ var shape=[[150,60],[430,28],[700,80],[812,225],[588,392],[212,362]];
+ var COLS=['#C43A2B','#7B3FA0','#2456C8','#151310'];
+ function img(P,g,persp){
+   var f=persp?1/(1+q*g):(1-r*g);
+   return [S[0]+(P[0]-S[0])*f, S[1]+(P[1]-S[1])*f];
+ }
+ function lerp(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]; }
+ function el(n,a){ var e=document.createElementNS(NS,n);
+   for(var k in a) e.setAttribute(k,a[k]); svg.appendChild(e); return e; }
+ function draw(persp){
+   while(svg.firstChild) svg.removeChild(svg.firstChild);
+   var e,k,st,i;
+   for(e=0;e<6;e++){
+     var P0=shape[e], P1=shape[(e+1)%6];
+     for(k=0;k<=m;k++){
+       var M=lerp(P0,P1,k/m), a=img(M,0,persp), b=img(M,1,persp);
+       el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#8E8C80',
+         'stroke-width':k===0?1.5:1,opacity:k===0?0.8:0.5});
+     }
+   }
+   for(e=0;e<6;e++) for(st=0;st<3;st++) for(k=0;k<m;k++){
+     var P0b=shape[e], P1b=shape[(e+1)%6], pts=[];
+     for(i=0;i<=14;i++){
+       var tau=i/14;
+       pts.push(img(lerp(P0b,P1b,(k+tau)/m), ST[st]+tau/3, persp));
+     }
+     el('polyline',{points:pts.map(function(p){return p[0]+','+p[1];}).join(' '),
+       fill:'none',stroke:'#2E9E4B','stroke-width':1.6,opacity:0.85});
+   }
+   for(st=3;st>=0;st--){
+     var cp=shape.map(function(P){ return img(P,ST[st],persp); });
+     el('polygon',{points:cp.map(function(p){return p[0]+','+p[1];}).join(' '),
+       fill:'none',stroke:COLS[st],'stroke-width':st===0?3.6:2.3,'stroke-linejoin':'round'});
+   }
+   var lab=document.getElementById('heromode');
+   if(lab) lab.innerHTML = persp
+     ? '<b>ONE-POINT PERSPECTIVE</b> — the diagonals snap straight, the stations crowd'
+     : '<b>THE BOARD\'S GLIDE</b> — equal stations, and the diagonals bend';
+ }
+ var persp=false;
+ draw(false);
+ var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!still) setInterval(function(){ persp=!persp; draw(persp); }, 3600);
+ })();
+ </script>
+
+ <div class="claim">
+  <b>THE CLAIM.</b> Projections come in three grades. <b>Real</b> ones a camera can perform —
+  perspective, the cross-slit — every meeting set finite. <b>Ideal</b> ones are exact limits of
+  cameras — orthographic, the pushbroom. And <b>constructed</b> ones exist only on the drafting
+  board: their rays bend, no camera performs them and none is the limit of cameras — yet they are
+  fully lawful, and they do things no camera can. This site is the case for taking the third grade
+  seriously. Every geometric statement on it links to a machine-checked proof.
+ </div>
+ <h2>THE SPINE — six pages, in order</h2>
+ <p class="secnote">About an hour. Everything else is on the shelf below.</p>
  <ol class="spine">
-  <li><a href="the-introduction-v2.html">The introduction</a><br><span class="sub">Thesis, the four desiderata, and the ledger of what is machine-verified against what is synthesis. Read this first; it tells you how much weight every other page will bear.</span></li>
-  <li><a href="the-inversion-v1.html">The inversion</a><br><span class="sub">The big idea in one sheet. Are parallel rays capturing a converging shape, or converging rays capturing a rectilinear one? Both — a congruence given a role, and the role can be swapped.</span></li>
-  <li><a href="the-assembly-v1.html">The assembly</a><br><span class="sub">Everything working together on one ray. A single scene point, and every structure the board has built live at once — the drawn armature with its mark, the depth-plane stack as the one-form, and both slits.</span></li>
-  <li><a href="the-congruence-map.html">The congruence map</a><br><span class="sub">The reference plate: which projections live where, degrees of freedom and formulas machine-verified.</span></li>
-  <li><a href="geometry-euler-all-v1.html">The tower and the field</a><br><span class="sub">One Euler diagram. The four classical geometries nest as groups; the congruence chart is not a fifth ring, because neither contains the other. They overlap — and the overlap is exactly the seam.</span></li>
+  <li><a href="the-introduction-v2.html">The introduction</a><br><span class="sub">Thesis, the four desiderata, and the ledger of what is machine-verified against what is synthesis. It tells you how much weight every other page will bear.</span></li>
+  <li><a href="the-inversion-v1.html">The inversion</a><br><span class="sub">The big idea in one sheet: parallel rays capturing a converging shape, or converging rays capturing a rectilinear one — one congruence, and the role can be swapped.</span></li>
+  <li><a href="the-assembly-v1.html">The assembly</a><br><span class="sub">Everything working together on one ray: the drawn armature with its mark, the depth-plane stack, and both slits, live at once.</span></li>
+  <li><a href="the-congruence-map.html">The congruence map</a><br><span class="sub">The reference plate: which projections live where, with degrees of freedom and formulas machine-verified — the three grades laid out as territory.</span></li>
+  <li><a href="the-depth-projection-v1.html">Depth projection of an irregular shape</a><br><span class="sub">The constructed grade's signature, on one figure: equal parts at every depth, curving diagonals — and a toggle to perspective, which straightens them and crowds the stations.</span></li>
   <li><a href="the-inversion-viewer-v2.html">The inversion viewer</a><br><span class="sub">Drop in any .obj and see the same vertices under both readings at once. The thesis, on your own model.</span></li>
  </ol>
 
- <h2>THE NUMBERED SERIES — sheets 37 to 41</h2>
- <p class="secnote">These five carry a number in their own title, and they run in order: two ways of pulling a station point apart, the engine that resulted, and two assemblies built on it. The series itself walks the seam: sheet 37 is the ray reading, sheets 38–41 the edge reading. Sheet 39 is the source — every unnumbered sheet on this page imports its channel law. Sheets 1 to 36 are not in this repository.</p>
- <div class="cards cS">
-  <div class="card"><span class="no">37</span><a class="t" href="station_point_to_slits_v12.html">Station point to slits</a>
-   <p>One control between two projections. The station point opened into two slits at two depths on the same axis of sight — perspective spending its fidelity on depth, cross-slit spending it on breadth.</p>
-</div>
-  <div class="card"><span class="no">38</span><a class="t" href="station-point-to-vanishing-axis-v3color.html">Station point to a vanishing axis</a>
-   <p>The other way to pull the station point apart: not two slits on one axis but two perpendicular armature axes — a vanishing axis metering depth, a directing axis assigning direction. Run on sheet 37's own scenes so the two can be read against each other.</p>
-</div>
-  <div class="card"><span class="no">39</span><a class="t" href="six-core-armatures-v1.html">The six core armatures</a>
-   <p>One gauge, six patterns of recession — and the channel law itself. Every unnumbered sheet below imports this sheet's makeProj as its engine.</p>
-</div>
-  <div class="card"><span class="no">40</span><a class="t" href="component-glides-v1.html">Component glides</a>
-   <p>The double herringbone and the eggcrate, with forced-shear continuity.</p>
-</div>
-  <div class="card"><span class="no">41</span><a class="t" href="series-component-chains-v1.html">Series component chains</a>
-   <p>Repeating and nonrepeating sequences, with a dynamic closure floor.</p>
-</div>
- </div>
-
- <h2>ONE CONGRUENCE — THE SEAM</h2>
- <p class="secnote">The thesis of the whole site: a single congruence of lines, read two ways. Read the rays and it is a camera; read the edges and it is a drafting-board construction. These pages hold both readings in one frame and show where they agree exactly.</p>
- <div class="cards cI">
-  <div class="card"><a class="t" href="the-assembly-v1.html">The assembly</a>
-   <p>Both readings assembled on the same congruence, one panel each.</p>
-</div>
-  <div class="card"><a class="t" href="the-inversion-viewer-v2.html">The inversion viewer</a>
-   <p>Any mesh, both readings, live. Picture-plane rotation about the viewing axis included.</p>
-</div>
-  <div class="card"><a class="t" href="glide-vs-crossslit.html">Glide versus cross-slit</a>
-   <p>Glide, cross-slit, and a compare mode on one construction — staging angle k, directing-axis position and slit separation as live controls, with the vanishing and directing fans drawable over either.</p>
-</div>
-  <div class="card"><a class="t" href="the-congruence-map.html">The congruence map</a>
-   <p>Fix the lines, fix the circular points, fix the scale: the reference plate for the whole family.</p>
-   <p class="meta">the reference plate · dof and formulas machine-verified</p>
-</div>
- </div>
-
- <h2>READING ONE — RAYS · OPTICAL PROJECTION</h2>
- <p class="secnote">Follow the rays. What a physical camera can do, the three regimes it contains, where it stops being buildable — and what an image is before both constraints have acted.</p>
- <div class="cards cII">
-  <div class="card"><a class="t" href="station_point_to_slits_v12.html">Station point to slits</a>
-   <p>Sheet 37. One control between two projections: the station point opened into two slits at two depths.</p>
-   <p class="meta">sheet 37</p>
-</div>
-  <div class="card"><a class="t" href="the-zones-v1.html">The three zones</a>
-   <p>A cross-slit does not blend the ordinary view with the reversed one. It contains both and a third besides, separated by the two slits — five faces, three faces, one face. With the face-shape reading, and the isotropic depth where a square stays square.</p>
-   <p class="meta"><a href="checks/check_xslit_zones.js">check_xslit_zones</a> 9/9 · <a href="checks/check_isotropic.js">check_isotropic</a> 5/5 · <a href="checks/check_aspect.js">check_aspect</a> 9/9 · <a href="checks/check_zones_plate.js">check_zones_plate</a> 16/16</p>
-</div>
-  <div class="card"><a class="t" href="the-midplane-v1.html">The midplane</a>
-   <p>Slide the picture plane to the midpoint of the slits and the second square depth runs off to infinity and returns from the other side. The square is the harmonic conjugate of the picture plane in the two slits — that is the invariant; the far-field aspect is not.</p>
-   <p class="meta"><a href="checks/check_midplane.js">check_midplane</a> 10/10 · <a href="checks/check_invariance.js">check_invariance</a> 8/8 · <a href="checks/check_midplane_plate.js">check_midplane_plate</a> 19/19</p>
-</div>
-  <div class="card"><a class="t" href="the-halfformed-v1.html">Half-formed</a>
-   <p>A slit does not dim an image, it settles one coordinate and leaves the other free. Put the picture plane between the slits and every scene point arrives as a stripe, its second coordinate fixed by something the ray has not yet reached.</p>
-   <p class="meta"><a href="checks/check_halfformed.js">check_halfformed</a> 9/9 · <a href="checks/check_halfformed_plate.js">check_halfformed_plate</a> 8/8</p>
-</div>
- </div>
-
- <h2>READING TWO — EDGES · BOARD CONSTRUCTIONS</h2>
- <p class="secnote">Follow the edges. The glide engine: its axioms, its channel law, its instruments and its assemblies. Everything here is drawn, not photographed — which is why it can do what no camera can.</p>
- <div class="cards cE">
-  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v3color.html">Station point to vanishing axis</a>
-   <p>Sheet 38. The k-slider pulls a station point apart into a vanishing axis and a directing axis, with the cross-slit ghost driven by the same control.</p>
-   <p class="meta">sheet 38</p>
-</div>
-  <div class="card"><a class="t" href="six-core-armatures-v1.html">The six core armatures</a>
-   <p>The channel law and the six armatures every other sheet runs on.</p>
-   <p class="meta">the source of the shared core</p>
-</div>
-  <div class="card"><a class="t" href="the-glide-axioms-v3.html">The glide axioms and transforms</a>
-   <p>The family put in order: one primitive, four axioms for the edge role, one transform that swaps the role, and everything else demoted to theorem.</p>
-</div>
-  <div class="card"><a class="t" href="the-channel-rates-v1.html">The channel rates</a>
-   <p>How the two equations work: one reciprocal foreshortening runs the depth, and each channel takes a fraction of it.</p>
-   <p class="meta"><a href="checks/check_growth.js">check_growth</a> 8/8</p>
-</div>
-  <div class="card"><a class="t" href="the-type-ab-v1.html">Type A and Type B</a>
-   <p>The drafting board's two length transfers, read off the channel law. Rate zero is the ruled transfer with no collector; every positive rate concurs at gauge 1/r — the seat is the collector.</p>
-   <p class="meta"><a href="checks/check_typeab.js">check_typeab</a> 10/10 · seat = collector verified to 10⁻¹⁶</p>
-</div>
-  <div class="card"><a class="t" href="the-directing-organizer-v2.html">The directing-point organizer</a>
-   <p>Construction, depth measure and projection in one instrument: the picture plane true-size, the vanishing plane at the eye, and the directing point of each channel yours to place.</p>
-</div>
-  <div class="card"><a class="t" href="the-split-element-v1.html">The split element</a>
-   <p>The fully general glide. Both channels finite and unequal, so each glide line carries two directing points, one per channel, landing on two perpendicular axes.</p>
-</div>
-  <div class="card"><a class="t" href="the-depth-knit-v1.html">The depth-plane knit</a>
-   <p>Scattered line elements at one depth. Stretch, translate and orient them freely and the same division persists, the marks crowding toward each vanishing point.</p>
-</div>
-  <div class="card"><a class="t" href="merges-and-depths-3d-v1.html">Merges and depths, in space</a>
-   <p>The merges-and-depths panels lifted off the page: level sets as translucent sheets, a ray as one leaf of each channel crossed.</p>
-</div>
-  <div class="card"><a class="t" href="the-glide-atlas-v1.html">The glide atlas</a>
-   <p>The whole family on one square. Every projection is a point in the (rᵤ, rᵥ) plane: the diagonal is the isotropic glides, the edges are the vanishing-axis, pushbroom and affine members, the corners are one-point, orthographic and pushbroom, and the interior is the general glide.</p>
-</div>
-  <div class="card"><a class="t" href="component-glides-v1.html">Component glides</a>
-   <p>Double herringbone and eggcrate assemblies with forced-shear continuity.</p>
-   <p class="meta">28+ harness assertions</p>
-</div>
-  <div class="card"><a class="t" href="series-component-chains-v1.html">Series component chains</a>
-   <p>Five-cell chains with a dynamic closure floor.</p>
-</div>
- </div>
-
- <h2>THE SHARED UNDERCARRIAGE</h2>
- <p class="secnote">The projective machinery both readings run on. The cross-ratio is the one currency the rays and the edges both accept, and the harmonic condition is its unit. This is also where the axiom lives that makes any of it possible.</p>
- <div class="cards cH">
-  <div class="card"><a class="t" href="the-cd-v1.html">C and D</a>
-   <p>The two cuts and the two events. C is the moving mark, D is fixed by the channel's rate; their four gaps make λ = ad/bc, and two things can happen to it — coincident, and harmonic.</p>
-</div>
-  <div class="card"><a class="t" href="the-bridge-v1.html">The bridge</a>
-   <p>The cross-ratio page IS the lateral projection, one axis at a time — not an analogy. The segment's two cuts and the depth ray's four graduations are the same four points; drag depth and both move.</p>
-</div>
-  <div class="card"><a class="t" href="the-hinge-v1.html">The hinge</a>
-   <p>One condition, three names. |ad| = |bc| wearing three costumes: matched size (Euclid I.43), similar shape, and straight corner-diagonals — with a readout that tells the signs apart.</p>
-</div>
-  <div class="card"><a class="t" href="the-loci-v1.html">The two balances</a>
-   <p>Where the whole C-and-D thread closes, tied back to the armature: the frame's opposite edges are the picture and vanishing planes, the mark is one cut and the directing point the other.</p>
-   <p class="meta">the sheet's own title is “The two balances”; the index called it “The two loci”</p>
-</div>
-  <div class="card"><a class="t" href="the-conjugate-v1.html">The conjugate construction</a>
-   <p>The quadrangle scaffold. Swing it; the answer does not move.</p>
-   <p class="meta">check_quadrangle 5/5 · check_inverse 3/3</p>
-</div>
-  <div class="card"><a class="t" href="the-gap-line-v1.html">The gap line</a>
-   <p>Four random lines, six crossings, and the harmonic range already latent. The unique unjoined pair, its gap-crossing line, and cr = −1 on all three diagonals.</p>
-   <p class="meta"><a href="checks/check_harmonic.js">check_harmonic</a> 10/10 · <a href="checks/check_gapline_plate.js">check_gapline_plate</a> 4/4 · uniqueness by the one-side test, not simplicity</p>
-</div>
-  <div class="card"><a class="t" href="the-trichotomy-v2.html">The trichotomy</a>
-   <p>The gap line divides the other four vertices 0–4, 1–3 or 2–2, one of each, every arrangement. The even split is the bowtie. Frames all nine points of the system on request.</p>
-   <p class="meta"><a href="checks/check_simple.js">check_simple</a> 8/8 · <a href="checks/check_straddle.js">check_straddle</a> 7/7 · <a href="checks/check_cuts.js">check_cuts</a> 3/3 · <a href="checks/check_bowtie.js">check_bowtie</a> 6/6 · <a href="checks/check_diagtriangle.js">check_diagtriangle</a> 6/6 · <a href="checks/check_frame.js">check_frame</a> 5/5 · <a href="checks/check_trichotomy_plate.js">check_trichotomy_plate</a> 5/5</p>
-</div>
-  <div class="card"><a class="t" href="the-fano-v1.html">Fano</a>
-   <p>Your diagonal triangle is a triangle because the plane is not of characteristic 2. In PG(2,2) it collapses to a point and the harmonic conjugate stops being a new point — the axiom the whole undercarriage stands on.</p>
-   <p class="meta"><a href="checks/check_fano.js">check_fano</a> 5/5 · <a href="checks/check_fano_plate.js">check_fano_plate</a> 9/9</p>
-</div>
-  <div class="card"><a class="t" href="the-gauge-is-the-group-v1.html">The gauge is the group</a>
-   <p>The board does not merely resemble the anharmonic group — it runs it. Six Möbius readings of one scene value, and the three involutions among them are the three constructions already drawn.</p>
-</div>
-  <div class="card"><a class="t" href="inside-and-minus.html">Does inside require minus?</a>
-   <p>No. Inside runs on order and multiplication; minus is what it becomes when the two sides are twins, or when you choose to measure it as a signed field.</p>
-</div>
-  <div class="card"><a class="t" href="inside-outside-no-circle.html">Inside and outside, without a circle</a>
-   <p>One projection carries the whole unbounded outside into a bounded inside — the reciprocal, drawn with a straightedge. The fixed point is all that is left of the circle.</p>
-</div>
-  <div class="card"><a class="t" href="reciprocal-images-invariant-v3.html">Reciprocal images and the invariant</a>
-   <p>Rotate the radius and the rectangle changes shape without ever changing area, because it stays equal to the square on the radius.</p>
-</div>
- </div>
-
- <h2>THE AMBIENT LADDER</h2>
- <p class="secnote">Where the congruence sits among the geometries — and the floor beneath the whole tower.</p>
- <div class="cards cI">
-  <div class="card"><a class="t" href="geometry-euler-diagram.html">The geometry tower</a>
-   <p>Euclidean ⊂ metric ⊂ affine ⊂ perspective. Each inner group is a subgroup of the next; the further out you go, the fewer things stay fixed.</p>
-</div>
-  <div class="card"><a class="t" href="geometry-euler-all-v1.html">The tower and the field</a>
-   <p>The nested groups and the congruence chart drawn together. Neither contains the other; where they overlap is precisely the seam this board is about.</p>
-</div>
-  <div class="card"><a class="t" href="the-census-v1.html">The census</a>
-   <p>The floor under the tower. Counts and incidence survive every drawing mode, including deformations that are no projection at all; cross-ratio survives only the projective ones.</p>
-   <p class="meta"><a href="checks/check_census.js">check_census</a> 6/6 · the ladder's zeroth level</p>
-</div>
- </div>
-
- <h2>REFERENCE</h2>
- <p class="secnote">Open alongside anything else.</p>
- <div class="cards cA">
-  <div class="card"><a class="t" href="the-glossary-v1.html">The glossary</a>
-   <p>Key terms of the board, defined once and used consistently everywhere else.</p>
-</div>
- </div>
-
- <h2>ANNEX — earlier states and companions</h2>
- <p class="secnote">Superseded drafts kept for provenance, and the companion site.</p>
- <div class="cards cA">
-  <div class="card"><a class="t" href="the-introduction-v1.html">The introduction, earlier draft</a>
-   <p>Kept for provenance. Note: its &lt;title&gt; ships a literal \u00b7 rather than the character — the escape-leak bug, still live in this file.</p>
-   <p class="meta">superseded by v2 · has a leaked escape</p>
-</div>
-  <div class="card"><a class="t" href="the-inversion-viewer-v1.html">The inversion viewer, earlier state</a>
-   <p>Before the picture-plane rotation feature.</p>
-   <p class="meta">superseded by v2</p>
-</div>
-  <div class="card"><a class="t" href="the-directing-organizer-v1.html">The directing-point organizer, earlier state</a>
-   <p>Before the depth-measure panel.</p>
-   <p class="meta">superseded by v2</p>
-</div>
-  <div class="card"><a class="t" href="reciprocal-images-invariant-v2.html">Reciprocal images, earlier state</a>
-   <p>Kept for provenance.</p>
-   <p class="meta">superseded by v3</p>
-</div>
-  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v1.html">Station point to vanishing axis, v1</a>
-   <p>Early state of sheet 38.</p>
-   <p class="meta">sheet 38 · early</p>
-</div>
-  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v2.html">Station point to vanishing axis, v2</a>
-   <p>Later state of sheet 38.</p>
-   <p class="meta">sheet 38 · earlier state</p>
-</div>
-  <div class="card"><a class="t" href="station-point-to-vanishing-axis-v8.html">Station point to vanishing axis, v8</a>
-   <p>A further state of sheet 38 — see the note below about which of these is current.</p>
-   <p class="meta">sheet 38 · sequence unresolved</p>
-</div>
-  <div class="card"><a class="t" href="station_point_to_slits_v10.html">Station point to slits, v10</a>
-   <p>Earlier state of sheet 37.</p>
-   <p class="meta">superseded by v12</p>
-</div>
-  <div class="card"><a class="t" href="https://flyingsticks.github.io/Overflow/cross-ratio-pm2.html">Cross-ratio, free point (Overflow)</a>
-   <p>The free 2-D point with signed lengths; the diagonal and the hyperbola as the ±1 loci.</p>
-   <p class="meta">companion site · constant corrected to ξη = −HW/4</p>
-</div>
-  <div class="card"><a class="t" href="https://flyingsticks.github.io/Overflow/Cross_ratio_size_and_shape_2.html">Cross-ratio, size and shape (Overflow)</a>
-   <p>The four lengths, the size pair and the shape pair, and the conservation ad·bc = ac·bd.</p>
-   <p class="meta">companion site</p>
-</div>
- </div>
+ <h2>THE SHELF — everything, alphabetically</h2>
+ <p class="secnote">One line each. Sheets 37–41 are the numbered series; the rest are unnumbered plates. Earlier drafts are archived off-site, not here.</p>
+ <ul class="shelf">
+  <li><a class="t2" href="the-bridge-v1.html">The bridge</a> — The cross-ratio page IS the lateral projection, one axis at a time — drag depth and both move.</li>
+  <li><a class="t2" href="the-cd-v1.html">C and D</a> — The two cuts and the two events: λ = ad/bc, coincident and harmonic.</li>
+  <li><a class="t2" href="the-census-v1.html">The census</a> — Counts and incidence survive every drawing mode; cross-ratio survives only the projective ones. <span class="ck">· <a href="checks/check_census.js">check_census</a> 6/6</span></li>
+  <li><a class="t2" href="the-channel-rates-v1.html">The channel rates</a> — One reciprocal foreshortening runs the depth; each channel takes a fraction of it. <span class="ck">· <a href="checks/check_growth.js">check_growth</a> 8/8</span></li>
+  <li><a class="t2" href="component-glides-v1.html">Component glides</a> — Double herringbone and eggcrate assemblies with forced-shear continuity. Sheet 40.</li>
+  <li><a class="t2" href="the-congruence-map.html">The congruence map</a> — The reference plate: the family, its degrees of freedom, and its formulas.</li>
+  <li><a class="t2" href="the-conjugate-v1.html">The conjugate construction</a> — The quadrangle scaffold: swing it, and the answer does not move.</li>
+  <li><a class="t2" href="https://flyingsticks.github.io/Overflow/cross-ratio-pm2.html">Cross-ratio, free point (Overflow)</a> — The free 2-D point with signed lengths; the ±1 loci. Companion site.</li>
+  <li><a class="t2" href="https://flyingsticks.github.io/Overflow/Cross_ratio_size_and_shape_2.html">Cross-ratio, size and shape (Overflow)</a> — The size pair, the shape pair, and ad·bc = ac·bd. Companion site.</li>
+  <li><a class="t2" href="the-depth-projection-v1.html">Depth projection of an irregular shape</a> — Equal parts at every depth; the diagonals bend — an exact quadratic — and straighten under perspective. The board's signature. <span class="ck">· <a href="checks/check_diagonals.js">check_diagonals</a> 7/7 · <a href="checks/check_persp_toggle.js">check_persp_toggle</a> 4/4</span></li>
+  <li><a class="t2" href="the-depth-knit-v1.html">The depth-plane knit</a> — Scattered elements at one depth keep one division, crowding toward each vanishing point.</li>
+  <li><a class="t2" href="the-directing-organizer-v2.html">The directing-point organizer</a> — Construction, depth measure and projection in one instrument.</li>
+  <li><a class="t2" href="the-fano-v1.html">Fano</a> — The diagonal triangle collapses only in characteristic 2 — the axiom under the whole undercarriage. <span class="ck">· <a href="checks/check_fano.js">check_fano</a> 5/5</span></li>
+  <li><a class="t2" href="the-gap-line-v1.html">The gap line</a> — Four random lines already carry the harmonic range: cr = −1 on all three diagonals. <span class="ck">· <a href="checks/check_harmonic.js">check_harmonic</a> 10/10</span></li>
+  <li><a class="t2" href="the-gauge-is-the-group-v1.html">The gauge is the group</a> — Six Möbius readings of one scene value; the three involutions are constructions already drawn.</li>
+  <li><a class="t2" href="geometry-euler-diagram.html">The geometry tower</a> — Euclidean ⊂ metric ⊂ affine ⊂ perspective: the nested groups.</li>
+  <li><a class="t2" href="the-glide-atlas-v1.html">The glide atlas</a> — The whole family as one square in the rate plane; edges and corners are the named members.</li>
+  <li><a class="t2" href="the-glide-axioms-v3.html">The glide axioms and transforms</a> — One primitive, four axioms, one transform that swaps the role; the rest demoted to theorem.</li>
+  <li><a class="t2" href="glide-vs-crossslit.html">Glide versus cross-slit</a> — Both constructions on one figure, with staging angle, axis position and slit separation live.</li>
+  <li><a class="t2" href="the-glossary-v1.html">The glossary</a> — Key terms of the board, defined once.</li>
+  <li><a class="t2" href="the-halfformed-v1.html">Half-formed</a> — One slit settles one coordinate exactly and leaves the other free: a half-formed image is a line, not a faint point. <span class="ck">· <a href="checks/check_halfformed.js">check_halfformed</a> 9/9</span></li>
+  <li><a class="t2" href="the-hinge-v1.html">The hinge</a> — |ad| = |bc| wearing three costumes: matched size, similar shape, straight corner-diagonals.</li>
+  <li><a class="t2" href="inside-outside-no-circle.html">Inside and outside, without a circle</a> — One projection carries the unbounded outside into a bounded inside, by straightedge.</li>
+  <li><a class="t2" href="inside-and-minus.html">Does inside require minus?</a> — No: inside runs on order and multiplication; minus is what it becomes when the two sides are twins.</li>
+  <li><a class="t2" href="the-inversion-v1.html">The inversion</a> — The big idea in one sheet: one congruence, two readings, and the swap.</li>
+  <li><a class="t2" href="the-inversion-viewer-v2.html">The inversion viewer</a> — Any mesh, both readings, live — with picture-plane rotation about the viewing axis.</li>
+  <li><a class="t2" href="merges-and-depths-3d-v1.html">Merges and depths, in space</a> — The merge panels lifted off the page: level sets as translucent sheets.</li>
+  <li><a class="t2" href="the-midplane-v1.html">The midplane</a> — Picture plane at the slits' midpoint: the second square depth runs to infinity and back — the invariant is the harmonic conjugacy, not the far-field aspect. <span class="ck">· <a href="checks/check_midplane.js">check_midplane</a> 10/10 · <a href="checks/check_invariance.js">check_invariance</a> 8/8</span></li>
+  <li><a class="t2" href="reciprocal-images-invariant-v3.html">Reciprocal images and the invariant</a> — Rotate the radius: the rectangle changes shape and never changes area.</li>
+  <li><a class="t2" href="series-component-chains-v1.html">Series component chains</a> — Five-cell chains with a dynamic closure floor. Sheet 41.</li>
+  <li><a class="t2" href="six-core-armatures-v1.html">The six core armatures</a> — One gauge, six patterns of recession — the channel law itself. Sheet 39, the source every other sheet imports.</li>
+  <li><a class="t2" href="the-split-element-v1.html">The split element</a> — The fully general glide: both channels finite and unequal, two directing points per glide line.</li>
+  <li><a class="t2" href="station-point-to-vanishing-axis-v3color.html">Station point to a vanishing axis</a> — The other way to pull the station point apart: two perpendicular armature axes. Sheet 38, on sheet 37's own scenes.</li>
+  <li><a class="t2" href="station_point_to_slits_v12.html">Station point to slits</a> — The station point opened into two slits at two depths on one axis. Sheet 37.</li>
+  <li><a class="t2" href="the-zones-v1.html">The three zones</a> — A cross-slit contains the ordinary view, the reversed one, and a mixed third — 5, 3, 1 faces — with the isotropic depth at the harmonic mean. <span class="ck">· <a href="checks/check_xslit_zones.js">check_xslit_zones</a> 9/9 · <a href="checks/check_aspect.js">check_aspect</a> 9/9</span></li>
+  <li><a class="t2" href="geometry-euler-all-v1.html">The tower and the field</a> — The tower and the congruence chart drawn together; neither contains the other, and the overlap is the seam.</li>
+  <li><a class="t2" href="the-trichotomy-v2.html">The trichotomy</a> — The gap line splits the other four vertices 0–4, 1–3 or 2–2, one of each; the even split is the bowtie. <span class="ck">· <a href="checks/check_simple.js">check_simple</a> 8/8 · <a href="checks/check_straddle.js">check_straddle</a> 7/7</span></li>
+  <li><a class="t2" href="the-loci-v1.html">The two balances</a> — Where the C-and-D thread closes onto the armature: the frame's opposite edges are the picture and vanishing planes.</li>
+  <li><a class="t2" href="the-type-ab-v1.html">Type A and Type B</a> — The board's two length transfers, read off the channel law; the seat is the collector. <span class="ck">· <a href="checks/check_typeab.js">check_typeab</a> 10/10</span></li>
+ </ul>
 
  <div class="foot">
   <p><b>The house rule.</b> No claim ships without a passing check. Every geometric statement on these pages
