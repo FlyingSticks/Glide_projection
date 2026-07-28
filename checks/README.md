@@ -16,6 +16,18 @@ node checks/run-all.js     # run everything, one line per script
 
 No dependencies, no install step. Node alone.
 
+The scripts do not care where they live. If GitHub's uploader will not take a
+folder — it will not, on iPad or in Safari — put all of these loose at the
+repository root instead and run:
+
+```
+node extract.js
+node run-all.js
+```
+
+Both layouts give the same result. `extract.js` looks for the plates beside
+itself first, then one directory up, and finds them either way.
+
 `extract.js` matters: the plate tests do not test a copy of the geometry, they
 test the exact code the page ships, lifted from its `<script id="geo">` block.
 If a sheet is edited and its geometry breaks, the corresponding check fails.
@@ -42,12 +54,14 @@ If a sheet is edited and its geometry breaks, the corresponding check fails.
 | `check_midplane.js` | picture plane at the midpoint sends the second square depth to infinity |
 | `check_invariance.js` | the invariant is (S₁, S₂ ; square, picture plane) = −1; the far-field aspect is only affine |
 | `check_halfformed.js` | one slit settles one coordinate exactly and leaves the other free — a half-formed image is a line |
+| `check_diagonals.js` | Type A holds at every depth; a wall diagonal images as an exact quadratic, bending only when r > 0 |
+| `check_persp_toggle.js` | under perspective the same diagonals are dead straight, but the depth stations fall into a progression |
 
 **Plate tests** — these exercise the code a page actually ships:
 
 `check_gapline_plate.js`, `check_trichotomy_plate.js`, `check_frame.js`,
 `check_fano_plate.js`, `check_zones_plate.js`, `check_midplane_plate.js`,
-`check_halfformed_plate.js`.
+`check_halfformed_plate.js`, `check_depthproj_plate.js`.
 
 ## A note on what these do and do not cover
 

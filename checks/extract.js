@@ -5,7 +5,8 @@
 // the page ships, lifted from the <script id="geo"> block. Run this once before
 // run-all.js, from the repository root:
 //
-//     node checks/extract.js
+//     node checks/extract.js      (if the scripts live in checks/)
+//     node extract.js             (if they live loose at the root)
 //
 'use strict';
 const fs = require('fs');
@@ -19,9 +20,19 @@ const MAP = [
   ['the-zones-v1.html',       'geo_zones.js'],
   ['the-midplane-v1.html',    'geo_mp.js'],
   ['the-halfformed-v1.html',  'geo_hf.js'],
+  ['the-depth-projection-v1.html', 'geo_dp.js'],
 ];
 
-const root = path.resolve(__dirname, '..');
+// Works whether these scripts sit in checks/ or loose at the repository root:
+// look for the plates beside the scripts first, then one level up.
+function findRoot() {
+  const probe = MAP[0][0];
+  for (const dir of [__dirname, path.resolve(__dirname, '..')]) {
+    if (fs.existsSync(path.join(dir, probe))) return dir;
+  }
+  return __dirname;
+}
+const root = findRoot();
 const out  = __dirname;
 let ok = 0, missing = [];
 
