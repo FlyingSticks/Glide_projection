@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The pairing · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1200px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1060px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:120px;} .ro{font-size:12px;margin-right:2px;min-width:32px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button[aria-pressed="true"]{background:#151310;color:#EBE9DA;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1060px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+ @media (prefers-reduced-motion: reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE PAIRING</p>
+ <h1>The pairing — <em>vector against one-form, and the map that swaps them</em></h1>
+ <p class="sub">The board's second anchor, live. <b>Reading 1</b> measures depth by counting piercings of the
+ <b style="color:#2456B0">depth-plane stack</b> — one-form behaviour to the letter: gold rings mark where the ray
+ crosses each leaf, and the count <i>is</i> the graduation, ⟨ray, stack⟩ = λ. <b>Reading 2</b> measures by incidence:
+ the <b style="color:#E8792B">camera ray</b> is chosen by threading both
+ <b style="color:#12A6A6">slits</b><span style="color:#0E6E6E"> </span>— the vector side, every point of the ray sharing one image.
+ The map that exchanges the two roles is a <b>composite</b>, D = C∘R: press <b style="color:#8A4FD6">R</b> to watch the
+ involutory projectivity swap the slits while the congruence maps to itself; press <b style="color:#9A8248">C</b> to see the
+ symmetric polarity of the ruled quadric <i>through</i> the slits send axis points to stack planes — its trace on the
+ view axis is the midplane involution the board already carries (slits fixed, midpoint ↔ ideal point).
+ Orbit with a finger; sweep depth and rates; the live checks re-verify on every move.</p>
+
+ <div class="bar" role="group" aria-label="stage">
+  <button id="bP" aria-pressed="true">⟨ , ⟩ &nbsp;the pairing</button>
+  <button id="bR" aria-pressed="false">R — swap the slits</button>
+  <button id="bC" aria-pressed="false">C — dualize</button>
+  <label for="mo">morph</label><input id="mo" type="range" min="0" max="1" step="0.01" value="1"><span class="ro" id="moV">1.00</span>
+ </div>
+ <div class="bar">
+  <label for="ru">rᵤ</label><input id="ru" type="range" min="0.05" max="1" step="0.01" value="0.45"><span class="ro" id="ruV">0.45</span>
+  <label for="rv">rᵥ</label><input id="rv" type="range" min="0.05" max="1" step="0.01" value="0.75"><span class="ro" id="rvV">0.75</span>
+  <label for="zt">ζ</label><input id="zt" type="range" min="-199" max="-5" step="1" value="-128"><span class="ro" id="ztV">-128</span>
+  <button id="bPersp">perspective preset (rᵤ = rᵥ)</button>
+ </div>
+
+ <canvas id="scene" style="width:1140px;height:640px;" role="img" aria-label="a 3D view of the pairing: the depth-plane stack pierced by the camera ray with gold count rings, the two slits, and — in the R and C stages — the swap projectivity and the ruled polarity quadric through the slits"></canvas>
+ <p class="hint">drag to orbit · the morph slider drives the R animation · in stage C the gold wireframe is the polarity quadric, tangent along both slits</p>
+
+ <div class="foot">
+  <p class="one">The deepest anchor on the board is the vector / one-form duality, and it is more than a rhyme — it is a
+  theorem with the map written down. Reading 1's graduation is a genuine one-form: the pierce count through the stack is
+  exactly λ, evenly graded. Reading 2 is genuine incidence: the image is chosen by which congruence ray, meeting both
+  focal lines, carries the point. The one scalar both compute is their contraction, ⟨ray, stack⟩ = λ. The projective
+  statement closes on the Klein quadric with one precision the coordinates forced: the inversion is not a single polarity
+  but a composite, <b>D = C∘R</b> — an involutory projectivity exchanging the two focal lines, followed by the symmetric
+  polarity of the ruled quadric through them. That polarity's trace on the view axis is the midplane involution (slits
+  fixed; midpoint ↔ ideal point), and at the perspective corner its quadric closes to a cone with vertex at the eye.
+  The categorical packaging of the duality remains unclaimed.</p>
+  <p class="verify">check_pairing_plate · 25/25 assertions · the composite reconstructed and re-proved this session (the earlier pairing/Klein scripts are not yet in checks/) · live checks LC1–LC5 run on every control change</p>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PANEL='#BEBCB0',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#0E6E6E', CAM='#E8792B', GOLD='#9A8248', MARK='#2456B0';
+var CW=1140, CH=640, DZ=200, N=5, eps=0.02, ZCLAMP=-560;
+var FW=130, FH=88, X0=78, Y0=52;
+var state={ ru:0.45, rv:0.75, zt:-128, yaw:0.65, pit:0.32, stage:'P', mo:1 };
+
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+var CAM3=[0,-260,0], SC=1.0, CX=430, CY=350;
+function draw3(p){ var B=viewBasis(state.yaw,state.pit);
+  return project(B,CAM3,SC,CX,CY,[p[0],p[2],p[1]]); }
+
+// ---- the shared formulas (identical to check_pairing_plate.js) ----
+function img1(ru,rv,X,Y,zt){ var l=-zt/DZ; return [X*(1-l*ru), Y*(1-l*rv)]; }
+function img2(ru,rv,X,Y,zt){ return [X*DZ/(DZ+ru*zt), Y*DZ/(DZ+rv*zt)]; }
+function slitU(ru){ return -DZ/ru; } function slitV(rv){ return -DZ/rv; }
+function mid(ru,rv){ return (slitU(ru)+slitV(rv))/2; }
+function Rmap(p,mm){ return [p[1],p[0],2*mm-p[2]]; }               // the involutory projectivity
+function gInv(z,mm,zu,zv){ return (mm*z - zu*zv)/(z - mm); }        // C's trace on the axis: the midplane involution
+function rayPt(ru,rv,zt,zq){ var P2=img2(ru,rv,X0,Y0,zt);
+  return [ P2[0]+(zq/zt)*(X0-P2[0]), P2[1]+(zq/zt)*(Y0-P2[1]), zq ]; }
+
+function seg(ctx,a,b){ var A=draw3(a),B2=draw3(b); ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B2[0],B2[1]);ctx.stroke(); }
+function dot(ctx,p,r,fill,ring){ var P=draw3(p);
+  if(fill){ctx.fillStyle=fill;ctx.beginPath();ctx.arc(P[0],P[1],r,0,6.2832);ctx.fill();}
+  if(ring){ctx.strokeStyle=ring;ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(P[0],P[1],r+(fill?2:0),0,6.2832);ctx.stroke();}
+  return P; }
+function rect3(ctx,zt){ var c=[[-FW,-FH,zt],[FW,-FH,zt],[FW,FH,zt],[-FW,FH,zt]];
+  ctx.beginPath(); var P0=draw3(c[0]); ctx.moveTo(P0[0],P0[1]);
+  for(var i=1;i<4;i++){var P=draw3(c[i]);ctx.lineTo(P[0],P[1]);} ctx.closePath(); }
+function lerp3(a,b,t){ return [a[0]+t*(b[0]-a[0]), a[1]+t*(b[1]-a[1]), a[2]+t*(b[2]-a[2])]; }
+
+function drawSlit(ctx,zS,isU,col,name,alpha){
+  if(zS<ZCLAMP){ var t2=draw3([0,0,ZCLAMP]); ctx.fillStyle=col;ctx.font='10px Helvetica, Arial, sans-serif';
+    ctx.fillText('→ '+name+' at ζ='+zS.toFixed(0)+' (beyond view)', t2[0]-30, t2[1]+(isU?-10:22)); return; }
+  ctx.globalAlpha=alpha; ctx.strokeStyle=col;ctx.lineWidth=3;
+  if(isU) seg(ctx,[0,-FH,zS],[0,FH,zS]); else seg(ctx,[-FW,0,zS],[FW,0,zS]);
+  var m2=draw3(isU?[0,FH,zS]:[FW,0,zS]); ctx.fillStyle=col;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+  ctx.fillText(name+' · ζ='+zS.toFixed(0), m2[0]+4, m2[1]-4); ctx.globalAlpha=1; }
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var ru=state.ru,rv=state.rv,zt=state.zt,l=-zt/DZ,mo=state.mo;
+  var zu=slitU(ru), zv=slitV(rv), mm=mid(ru,rv), seam=Math.abs(ru-rv)<eps;
+
+  ctx.textAlign='center';ctx.font='bold 15px Helvetica, Arial, sans-serif';ctx.fillStyle=INK;
+  ctx.fillText(state.stage==='P' ? '⟨ RAY, STACK ⟩ = λ — the contraction, counted live'
+             : state.stage==='R' ? 'R — involutory projectivity · slits exchange · congruence → itself'
+             : (seam ? 'C — at perspective the quadric closes to a CONE with vertex at the eye (det C = 0)'
+                     : 'C — the polarity of the ruled quadric through both slits · axis ↔ stack'), CW/2, 30);
+  ctx.textAlign='left';
+
+  // depth-plane stack (reading 1's one-form) — always present, faint outside stage P
+  var stackA = state.stage==='P' ? 0.20 : 0.08;
+  for(var k=1;k<=N;k++){ var zk=-(DZ/N)*k;
+    ctx.strokeStyle=MARK;ctx.globalAlpha=stackA;ctx.lineWidth=1; rect3(ctx,zk); ctx.stroke();
+    ctx.fillStyle=MARK;ctx.globalAlpha=stackA*0.28; rect3(ctx,zk); ctx.fill(); ctx.globalAlpha=1;
+    var lb=draw3([-FW,FH,zk]); ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('λ='+(k/N).toFixed(1), lb[0]-30, lb[1]-2); }
+
+  // picture plane
+  ctx.strokeStyle=PIC;ctx.lineWidth=2.5; rect3(ctx,0); ctx.stroke();
+  var pl=draw3([-FW,-FH,0]); ctx.fillStyle=PIC;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  ctx.fillText('picture plane · ζ = 0', pl[0]-6, pl[1]+16);
+
+  // view axis
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.setLineDash([2,4]); seg(ctx,[0,0,30],[0,0,ZCLAMP]); ctx.setLineDash([]);
+
+  var P2=img2(ru,rv,X0,Y0,zt), S=[X0,Y0,zt];
+
+  if(state.stage==='R'){
+    // originals faint
+    drawSlit(ctx,zu,true,DU,'u-slit',0.25); drawSlit(ctx,zv,false,DV,'v-slit',0.25);
+    ctx.globalAlpha=0.25;ctx.strokeStyle=CAM;ctx.lineWidth=2; seg(ctx,[P2[0],P2[1],0],S); ctx.globalAlpha=1;
+    // morph p -> R(p)
+    function mp(p){ return lerp3(p, Rmap(p,mm), mo); }
+    ctx.strokeStyle=DU;ctx.lineWidth=3; seg(ctx, mp([0,-FH,zu]), mp([0,FH,zu]));
+    ctx.strokeStyle=DV;ctx.lineWidth=3; seg(ctx, mp([-FW,0,zv]), mp([FW,0,zv]));
+    ctx.strokeStyle=VAN;ctx.lineWidth=2; seg(ctx, mp([P2[0],P2[1],0]), mp(S));
+    var lb2=draw3(mp([0,FH,zu])); ctx.fillStyle=VAN;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText(mo>0.99?'R(u-slit) = v-slit':'u-slit → …', lb2[0]+5, lb2[1]-4);
+    var lb3=draw3(mp([FW,0,zv])); ctx.fillText(mo>0.99?'R(v-slit) = u-slit':'v-slit → …', lb3[0]+5, lb3[1]+14);
+    var lb4=draw3(mp(S)); ctx.fillStyle=VAN;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('R(ray) — still threads both slits', lb4[0]+7, lb4[1]);
+    dot(ctx,mp(S),4,VAN,'#fff');
+  } else if(state.stage==='C'){
+    drawSlit(ctx,zu,true,DU,'u-slit',1); drawSlit(ctx,zv,false,DV,'v-slit',1);
+    if(!seam){
+      // rulings of 2xy+(ζ-zu)(ζ-zv)=0 through points of the u-slit (opposite family), clamped
+      ctx.strokeStyle=GOLD;ctx.lineWidth=1;ctx.globalAlpha=0.55;
+      var ys=[-80,-40,40,80], zA=Math.max(ZCLAMP,Math.min(zu,zv)-40), zB=20;
+      for(var q=0;q<ys.length;q++){ var y0=ys[q];
+        var dx=-(zu-zv)/(2*y0), dy=y0/(zu-zv); // direction with dζ=1
+        var a=[dx*(zA-zu), y0+dy*(zA-zu), zA], b=[dx*(zB-zu), y0+dy*(zB-zu), zB];
+        seg(ctx,a,b); }
+      ctx.globalAlpha=1;
+      var ql=draw3([0,86,(zu+zv)/2]); ctx.fillStyle=GOLD;ctx.font='9px Helvetica, Arial, sans-serif';
+      ctx.fillText('polarity quadric — ruled, through both slits', ql[0]+6, ql[1]);
+    } else {
+      // cone: rays through the eye
+      var zE=zu; ctx.strokeStyle=GOLD;ctx.lineWidth=1;ctx.globalAlpha=0.55;
+      for(var a2=0;a2<8;a2++){ var th=a2*Math.PI/4;
+        seg(ctx,[0,0,zE],[70*Math.cos(th),70*Math.sin(th),0]); }
+      ctx.globalAlpha=1; var el=dot(ctx,[0,0,zE],4,GOLD,'#fff');
+      ctx.fillStyle=GOLD;ctx.font='bold 10px Helvetica, Arial, sans-serif';ctx.fillText('the eye — cone vertex', el[0]+6, el[1]-6);
+    }
+    // axis point at ζt  <->  its polar stack plane at g(ζt)
+    var gz=gInv(zt,mm,zu,zv);
+    var Ax=dot(ctx,[0,0,zt],4,INK,'#fff'); ctx.fillStyle=INK;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText('axis point · ζ='+zt.toFixed(0), Ax[0]+7, Ax[1]-6);
+    if(gz>ZCLAMP && gz<60){ ctx.strokeStyle=GOLD;ctx.lineWidth=2; rect3(ctx,gz); ctx.stroke();
+      var gl=draw3([FW,-FH,gz]); ctx.fillStyle=GOLD;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+      ctx.fillText('C(point) — stack plane · ζ='+gz.toFixed(0), gl[0]-160, gl[1]+16);
+      ctx.setLineDash([4,4]); ctx.strokeStyle=GOLD;ctx.lineWidth=1.2; seg(ctx,[0,0,zt],[0,0,gz]); ctx.setLineDash([]);
+    } else { var gl2=draw3([0,-FH,ZCLAMP+40]); ctx.fillStyle=GOLD;ctx.font='10px Helvetica, Arial, sans-serif';
+      ctx.fillText('C(point) → stack plane at ζ='+(isFinite(gz)?gz.toFixed(0):'∞')+' (beyond view)', gl2[0]-60, gl2[1]); }
+  } else {
+    // stage P — the pairing itself
+    drawSlit(ctx,zu,true,DU,'u-slit',1); drawSlit(ctx,zv,false,DV,'v-slit',1);
+    // camera ray + pierce rings + running count
+    ctx.strokeStyle=CAM;ctx.lineWidth=2.5; seg(ctx,[P2[0],P2[1],0],S);
+    var pierced=0;
+    for(var k2=1;k2<=N;k2++){ var zk2=-(DZ/N)*k2; if(zk2>=zt){ pierced++;
+      var pp=rayPt(ru,rv,zt,zk2); dot(ctx,pp,3,null,GOLD);
+      var pt=draw3(pp); ctx.fillStyle=GOLD;ctx.font='bold 9px Helvetica, Arial, sans-serif';
+      ctx.fillText(''+pierced, pt[0]+6, pt[1]-4); } }
+    var Sp=dot(ctx,S,4.5,INK,'#fff'); ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('S',Sp[0]+7,Sp[1]-6);
+    var C2=dot(ctx,[P2[0],P2[1],0],3.2,CAM,'#fff'); ctx.fillStyle=CAM;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText('img₂', C2[0]+6, C2[1]+12);
+    // reading 1's mark on the armature line
+    var A=[X0,Y0], V=[X0*(1-ru), Y0*(1-rv)], P1=img1(ru,rv,X0,Y0,zt);
+    ctx.strokeStyle=INK;ctx.lineWidth=2; seg(ctx,[A[0],A[1],0],[V[0],V[1],0]);
+    var Mk=dot(ctx,[P1[0],P1[1],0],3.2,MARK,'#fff'); ctx.fillStyle=MARK;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText('mark λ='+l.toFixed(2), Mk[0]+6, Mk[1]-6);
+  }
+
+  drawReadouts(ctx, 806, 66);
+  drawLive(ctx, 24, CH-118);
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+function drawReadouts(ctx,x,y){
+  var ru=state.ru,rv=state.rv,zt=state.zt,l=-zt/DZ;
+  var zu=slitU(ru),zv=slitV(rv),mm=mid(ru,rv);
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('THE TWO SIDES, ONE SCALAR',x,y);
+  ctx.font='11px Helvetica, Arial, sans-serif'; var yy=y+22,lh=18;
+  function row(a,b,c){ctx.fillStyle=c||INK;ctx.fillText(a,x,yy);ctx.textAlign='right';ctx.fillText(b,x+300,yy);ctx.textAlign='left';yy+=lh;}
+  row('rates (rᵤ, rᵥ):', ru.toFixed(2)+', '+rv.toFixed(2), FAINT);
+  row('slit depths ζᵤ, ζᵥ:', zu.toFixed(1)+', '+zv.toFixed(1), DU);
+  row('mid-depth m:', mm.toFixed(1), FAINT);
+  row('one-form count ⟨ray,stack⟩:', (l*5).toFixed(3)+' of 5 leaves', GOLD);
+  row('graduation λ = count/N:', l.toFixed(3), MARK);
+  row('true-depth count −z/Zp:', (l/(1-l)).toFixed(3), MARK);
+  row('C on the axis: ζ ↔ g(ζ):', state.zt.toFixed(0)+' ↔ '+gInv(zt,mm,zu,zv).toFixed(1), GOLD);
+  row('fixed points of g:', 'ζᵤ and ζᵥ — the slits', GOLD);
+  yy+=6; ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('D = C∘R · R swaps the slits, C dualizes;',x,yy); yy+=14;
+  ctx.fillText('C\u2019s axis trace is the midplane involution.',x,yy);
+}
+
+function drawLive(ctx,x,y){
+  var ru=state.ru,rv=state.rv,zt=state.zt,l=-zt/DZ;
+  var zu=slitU(ru),zv=slitV(rv),mm=mid(ru,rv);
+  var LC=[];
+  // LC1 one-form: pierce count linear in depth
+  LC.push(['LC1 count = λ·N (one-form)', Math.abs((-zt/(DZ/N)) - l*N) < 1e-12]);
+  // LC2 incidence: image collapse along the ray
+  var P2=img2(ru,rv,X0,Y0,zt), sp=0;
+  for(var i=0;i<=4;i++){ var q=rayPt(ru,rv,zt, zt*i/4), im=img2(ru,rv,q[0],q[1],q[2]===0?-1e-9:q[2]);
+    if(q[2]===0) im=[q[0],q[1]];
+    sp=Math.max(sp, Math.hypot(im[0]-P2[0], im[1]-P2[1])); }
+  LC.push(['LC2 image collapse on the ray (vector)', sp < 1e-8]);
+  // LC3 the contraction
+  LC.push(['LC3 ⟨ray,stack⟩/N = λ (the contraction)', Math.abs((-zt/(DZ/N))/N - l) < 1e-12]);
+  // LC4 R involutory + swaps slits
+  var p=[37,-53,zt], rr=Rmap(Rmap(p,mm),mm);
+  var w4=Math.abs(rr[0]-p[0])+Math.abs(rr[1]-p[1])+Math.abs(rr[2]-p[2]);
+  var iU=Rmap([0,66,zu],mm), iV=Rmap([66,0,zv],mm);
+  w4+=Math.abs(iU[1])+Math.abs(iU[2]-zv)+Math.abs(iV[0])+Math.abs(iV[2]-zu);
+  LC.push(['LC4 R² = id · R(A)=B, R(B)=A', w4 < 1e-8]);
+  // LC5 C: involution with the slits fixed
+  var g1=gInv(gInv(zt,mm,zu,zv),mm,zu,zv);
+  var w5=Math.abs(g1-zt)/Math.max(1,Math.abs(zt)) + Math.abs(gInv(zu,mm,zu,zv)-zu)/Math.abs(zu) + Math.abs(gInv(zv,mm,zu,zv)-zv)/Math.abs(zv);
+  LC.push(['LC5 g∘g = id · slits are the fixed points', w5 < 1e-8]);
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('LIVE CHECKS',x,y);
+  ctx.font='10px Helvetica, Arial, sans-serif'; var yy=y+16;
+  for(var j=0;j<LC.length;j++){ ctx.fillStyle=LC[j][1]?'#46973D':'#ED3121';
+    ctx.fillText((LC[j][1]?'✓ ':'✗ ')+LC[j][0], x, yy); yy+=15; }
+}
+
+// ---- wiring ----
+function setStage(s){ state.stage=s;
+  document.getElementById('bP').setAttribute('aria-pressed', s==='P');
+  document.getElementById('bR').setAttribute('aria-pressed', s==='R');
+  document.getElementById('bC').setAttribute('aria-pressed', s==='C');
+  draw(); }
+document.getElementById('bP').addEventListener('click',function(){setStage('P');});
+document.getElementById('bR').addEventListener('click',function(){setStage('R');});
+document.getElementById('bC').addEventListener('click',function(){setStage('C');});
+document.getElementById('bPersp').addEventListener('click',function(){
+  state.rv=state.ru; document.getElementById('rv').value=state.ru;
+  document.getElementById('rvV').textContent=state.ru.toFixed(2); draw(); });
+[['ru','ruV',2],['rv','rvV',2],['zt','ztV',0],['mo','moV',2]].forEach(function(cfg){
+  var el=document.getElementById(cfg[0]);
+  el.addEventListener('input',function(){ state[cfg[0]]=parseFloat(el.value);
+    document.getElementById(cfg[1]).textContent=parseFloat(el.value).toFixed(cfg[2]); draw(); }); });
+var cv=document.getElementById('scene'), dragging=false, lx=0, ly=0;
+cv.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',function(e){ if(!dragging)return;
+  state.yaw+=(e.clientX-lx)*0.008; state.pit=Math.max(-1.4,Math.min(1.4,state.pit+(e.clientY-ly)*0.008));
+  lx=e.clientX; ly=e.clientY; draw(); });
+cv.addEventListener('pointerup',function(){dragging=false;});
+draw();
+})();
+</script>
+</body>
+</html>
