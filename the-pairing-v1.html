@@ -29,7 +29,9 @@
  <h1>The pairing — <em>vector against one-form, and the map that swaps them</em></h1>
  <p class="sub">The board's second anchor, live. <b>Reading 1</b> measures depth by counting piercings of the
  <b style="color:#2456B0">depth-plane stack</b> — one-form behaviour to the letter: gold rings mark where the ray
- crosses each leaf, and the count <i>is</i> the graduation, ⟨ray, stack⟩ = λ. <b>Reading 2</b> measures by incidence:
+ crosses each leaf, and the count <i>is</i> the graduation, ⟨ray, stack⟩ = λ. The black <b>armature line</b> P→V on the
+ picture plane is reading 1's drawn line; the dashed glide projector carries the scene point onto it at the
+ <b style="color:#2456B0">mark</b>, and the mark's λ is exactly the ray's count. <b>Reading 2</b> measures by incidence:
  the <b style="color:#E8792B">camera ray</b> is chosen by threading both
  <b style="color:#12A6A6">slits</b><span style="color:#0E6E6E"> </span>— the vector side, every point of the ray sharing one image.
  The map that exchanges the two roles is a <b>composite</b>, D = C∘R: press <b style="color:#8A4FD6">R</b> to watch the
@@ -199,6 +201,8 @@ function draw(){
     drawSlit(ctx,zu,true,DU,'u-slit',1); drawSlit(ctx,zv,false,DV,'v-slit',1);
     // camera ray + pierce rings + running count
     ctx.strokeStyle=CAM;ctx.lineWidth=2.5; seg(ctx,[P2[0],P2[1],0],S);
+    var rl=draw3([(P2[0]+X0)/2,(P2[1]+Y0)/2,zt/2]); ctx.fillStyle=CAM;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('camera ray — reading 2', rl[0]+8, rl[1]+12);
     var pierced=0;
     for(var k2=1;k2<=N;k2++){ var zk2=-(DZ/N)*k2; if(zk2>=zt){ pierced++;
       var pp=rayPt(ru,rv,zt,zk2); dot(ctx,pp,3,null,GOLD);
@@ -207,9 +211,17 @@ function draw(){
     var Sp=dot(ctx,S,4.5,INK,'#fff'); ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('S',Sp[0]+7,Sp[1]-6);
     var C2=dot(ctx,[P2[0],P2[1],0],3.2,CAM,'#fff'); ctx.fillStyle=CAM;ctx.font='bold 10px Helvetica, Arial, sans-serif';
     ctx.fillText('img₂', C2[0]+6, C2[1]+12);
-    // reading 1's mark on the armature line
+    // reading 1's drawn line: the armature P→V on the picture plane, mark at λ
     var A=[X0,Y0], V=[X0*(1-ru), Y0*(1-rv)], P1=img1(ru,rv,X0,Y0,zt);
     ctx.strokeStyle=INK;ctx.lineWidth=2; seg(ctx,[A[0],A[1],0],[V[0],V[1],0]);
+    var Pl=dot(ctx,[A[0],A[1],0],3,INK,null); ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('P',Pl[0]+5,Pl[1]+12);
+    var Vl=dot(ctx,[V[0],V[1],0],3,VAN,null); ctx.fillStyle=VAN;ctx.fillText('V',Vl[0]+5,Vl[1]+12);
+    var al=draw3([(A[0]+V[0])/2,(A[1]+V[1])/2,0]); ctx.fillStyle=INK;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('armature line — reading 1', al[0]-40, al[1]-10);
+    // the dashed glide projector: S lands on the mark
+    ctx.strokeStyle=INK;ctx.lineWidth=1.4;ctx.setLineDash([5,4]); seg(ctx,S,[P1[0],P1[1],0]); ctx.setLineDash([]);
+    var gm=draw3([(X0+P1[0])/2,(Y0+P1[1])/2,zt/2]); ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('glide projector → mark', gm[0]+7, gm[1]);
     var Mk=dot(ctx,[P1[0],P1[1],0],3.2,MARK,'#fff'); ctx.fillStyle=MARK;ctx.font='bold 10px Helvetica, Arial, sans-serif';
     ctx.fillText('mark λ='+l.toFixed(2), Mk[0]+6, Mk[1]-6);
   }
