@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The matrix primer · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1200px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1060px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:110px;} .ro{font-size:12px;margin-right:2px;min-width:38px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1060px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE MATRIX PRIMER</p>
+ <h1>The matrix primer — <em>four numbers, one machine, and the mirror that makes a quadric</em></h1>
+ <p class="sub">The grid at left is the whole object: M = [[a, b], [c, d]], with the dashed <b>mirror diagonal</b>
+ across it. Sweep the four sliders. The machine's action is drawn live: the frame arrows
+ <b style="color:#12A6A6">e₁, e₂</b> land on the <b style="color:#E8792B">columns</b> — column 1 is Me₁, column 2 is
+ Me₂ — and the grey unit circle is carried to the <b style="color:#E8792B">image oval</b>. The parallelogram they
+ span has signed area <b>det = ad − bc</b>: drive it to zero (preset provided) and watch the machine flatten the whole
+ plane onto a line — the degeneracy alarm, P7's cone in miniature. The two off-diagonal cells <b>b</b> and <b>c</b>
+ are reflections of each other in the mirror: when they agree, the grid equals its transpose, the machine is
+ <b>even-handed</b> — (Mp)·q = p·(Mq), reciprocity in embryo — and the gold <b style="color:#9A8248">conic
+ p·Mp = 1</b> stands with its perpendicular principal axes drawn. When b ≠ c the conic doesn't flinch: the
+ quadratic form reads only the symmetric half (M+Mᵀ)/2, and the lopsided remainder is invisible to it. Drag
+ <b>P</b> to steer a probe point; its image MP and the two dot products against the fixed probe q are in the
+ readout, agreeing exactly when the mirror holds.</p>
+
+ <div class="bar">
+  <label for="a">a</label><input id="a" type="range" min="-3" max="3" step="0.05" value="2"><span class="ro" id="aV">2.00</span>
+  <label for="b">b</label><input id="b" type="range" min="-3" max="3" step="0.05" value="1"><span class="ro" id="bV">1.00</span>
+  <label for="c">c</label><input id="c" type="range" min="-3" max="3" step="0.05" value="0.3"><span class="ro" id="cV">0.30</span>
+  <label for="d">d</label><input id="d" type="range" min="-3" max="3" step="0.05" value="1.6"><span class="ro" id="dV">1.60</span>
+ </div>
+ <div class="bar">
+  <button id="pId">identity</button>
+  <button id="pSym">make symmetric (c ← b)</button>
+  <button id="pT">transpose (b ↔ c)</button>
+  <button id="pShear">shear</button>
+  <button id="pFlat">flatten (det = 0)</button>
+  <button id="pCirc">the circle matrix</button>
+ </div>
+
+ <canvas id="scene" style="width:1140px;height:640px;" role="img" aria-label="left: the 2 by 2 grid with its mirror diagonal, b and c cells highlighted; center: the frame arrows and their images, the unit circle and its image oval, the gold conic of the symmetric part with principal axes, and a draggable probe point P with its image MP"></canvas>
+ <p class="hint">drag P in the picture · b and c glow green when the mirror holds · all live checks re-verify on every change</p>
+
+ <div class="foot">
+  <p class="one">Everything the board asks of matrices is on this one sheet. A matrix is a recipe for moving points, known
+  entirely by where it sends the frame — the columns. Applying it is dotting rows against coordinates; composing machines
+  is D = C∘R. The transpose is the same machine addressed from the other slot, tied to the original by the balance law
+  (Mp)·q = p·(Mᵀq), which holds for every grid without exception. Symmetry — the grid equal to its mirror image — is
+  even-handedness: the machine cannot tell which point came first, and that is reciprocity, the engine of every polarity.
+  Feed a symmetric grid the same point twice and its vanishing locus is a conic here, a quadric one dimension up: the
+  circle matrix diag(1, 1, −R²) of the polarity primer, the ruled-surface matrix of stage C. The determinant is the
+  degeneracy alarm — area scale of the frame image, zero exactly when the machine flattens, which is P7's cone at the
+  perspective corner. Grids as moves, transpose as balance, symmetry as quadric, determinant as alarm: the full kit.</p>
+  <p class="verify">check_matrix_primer · 7/7 assertions · live checks LC1–LC5 run on every control change</p>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PANEL='#BEBCB0',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121',GOLD='#9A8248',MARK='#2456B0',DU='#12A6A6',CAM='#E8792B',VAN='#8A4FD6';
+var CW=1140, CH=640, OX=560, OY=330, U=95;    // geometry panel origin and unit
+var state={ a:2, b:1, c:0.3, d:1.6, px:1.3, py:0.55, drag:false };
+var Q=[0.6,1.1]; // fixed probe q
+
+function M(){ return [[state.a,state.b],[state.c,state.d]]; }
+function mul(Mx,p){ return [Mx[0][0]*p[0]+Mx[0][1]*p[1], Mx[1][0]*p[0]+Mx[1][1]*p[1]]; }
+function T(Mx){ return [[Mx[0][0],Mx[1][0]],[Mx[0][1],Mx[1][1]]]; }
+function dotv(u,v){ return u[0]*v[0]+u[1]*v[1]; }
+function W(x,y){ return [OX+U*x, OY-U*y]; }
+
+function arrow(ctx,from,to,col,wid,label,dx,dy){
+  var A=W(from[0],from[1]), B=W(to[0],to[1]);
+  ctx.strokeStyle=col;ctx.lineWidth=wid;
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.stroke();
+  var ang=Math.atan2(B[1]-A[1],B[0]-A[0]);
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(B[0],B[1]);
+  ctx.lineTo(B[0]-9*Math.cos(ang-0.42),B[1]-9*Math.sin(ang-0.42));
+  ctx.lineTo(B[0]-9*Math.cos(ang+0.42),B[1]-9*Math.sin(ang+0.42));
+  ctx.closePath();ctx.fill();
+  if(label){ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText(label,B[0]+(dx||6),B[1]+(dy||-6));}
+}
+
+function drawGrid(ctx){
+  var gx=64, gy=140, cs=74, vals=[[state.a,state.b],[state.c,state.d]], names=[['a','b'],['c','d']];
+  var sym=Math.abs(state.b-state.c)<1e-9;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';
+  ctx.fillText('THE GRID  M', gx, gy-46);
+  ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillStyle=FAINT;
+  ctx.fillText('rows dot the point; columns', gx, gy-30);
+  ctx.fillText('are the frame images', gx, gy-17);
+  for(var i=0;i<2;i++)for(var j=0;j<2;j++){
+    var x=gx+j*cs, y=gy+i*cs, off=(i!==j);
+    ctx.fillStyle = off ? (sym?'#DDEBD2':'#EBE9DA') : '#E4E2D4';
+    ctx.fillRect(x,y,cs-6,cs-6);
+    ctx.strokeStyle=off&&sym?GREEN:INK;ctx.lineWidth=off&&sym?2:1.2;ctx.strokeRect(x,y,cs-6,cs-6);
+    ctx.fillStyle=off&&sym?GREEN:INK;ctx.font='bold 15px Helvetica, Arial, sans-serif';
+    ctx.fillText(vals[i][j].toFixed(2), x+9, y+30);
+    ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+    ctx.fillText(names[i][j], x+cs-20, y+cs-16);
+  }
+  // the mirror diagonal
+  ctx.strokeStyle=GOLD;ctx.lineWidth=1.4;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(gx-10,gy-10);ctx.lineTo(gx+2*cs+2,gy+2*cs+2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=GOLD;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText('the mirror', gx+2*cs-38, gy+2*cs+14);
+  ctx.fillStyle=sym?GREEN:RED;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  ctx.fillText(sym?'b = c — the grid equals its mirror: SYMMETRIC':'b ≠ c — lopsided: M ≠ Mᵀ', gx, gy+2*cs+34);
+  var det=state.a*state.d-state.b*state.c;
+  ctx.fillStyle=Math.abs(det)<0.05?RED:INK;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('det = ad − bc = '+det.toFixed(2)+(Math.abs(det)<0.05?'  — FLATTENS':''), gx, gy+2*cs+54);
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var Mx=M(), sym=Math.abs(state.b-state.c)<1e-9, det=state.a*state.d-state.b*state.c;
+
+  ctx.textAlign='left';
+  drawGrid(ctx);
+
+  // axes
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.setLineDash([2,4]);
+  var ax1=W(-2.6,0),ax2=W(2.9,0),ay1=W(0,-2.9),ay2=W(0,2.9);
+  ctx.beginPath();ctx.moveTo(ax1[0],ax1[1]);ctx.lineTo(ax2[0],ax2[1]);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ay1[0],ay1[1]);ctx.lineTo(ay2[0],ay2[1]);ctx.stroke();ctx.setLineDash([]);
+
+  // unit circle (grey) and its image (orange)
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1.2;ctx.beginPath();
+  for(var t=0;t<=64;t++){var th=t/64*6.2832,P0=W(Math.cos(th),Math.sin(th));
+    t===0?ctx.moveTo(P0[0],P0[1]):ctx.lineTo(P0[0],P0[1]);}
+  ctx.stroke();
+  ctx.strokeStyle=CAM;ctx.lineWidth=1.6;ctx.beginPath();
+  for(t=0;t<=96;t++){var th2=t/96*6.2832,im=mul(Mx,[Math.cos(th2),Math.sin(th2)]),P1=W(im[0],im[1]);
+    t===0?ctx.moveTo(P1[0],P1[1]):ctx.lineTo(P1[0],P1[1]);}
+  ctx.stroke();
+  var il=mul(Mx,[Math.cos(0.8),Math.sin(0.8)]),ill=W(il[0],il[1]);
+  ctx.fillStyle=CAM;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText('image of the unit circle', ill[0]+8, ill[1]-6);
+
+  // frame parallelogram (image), area = det
+  var C1=mul(Mx,[1,0]), C2=mul(Mx,[0,1]);
+  ctx.fillStyle=CAM;ctx.globalAlpha=0.10;
+  var p00=W(0,0),p10=W(C1[0],C1[1]),p11=W(C1[0]+C2[0],C1[1]+C2[1]),p01=W(C2[0],C2[1]);
+  ctx.beginPath();ctx.moveTo(p00[0],p00[1]);ctx.lineTo(p10[0],p10[1]);ctx.lineTo(p11[0],p11[1]);ctx.lineTo(p01[0],p01[1]);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+  ctx.fillStyle=CAM;ctx.font='9px Helvetica, Arial, sans-serif';
+  var mid=W((C1[0]+C2[0])/2,(C1[1]+C2[1])/2);
+  ctx.fillText('area = det = '+det.toFixed(2), mid[0]-24, mid[1]);
+
+  // frame arrows and their images
+  arrow(ctx,[0,0],[1,0],DU,1.6,'e₁',6,14);
+  arrow(ctx,[0,0],[0,1],DU,1.6,'e₂',8,0);
+  arrow(ctx,[0,0],C1,CAM,2.2,'Me₁ = col 1',6,14);
+  arrow(ctx,[0,0],C2,CAM,2.2,'Me₂ = col 2',6,-8);
+
+  // the gold conic of the symmetric part, with principal axes
+  var S=[[state.a,(state.b+state.c)/2],[(state.b+state.c)/2,state.d]];
+  ctx.strokeStyle=GOLD;ctx.lineWidth=sym?2.4:1.4; if(!sym)ctx.setLineDash([6,4]);
+  ctx.beginPath(); var started=false;
+  for(t=0;t<=240;t++){var ph=t/240*6.2832,w=[Math.cos(ph),Math.sin(ph)],qv=dotv(w,mul(S,w));
+    if(qv>0.02){var r=1/Math.sqrt(qv); if(r<3.1){var Pt=W(r*w[0],r*w[1]);
+      started?ctx.lineTo(Pt[0],Pt[1]):ctx.moveTo(Pt[0],Pt[1]); started=true; continue;}}
+    started=false;}
+  ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=GOLD;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+  ctx.fillText('the conic p·Mp = 1'+(sym?'':'  (reads only the symmetric half)'), 372, 78);
+  if(Math.abs(S[0][1])>1e-9||Math.abs(S[0][0]-S[1][1])>1e-9){
+    var thax=0.5*Math.atan2(2*S[0][1],S[0][0]-S[1][1]);
+    ctx.strokeStyle=GOLD;ctx.lineWidth=1;ctx.setLineDash([2,5]);
+    var e1=W(2.7*Math.cos(thax),2.7*Math.sin(thax)),e1b=W(-2.7*Math.cos(thax),-2.7*Math.sin(thax));
+    var e2=W(-2.7*Math.sin(thax),2.7*Math.cos(thax)),e2b=W(2.7*Math.sin(thax),-2.7*Math.cos(thax));
+    ctx.beginPath();ctx.moveTo(e1b[0],e1b[1]);ctx.lineTo(e1[0],e1[1]);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(e2b[0],e2b[1]);ctx.lineTo(e2[0],e2[1]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=GOLD;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('principal axes — perpendicular', e1[0]-60, e1[1]+14);
+  }
+
+  // probe point P, its image, and the fixed probe q
+  var p=[state.px,state.py], Mp=mul(Mx,p);
+  arrow(ctx,p,Mp,VAN,1.6,'MP',6,-6);
+  var Pp=W(p[0],p[1]);
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(Pp[0],Pp[1],5,0,6.2832);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(Pp[0],Pp[1],7,0,6.2832);ctx.stroke();
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('P',Pp[0]+9,Pp[1]-8);
+  var Qp=W(Q[0],Q[1]);
+  ctx.fillStyle=MARK;ctx.beginPath();ctx.arc(Qp[0],Qp[1],3.4,0,6.2832);ctx.fill();
+  ctx.fillStyle=MARK;ctx.font='bold 10px Helvetica, Arial, sans-serif';ctx.fillText('q (probe)',Qp[0]+7,Qp[1]-6);
+
+  // readouts
+  var x=856,y=64;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('THE BALANCE LAW, LIVE',x,y);
+  ctx.font='11px Helvetica, Arial, sans-serif'; var yy=y+22,lh=18;
+  function row(a2,b2,c2){ctx.fillStyle=c2||INK;ctx.fillText(a2,x,yy);ctx.textAlign='right';ctx.fillText(b2,x+258,yy);ctx.textAlign='left';yy+=lh;}
+  var lhs=dotv(Mp,Q), rhsT=dotv(p,mul(T(Mx),Q)), rhsM=dotv(p,mul(Mx,Q));
+  row('(MP)·q :', lhs.toFixed(4), INK);
+  row('P·(Mᵀq) — always equal:', rhsT.toFixed(4), GREEN);
+  row('P·(Mq) — equal iff b = c:', rhsM.toFixed(4), sym?GREEN:RED);
+  row('gap = (b−c)·(P×q):', (rhsM-lhs).toFixed(4), sym?GREEN:RED);
+  row('p·Mp = p·Sp (S symmetric half):', dotv(p,mul(Mx,p)).toFixed(3)+' = '+dotv(p,mul(S,p)).toFixed(3), GOLD);
+  row('det (area scale):', det.toFixed(3), Math.abs(det)<0.05?RED:INK);
+  yy+=4; ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('symmetric ⇒ even-handed ⇒ reciprocity:',x,yy);yy+=14;
+  ctx.fillText('the engine of every polarity.',x,yy);
+
+  // live checks
+  var LC=[];
+  LC.push(['LC1 columns = frame images', Math.abs(C1[0]-Mx[0][0])+Math.abs(C1[1]-Mx[1][0])+Math.abs(C2[0]-Mx[0][1])+Math.abs(C2[1]-Mx[1][1])<1e-12]);
+  LC.push(['LC2 balance law (MP)·q = P·(Mᵀq)', Math.abs(lhs-rhsT)<1e-10]);
+  LC.push(['LC3 even-handed ⇔ b = c', sym ? Math.abs(lhs-rhsM)<1e-10 : Math.abs((rhsM-lhs)-(state.b-state.c)*(p[0]*Q[1]-p[1]*Q[0]))<1e-10]);
+  LC.push(['LC4 det = signed area of the frame image', Math.abs(det-(C1[0]*C2[1]-C1[1]*C2[0]))<1e-12]);
+  LC.push(['LC5 conic reads only the symmetric half', Math.abs(dotv(p,mul(Mx,p))-dotv(p,mul(S,p)))<1e-10]);
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('LIVE CHECKS',24,CH-112);
+  ctx.font='10px Helvetica, Arial, sans-serif'; var y2=CH-96;
+  for(var j=0;j<LC.length;j++){ ctx.fillStyle=LC[j][1]?'#46973D':'#ED3121';
+    ctx.fillText((LC[j][1]?'✓ ':'✗ ')+LC[j][0], 24, y2); y2+=15; }
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ---- wiring ----
+[['a','aV'],['b','bV'],['c','cV'],['d','dV']].forEach(function(cfg){
+  var el=document.getElementById(cfg[0]);
+  el.addEventListener('input',function(){ state[cfg[0]]=parseFloat(el.value);
+    document.getElementById(cfg[1]).textContent=parseFloat(el.value).toFixed(2); draw(); }); });
+function setM(a,b,c,d){ state.a=a;state.b=b;state.c=c;state.d=d;
+  [['a',a],['b',b],['c',c],['d',d]].forEach(function(x){
+    document.getElementById(x[0]).value=x[1];
+    document.getElementById(x[0]+'V').textContent=x[1].toFixed(2); }); draw(); }
+document.getElementById('pId').addEventListener('click',function(){setM(1,0,0,1);});
+document.getElementById('pSym').addEventListener('click',function(){setM(state.a,state.b,state.b,state.d);});
+document.getElementById('pT').addEventListener('click',function(){setM(state.a,state.c,state.b,state.d);});
+document.getElementById('pShear').addEventListener('click',function(){setM(1,1,0,1);});
+document.getElementById('pFlat').addEventListener('click',function(){setM(2,1,1.5,0.75);});
+document.getElementById('pCirc').addEventListener('click',function(){setM(1,0,0,1);});
+var cv=document.getElementById('scene');
+cv.addEventListener('pointerdown',function(e){ state.drag=true; cv.setPointerCapture(e.pointerId); move(e); });
+function move(e){ if(!state.drag)return; var r=cv.getBoundingClientRect();
+  var x=((e.clientX-r.left)*(CW/r.width)-OX)/U, y=(OY-(e.clientY-r.top)*(CH/r.height))/U;
+  if(x>-3&&x<3.2&&y>-3.2&&y<3.2){ state.px=x; state.py=y; draw(); } }
+cv.addEventListener('pointermove',move);
+cv.addEventListener('pointerup',function(){state.drag=false;});
+draw();
+})();
+</script>
+</body>
+</html>
