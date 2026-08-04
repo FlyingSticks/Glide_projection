@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The polarity primer · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1200px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1060px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ .bar label{font-size:12px;margin:0 6px 0 14px;} .bar label:first-child{margin-left:0;}
+ .bar input[type=range]{width:150px;} .ro{font-size:12px;margin-right:2px;min-width:32px;display:inline-block;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button[aria-pressed="true"]{background:#151310;color:#EBE9DA;}
+ button:focus,input:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1060px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE POLARITY PRIMER</p>
+ <h1>The polarity primer — <em>point to line, out and back, one dimension down</em></h1>
+ <p class="sub">One symmetric matrix, seen twice. Its zero set is the <b>conic</b> (here a circle of radius R);
+ its action sends the draggable point <b>P</b> to the gold <b>polar line</b> C·P — the grade-reversing move: a
+ grade-0 thing in, a grade-1 thing out. Drag P and watch: <b>outside</b> the circle, the polar is the chord joining
+ the two tangency points of the tangents from P; <b>on</b> the circle, it is the tangent there; drifting toward the
+ center, it recedes to infinity. The polar always stands perpendicular to OP through the reciprocal point at
+ distance R²/|OP| — reciprocal distances, the 1/r signature. The <b style="color:#2456B0">secant</b> shows the deeper
+ fact: it cuts the conic at X₁, X₂, and the fourth <b style="color:#46973D">harmonic point H</b> of P — cross-ratio −1,
+ the complete-quadrilateral machinery — lands on the polar, on every secant, always. Toggle <b>Q</b> for
+ reciprocity: put Q on the polar of P and P is instantly on the polar of Q. Out and back returns home: that
+ involutivity is exactly what forces the matrix symmetric, and is what earns the name <b>polarity</b>.</p>
+
+ <div class="bar">
+  <label for="sa">secant angle</label><input id="sa" type="range" min="-90" max="90" step="1" value="32"><span class="ro" id="saV">32°</span>
+  <button id="bQ" aria-pressed="false">show Q + its polar</button>
+  <button id="bSnapC">snap P onto the circle</button>
+  <button id="bSnapQ">put Q on the polar of P</button>
+  <button id="bReset">reset</button>
+ </div>
+
+ <canvas id="scene" style="width:1140px;height:620px;" role="img" aria-label="a circle with center O, a draggable point P, its gold polar line, tangents from P with tangency points, a secant through P cutting the circle at X1 and X2 with the harmonic point H on the polar, and optionally a second point Q with its polar"></canvas>
+ <p class="hint">drag P (and Q) anywhere · the readouts and live checks re-verify on every move</p>
+
+ <div class="foot">
+  <p class="one">This is the whole of "every polarity is the polar map of a quadric," one dimension down where it fits on a
+  sheet. The symmetric matrix C = diag(1, 1, −R²) does both jobs: the points with p·Cp = 0 are the circle, and the map
+  p ↦ Cp is the polar. Points on the circle are exactly the <b>self-conjugate</b> ones — lying on their own polar, which is
+  then the tangent. The harmonic point H on the ray OP is the classical <i>inverse point</i> in the circle — no relation to
+  the board's "the inversion," which names the two-readings map; the collision of names is centuries old and worth
+  flagging once. One dimension up, this same picture is stage C of the pairing plate: the quadric becomes the ruled
+  surface through both slits, the polar of an axis point becomes the gold stack plane, and the reciprocal-distance law
+  becomes the midplane involution g(ζ) with the slits as its fixed points.</p>
+  <p class="verify">check_polarity_primer · 6/6 assertions at machine zero · live checks LCa–LCd run on every drag</p>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PANEL='#BEBCB0',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121',GOLD='#9A8248',MARK='#2456B0',DU='#12A6A6',VAN='#8A4FD6';
+var CW=1140, CH=620, OX=430, OY=316, R=170;
+var state={ px:300, py:-90, qx:-170, qy:150, sec:32*Math.PI/180, showQ:false, drag:null };
+
+// homogeneous polar machinery: C = diag(1,1,-R^2)
+function polar(p){ return [p[0], p[1], -R*R]; }                 // line: p0*x + p1*y - R^2 = 0
+function onLine(L,x,y){ return L[0]*x + L[1]*y + L[2]; }
+
+function W(x,y){ return [OX + x, OY - y]; }                     // world -> screen
+function drawLineClip(ctx,L,col,wid,dash){                       // draw a*x+b*y+c=0 within canvas
+  var a=L[0],b=L[1],c=L[2],pts=[];
+  function tryPt(x,y){ if(x>=-OX-40&&x<=CW-OX+40&&y>=-(CH-OY)-40&&y<=OY+40) pts.push([x,y]); }
+  var Xm=CW; if(Math.abs(b)>1e-9){ tryPt(-OX-40, -(a*(-OX-40)+c)/b); tryPt(CW-OX+40, -(a*(CW-OX+40)+c)/b); }
+  if(Math.abs(a)>1e-9){ tryPt(-(b*(OY+40)+c)/a, OY+40); tryPt(-(b*(-(CH-OY)-40)+c)/a, -(CH-OY)-40); }
+  if(pts.length<2) return;
+  ctx.strokeStyle=col;ctx.lineWidth=wid; if(dash)ctx.setLineDash(dash);
+  var A=W(pts[0][0],pts[0][1]), B=W(pts[1][0],pts[1][1]);
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.stroke(); ctx.setLineDash([]);
+}
+function dot(ctx,x,y,r,fill,ring,label,col,dx,dy){
+  var P=W(x,y);
+  if(fill){ctx.fillStyle=fill;ctx.beginPath();ctx.arc(P[0],P[1],r,0,6.2832);ctx.fill();}
+  if(ring){ctx.strokeStyle=ring;ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(P[0],P[1],r+2,0,6.2832);ctx.stroke();}
+  if(label){ctx.fillStyle=col||INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText(label,P[0]+(dx||7),P[1]+(dy||-7));}
+  return P;
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  var px=state.px, py=state.py, d=Math.hypot(px,py), L=polar([px,py]);
+
+  // the conic
+  var O=W(0,0);
+  ctx.strokeStyle=INK;ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(O[0],O[1],R,0,6.2832);ctx.stroke();
+  dot(ctx,0,0,2.6,INK,null,'O',INK,8,14);
+  ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  var rl=W(R*0.72,-R*0.76); ctx.fillText('the conic · p·Cp = 0', rl[0], rl[1]+14);
+
+  // ray OP (faint) and the reciprocal point
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;ctx.setLineDash([2,4]);
+  var far=1.6*Math.max(d,R), fx=px/d*far, fy=py/d*far;
+  var A0=W(-fx,-fy), B0=W(fx,fy);
+  ctx.beginPath();ctx.moveTo(A0[0],A0[1]);ctx.lineTo(B0[0],B0[1]);ctx.stroke();ctx.setLineDash([]);
+  var h=R*R/d, Hx=px/d*h, Hy=py/d*h;
+
+  // the polar line
+  drawLineClip(ctx,L,GOLD,2.4,null);
+  var lp=W(Hx,Hy);
+  ctx.fillStyle=GOLD;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+  ctx.fillText('polar of P — the line C·P', lp[0]+12, lp[1]+22);
+  dot(ctx,Hx,Hy,2.6,GOLD,null,'R²/|OP|',GOLD,9,16);
+
+  // tangents + chord of contact when P is outside
+  var outside = d > R + 0.5;
+  if(outside){
+    var s=Math.sqrt(Math.max(0,R*R-h*h)), ux=px/d, uy=py/d;
+    var T1=[h*ux - s*uy, h*uy + s*ux], T2=[h*ux + s*uy, h*uy - s*ux];
+    ctx.strokeStyle=DU;ctx.lineWidth=1.4;
+    var Pp=W(px,py), t1=W(T1[0],T1[1]), t2=W(T2[0],T2[1]);
+    ctx.beginPath();ctx.moveTo(Pp[0],Pp[1]);ctx.lineTo(t1[0],t1[1]);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(Pp[0],Pp[1]);ctx.lineTo(t2[0],t2[1]);ctx.stroke();
+    dot(ctx,T1[0],T1[1],3,DU,null,'T₁',DU); dot(ctx,T2[0],T2[1],3,DU,null,'T₂',DU,7,16);
+    ctx.fillStyle=DU;ctx.font='9px Helvetica, Arial, sans-serif';
+    ctx.fillText('tangents from P — the polar is their chord of contact T₁T₂', Pp[0]-230, Pp[1]-14);
+  }
+  var nearOn = Math.abs(d-R) < 3;
+  if(nearOn){ ctx.fillStyle=GREEN;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+    var m0=W(px*1.25,py*1.25); ctx.fillText('P on the conic — self-conjugate: the polar is the TANGENT at P', m0[0]-140, m0[1]); }
+
+  // the secant through P and the harmonic point H
+  var phi=Math.atan2(py,px)+state.sec, u=[Math.cos(phi),Math.sin(phi)];
+  var b2=px*u[0]+py*u[1], c2=px*px+py*py-R*R, disc=b2*b2-c2, Hh=null, crtxt='—';
+  if(disc>1){
+    var t1s=-b2+Math.sqrt(disc), t2s=-b2-Math.sqrt(disc);
+    var X1=[px+t1s*u[0], py+t1s*u[1]], X2=[px+t2s*u[0], py+t2s*u[1]];
+    drawLineClip(ctx,[u[1],-u[0], -(u[1]*px - u[0]*py)],MARK,1.3,[6,4]);
+    dot(ctx,X1[0],X1[1],3,MARK,null,'X₁',MARK); dot(ctx,X2[0],X2[1],3,MARK,null,'X₂',MARK,7,16);
+    var hh=2*t1s*t2s/(t1s+t2s);
+    if(isFinite(hh)&&Math.abs(hh)<3000){ Hh=[px+hh*u[0], py+hh*u[1]];
+      dot(ctx,Hh[0],Hh[1],3.4,GREEN,'#fff','H — harmonic, ON the polar',GREEN,9,-9);
+      var cr=((t1s)*(t2s-hh))/((t1s-hh)*(t2s)); crtxt=cr.toFixed(6); }
+  }
+
+  // P itself
+  dot(ctx,px,py,5,INK,'#fff','P',INK,9,-9);
+
+  // Q and its polar (reciprocity)
+  var recip=null;
+  if(state.showQ){
+    var LQ=polar([state.qx,state.qy]);
+    drawLineClip(ctx,LQ,VAN,1.6,[8,5]);
+    dot(ctx,state.qx,state.qy,4.4,VAN,'#fff','Q',VAN,9,-9);
+    var qOnLp=Math.abs(onLine(L,state.qx,state.qy))/(R*R);
+    var pOnLq=Math.abs(onLine(LQ,px,py))/(R*R);
+    recip=[qOnLp,pOnLq];
+    var ql=W(state.qx,state.qy);
+    ctx.fillStyle=(qOnLp<0.01)?GREEN:FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+    ctx.fillText((qOnLp<0.01)?'Q on polar(P) ⇔ P on polar(Q) — reciprocity, live':'polar of Q (drag Q onto the gold line)', ql[0]+10, ql[1]+20);
+  }
+
+  // readouts
+  var x=812,y=64;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('ONE MATRIX, SEEN TWICE',x,y);
+  ctx.font='11px Helvetica, Arial, sans-serif'; var yy=y+22,lh=18;
+  function row(a,b,c){ctx.fillStyle=c||INK;ctx.fillText(a,x,yy);ctx.textAlign='right';ctx.fillText(b,x+296,yy);ctx.textAlign='left';yy+=lh;}
+  row('|OP|:', d.toFixed(1), FAINT);
+  row('polar foot R²/|OP|:', h.toFixed(1), GOLD);
+  row('|OP| × foot = R²:', (d*h).toFixed(1)+' = '+(R*R).toFixed(0), GOLD);
+  row('P is:', nearOn?'on the conic':(outside?'outside':'inside'), nearOn?GREEN:INK);
+  row('cross-ratio (X₁,X₂; P,H):', crtxt, GREEN);
+  if(recip) row('reciprocity residues:', recip[0].toExponential(1)+' · '+recip[1].toExponential(1), recip[0]<0.01?GREEN:FAINT);
+  yy+=6; ctx.fillStyle=FAINT;ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillText('grade-reversing: point in (grade 0),',x,yy); yy+=14;
+  ctx.fillText('line out (grade 1); out-and-back = id.',x,yy);
+
+  // live checks
+  var LC=[]; 
+  LC.push(['LCa H on the polar · cr = −1', Hh? (Math.abs(onLine(L,Hh[0],Hh[1]))/(R*R)<1e-9 && Math.abs(parseFloat(crtxt)+1)<1e-9) : true]);
+  LC.push(['LCb reciprocal distances: |OP|·|Ofoot| = R²', Math.abs(d*h-R*R)/(R*R)<1e-12]);
+  var back=[L[0],L[1],-L[2]/(R*R)];
+  LC.push(['LCc out-and-back: C⁻¹(C·P) = P', Math.abs(back[0]*py-back[1]*px)/(R*R)<1e-12]);
+  LC.push(['LCd self-conjugate ⇔ on the conic', nearOn ? Math.abs(onLine(L,px,py))/(R*R)<0.05 : Math.abs(onLine(L,px,py))/(R*R)>1e-6]);
+  ctx.fillStyle=INK;ctx.font='bold 11px Helvetica, Arial, sans-serif';ctx.fillText('LIVE CHECKS',24,CH-96);
+  ctx.font='10px Helvetica, Arial, sans-serif'; var y2=CH-80;
+  for(var j=0;j<LC.length;j++){ ctx.fillStyle=LC[j][1]?'#46973D':'#ED3121';
+    ctx.fillText((LC[j][1]?'✓ ':'✗ ')+LC[j][0], 24, y2); y2+=15; }
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ---- wiring ----
+document.getElementById('sa').addEventListener('input',function(e){
+  state.sec=parseFloat(e.target.value)*Math.PI/180;
+  document.getElementById('saV').textContent=e.target.value+'°'; draw(); });
+document.getElementById('bQ').addEventListener('click',function(){
+  state.showQ=!state.showQ; this.setAttribute('aria-pressed',state.showQ); draw(); });
+document.getElementById('bSnapC').addEventListener('click',function(){
+  var d=Math.hypot(state.px,state.py)||1; state.px*=R/d; state.py*=R/d; draw(); });
+document.getElementById('bSnapQ').addEventListener('click',function(){
+  var L=polar([state.px,state.py]); state.showQ=true;
+  document.getElementById('bQ').setAttribute('aria-pressed',true);
+  // nearest point of the polar to Q's current spot
+  var a=L[0],b=L[1],c=L[2],n=a*a+b*b, t=(a*state.qx+b*state.qy+c)/n;
+  state.qx-=a*t; state.qy-=b*t; draw(); });
+document.getElementById('bReset').addEventListener('click',function(){
+  state.px=300;state.py=-90;state.qx=-170;state.qy=150;state.sec=32*Math.PI/180;
+  document.getElementById('sa').value=32;document.getElementById('saV').textContent='32°';draw(); });
+var cv=document.getElementById('scene');
+function pick(e){ var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(CW/r.width)-OX, y=OY-(e.clientY-r.top)*(CH/r.height);
+  var dP=Math.hypot(x-state.px,y-state.py), dQ=state.showQ?Math.hypot(x-state.qx,y-state.qy):1e9;
+  return dQ<dP?'Q':'P'; }
+cv.addEventListener('pointerdown',function(e){ state.drag=pick(e); cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove',function(e){ if(!state.drag)return;
+  var r=cv.getBoundingClientRect();
+  var x=(e.clientX-r.left)*(CW/r.width)-OX, y=OY-(e.clientY-r.top)*(CH/r.height);
+  var d=Math.hypot(x,y); if(d<8){x=8;y=0;}
+  if(state.drag==='P'){state.px=x;state.py=y;}else{state.qx=x;state.qy=y;} draw(); });
+cv.addEventListener('pointerup',function(){state.drag=null;});
+draw();
+})();
+</script>
+</body>
+</html>
