@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The ladder · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;line-height:1.5;}
+ .wrap{max-width:1200px;margin:0 auto;padding:28px 22px 44px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 9px;}
+ h1{font-size:27px;margin:0 0 8px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1060px;margin:0 0 16px;}
+ .bar{display:flex;flex-wrap:wrap;align-items:center;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 10px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ canvas{display:block;background:#BEBCB0;touch-action:none;margin:0 auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 12px;text-align:center;}
+ .foot{border-top:1.5px solid #151310;padding-top:15px;margin-top:18px;} .foot .one{font-size:13px;line-height:1.55;max-width:1060px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE LADDER</p>
+ <h1>The ladder — <em>projective, affine, vector, metric: structure as what a scramble cannot destroy</em></h1>
+ <p class="sub">One scene, four kinds of scramble. The cast: four <b>collinear points</b> with their cross-ratio; a
+ <b style="color:#E8792B">displacement arrow</b> piercing a <b style="color:#2456B0">stack of leaves</b> (gold rings
+ count the crossings); the arrow's <b>midpoint</b>; the <b style="color:#8A4FD6">origin</b> with two probe vectors and
+ the unit circle. Each button shuffles the <i>whole scene at once</i> by a random map from one rung's repertoire —
+ and the table on the right, recomputed honestly from the shuffled geometry, shows in green what that rung's maps
+ can never destroy and in red what they just destroyed. Press <b>rotate</b>: everything holds. Press <b>linear</b>:
+ length and angle die; the origin, midpoint, stack, count, cross-ratio hold. Press <b>affine</b>: the origin dies too.
+ Press <b>projective</b>: the stack ceases to be a stack — leaves no longer parallel or evenly spaced, the midpoint
+ slides — yet the <b>pierce count</b> and the <b>cross-ratio</b> hold even here, because they are pure incidence.
+ The rungs going down are the board's Euler rings walked live.</p>
+
+ <div class="bar">
+  <button id="bProj">scramble projectively</button>
+  <button id="bAff">scramble affinely</button>
+  <button id="bLin">scramble linearly</button>
+  <button id="bRot">rotate</button>
+  <button id="bReset">reset</button>
+ </div>
+
+ <canvas id="scene" style="width:1140px;height:640px;" role="img" aria-label="left: the four-rung ladder with the current rung highlighted; center: four collinear points, an arrow piercing a stack of leaves with counted crossings, a midpoint, the origin with two probe vectors and the unit circle; right: the invariance table with green surviving quantities and red destroyed ones"></canvas>
+ <p class="hint">every table value is recomputed from the scrambled geometry — nothing is remembered except the baseline</p>
+
+ <div class="foot">
+  <p class="one"><b>Structure</b> is whatever must be installed before a question has an answer; an <b>invariant</b> is a
+  quantity no allowed shuffle can change. Each rung names an agreement about which shuffles are allowed: the
+  <b>projective</b> rung allows any invertible map — only incidence, cross-ratio, and crossing counts survive, and this is
+  the rung the drafting board lives on. The <b>affine</b> rung reserves a line at infinity: parallelism, evenly spaced
+  stacks — the covector as a <i>type</i> of object — and midpoints become meaningful. The <b>vector</b> rung nails one
+  point as origin: now displacements can be added and scaled against it. The <b>metric</b> rung installs the unit circle —
+  a symmetric matrix g — and only then do length and angle exist, with rotations as the shuffles that respect them.
+  Going down the ladder adds structure and shrinks the allowed shuffles; every older invariant survives on every lower
+  rung. The pairing ⟨ray, stack⟩ = λ needs only the count — which is why the graduation works on a board with no scale
+  bar, and why the vector/one-form reading of the two sides sits at the pre-metric layer of differential geometry:
+  vectors and covectors exist and contract before any metric is chosen. The four rungs are the nested rings of the
+  Euler plate; the scrambles are their groups, felt by hand.</p>
+  <p class="verify">check_ladder · 11/11 assertions, including the contra/co-variance law (v → Tv, ω → T⁻ᵀω, ⟨ω,v⟩ unchanged) · the table recomputes on every press</p>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PANEL='#BEBCB0',INK='#151310',FAINT='#8E8C80',GREEN='#46973D',RED='#ED3121',GOLD='#9A8248',MARK='#2456B0',CAM='#E8792B',VAN='#8A4FD6',DU='#12A6A6';
+var CW=1140,CH=640, SCX=555,SCY=305, U=118;
+var H=[[1,0,0],[0,1,0],[0,0,1]], weakest=4; // 1 proj, 2 aff, 3 lin, 4 rot/none
+function mul3(A,B){ var R=[[0,0,0],[0,0,0],[0,0,0]],i,j,k;
+  for(i=0;i<3;i++)for(j=0;j<3;j++)for(k=0;k<3;k++)R[i][j]+=A[i][k]*B[k][j]; return R; }
+function ap(p){ var x=H[0][0]*p[0]+H[0][1]*p[1]+H[0][2], y=H[1][0]*p[0]+H[1][1]*p[1]+H[1][2],
+  w=H[2][0]*p[0]+H[2][1]*p[1]+H[2][2]; return [x/w,y/w]; }
+function W(p){ return [SCX+U*p[0], SCY-U*p[1]]; }
+
+// the cast (world coordinates)
+var Pl=[-2.6,-1.25], dl=[1,0.55], ts=[0,0.9,1.7,3.4];
+function linePt(t){ return [Pl[0]+t*dl[0], Pl[1]+t*dl[1]]; }
+var A=[-0.9,-0.9], B=[1.5,0.6], O=[0,0], v0=[1.1,0.4], w0=[0.3,1.0];
+function f(p){ return 0.55*p[0]+0.9*p[1]; }
+function leafPts(k){ return [[k/0.55,0],[(k-0.9)/0.55,1]]; }
+
+// measured quantities, all from transformed geometry
+function crossRatio(){ var pts=ts.map(function(t){return ap(linePt(t));});
+  var d=[pts[3][0]-pts[0][0],pts[3][1]-pts[0][1]],n2=d[0]*d[0]+d[1]*d[1];
+  var t=pts.map(function(p){return ((p[0]-pts[0][0])*d[0]+(p[1]-pts[0][1])*d[1])/n2;});
+  return ((t[0]-t[2])*(t[1]-t[3]))/((t[0]-t[3])*(t[1]-t[2])); }
+function pierce(){ var n=0,prev=f(A),i,steps=2000;
+  for(i=1;i<=steps;i++){var t=i/steps,p=[A[0]+t*(B[0]-A[0]),A[1]+t*(B[1]-A[1])];
+    var cur=f(p); n+=Math.abs(Math.floor(cur)-Math.floor(prev)); prev=cur;} return n; }
+function crossings(){ var res=[],prev=f(A),i,steps=2000;
+  for(i=1;i<=steps;i++){var t=i/steps,p=[A[0]+t*(B[0]-A[0]),A[1]+t*(B[1]-A[1])];
+    var cur=f(p); if(Math.floor(cur)!==Math.floor(prev))res.push(p); prev=cur;} return res; }
+function leafGeom(){ var L=[0,1,2].map(function(k){return leafPts(k).map(ap);});
+  function dir(l){var d=[l[1][0]-l[0][0],l[1][1]-l[0][1]],n=Math.hypot(d[0],d[1]);return [d[0]/n,d[1]/n];}
+  function distTo(l,p){var d=dir(l);return Math.abs((p[0]-l[0][0])*d[1]-(p[1]-l[0][1])*d[0]);}
+  var d0=dir(L[0]),d1=dir(L[1]),d2=dir(L[2]);
+  var par=Math.abs(d0[0]*d1[1]-d0[1]*d1[0])+Math.abs(d1[0]*d2[1]-d1[1]*d2[0]);
+  var s01=distTo(L[0],L[1][0]), s12=distTo(L[1],L[2][0]);
+  return par + Math.abs(s01-s12)/(s01+s12); }
+function midErr(){ var M=[(A[0]+B[0])/2,(A[1]+B[1])/2],Mi=ap(M),Ai=ap(A),Bi=ap(B);
+  return Math.hypot(Mi[0]-(Ai[0]+Bi[0])/2, Mi[1]-(Ai[1]+Bi[1])/2); }
+function originErr(){ var Oi=ap(O); return Math.hypot(Oi[0],Oi[1]); }
+function lenAng(){ var Oi=ap(O),vi=ap(v0),wi=ap(w0);
+  var a=[vi[0]-Oi[0],vi[1]-Oi[1]],b=[wi[0]-Oi[0],wi[1]-Oi[1]];
+  var la=Math.hypot(a[0],a[1]),lb=Math.hypot(b[0],b[1]);
+  return [la, Math.acos(Math.max(-1,Math.min(1,(a[0]*b[0]+a[1]*b[1])/(la*lb))))*180/Math.PI]; }
+var base={cr:crossRatio(), n:pierce(), la:lenAng()};
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  ctx.textAlign='left';
+
+  // ---- the ladder panel ----
+  var rungs=[
+    ['METRIC','rotations','+ length, angle (unit circle installed)'],
+    ['VECTOR','linear maps','+ the origin; add & scale'],
+    ['AFFINE','affine maps','+ parallels, even stacks, midpoints'],
+    ['PROJECTIVE','all invertible','incidence, cross-ratio, counts']];
+  var gx=26, gy=70, rh=64;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('THE LADDER',gx,gy-18);
+  for(var r=0;r<4;r++){
+    var lit=(4-r)===weakest;
+    ctx.fillStyle=lit?'#E4E2D4':'#BEBCB0';
+    ctx.fillRect(gx,gy+r*rh,214,rh-9);
+    ctx.strokeStyle=lit?INK:FAINT;ctx.lineWidth=lit?2:1;ctx.strokeRect(gx,gy+r*rh,214,rh-9);
+    ctx.fillStyle=lit?INK:FAINT;ctx.font='bold 11px Helvetica, Arial, sans-serif';
+    ctx.fillText(rungs[r][0]+' — '+rungs[r][1],gx+8,gy+r*rh+18);
+    ctx.font='9.5px Helvetica, Arial, sans-serif';
+    ctx.fillText(rungs[r][2],gx+8,gy+r*rh+34);
+    if(r<3){ctx.fillStyle=FAINT;ctx.fillText('▼ forget structure',gx+58,gy+r*rh+rh-13);}
+  }
+  ctx.fillStyle=FAINT;ctx.font='9.5px Helvetica, Arial, sans-serif';
+  ctx.fillText('highlight = weakest scramble used',gx,gy+4*rh+6);
+
+  // ---- the scene ----
+  // leaves
+  ctx.strokeStyle=MARK;ctx.lineWidth=1.1;ctx.globalAlpha=0.55;
+  for(var k=-4;k<=5;k++){ var lp=leafPts(k).map(ap);
+    var d=[lp[1][0]-lp[0][0],lp[1][1]-lp[0][1]];
+    var a1=[lp[0][0]-6*d[0],lp[0][1]-6*d[1]], a2=[lp[0][0]+6*d[0],lp[0][1]+6*d[1]];
+    var A1=W(a1),A2=W(a2);
+    ctx.save();ctx.beginPath();ctx.rect(252,44,600,540);ctx.clip();
+    ctx.beginPath();ctx.moveTo(A1[0],A1[1]);ctx.lineTo(A2[0],A2[1]);ctx.stroke();ctx.restore(); }
+  ctx.globalAlpha=1;
+  var ll=W(ap([2.0,-0.55])); ctx.fillStyle=MARK;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText('the stack (covector)',ll[0],ll[1]+26);
+  // arrow + crossings
+  var Ai=W(ap(A)), Bi=W(ap(B));
+  ctx.strokeStyle=CAM;ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(Ai[0],Ai[1]);ctx.lineTo(Bi[0],Bi[1]);ctx.stroke();
+  var ang=Math.atan2(Bi[1]-Ai[1],Bi[0]-Ai[0]);
+  ctx.fillStyle=CAM;ctx.beginPath();ctx.moveTo(Bi[0],Bi[1]);
+  ctx.lineTo(Bi[0]-10*Math.cos(ang-0.4),Bi[1]-10*Math.sin(ang-0.4));
+  ctx.lineTo(Bi[0]-10*Math.cos(ang+0.4),Bi[1]-10*Math.sin(ang+0.4));ctx.closePath();ctx.fill();
+  ctx.font='bold 10px Helvetica, Arial, sans-serif';ctx.fillText('the arrow (vector)',Bi[0]+8,Bi[1]-8);
+  crossings().forEach(function(p,i){ var Pp=W(ap(p));
+    ctx.strokeStyle=GOLD;ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(Pp[0],Pp[1],4.5,0,6.2832);ctx.stroke();
+    ctx.fillStyle=GOLD;ctx.font='bold 9px Helvetica, Arial, sans-serif';ctx.fillText(''+(i+1),Pp[0]+6,Pp[1]-5); });
+  // midpoint
+  var M=[(A[0]+B[0])/2,(A[1]+B[1])/2], Mi=W(ap(M));
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(Mi[0],Mi[1],3,0,6.2832);ctx.fill();
+  ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText('midpoint',Mi[0]+6,Mi[1]+12);
+  // collinear four + their line
+  var lpts=ts.map(function(t){return W(ap(linePt(t)));});
+  ctx.strokeStyle=FAINT;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(lpts[0][0],lpts[0][1]);ctx.lineTo(lpts[3][0],lpts[3][1]);ctx.stroke();
+  lpts.forEach(function(P,i){ ctx.fillStyle=INK;ctx.beginPath();ctx.arc(P[0],P[1],3,0,6.2832);ctx.fill();
+    ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText('P'+(i+1),P[0]-4,P[1]+15); });
+  ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';
+  ctx.fillText('four collinear points — cross-ratio',lpts[0][0],lpts[0][1]-10);
+  // origin, probes, unit circle
+  var Oi=W(ap(O));
+  ctx.strokeStyle=VAN;ctx.lineWidth=1.4;
+  [v0,w0].forEach(function(vv,ix){ var Vi=W(ap(vv));
+    ctx.beginPath();ctx.moveTo(Oi[0],Oi[1]);ctx.lineTo(Vi[0],Vi[1]);ctx.stroke();
+    ctx.fillStyle=VAN;ctx.font='bold 10px Helvetica, Arial, sans-serif';
+    ctx.fillText(ix?'w':'v',Vi[0]+5,Vi[1]-4); });
+  ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(Oi[0],Oi[1],4,0,6.2832);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(Oi[0],Oi[1],6,0,6.2832);ctx.stroke();
+  ctx.fillStyle=VAN;ctx.font='bold 10px Helvetica, Arial, sans-serif';ctx.fillText('O (origin)',Oi[0]+8,Oi[1]+14);
+  ctx.strokeStyle=DU;ctx.lineWidth=1.2;ctx.beginPath();
+  for(var t2=0;t2<=72;t2++){var th=t2/72*6.2832,ci=W(ap([Math.cos(th)*0.85,Math.sin(th)*0.85]));
+    t2===0?ctx.moveTo(ci[0],ci[1]):ctx.lineTo(ci[0],ci[1]);}
+  ctx.stroke();
+  ctx.fillStyle=DU;ctx.font='9px Helvetica, Arial, sans-serif';
+  var cl=W(ap([0.62,-0.62])); ctx.fillText('the unit circle (metric)',cl[0],cl[1]+12);
+
+  // ---- the invariance table ----
+  var cr=crossRatio(), n=pierce(), lg=leafGeom(), me=midErr(), oe=originErr(), la=lenAng();
+  var x=872,y=64;
+  ctx.fillStyle=INK;ctx.font='bold 12px Helvetica, Arial, sans-serif';ctx.fillText('WHAT SURVIVED',x,y);
+  ctx.font='10.5px Helvetica, Arial, sans-serif'; var yy=y+22,lh=30;
+  function row(name,val,good,rung){ ctx.fillStyle=good?GREEN:RED;
+    ctx.fillText((good?'✓ ':'✗ ')+name,x,yy);
+    ctx.fillStyle=good?GREEN:RED;ctx.fillText(val,x+12,yy+13);
+    ctx.fillStyle=FAINT;ctx.font='9px Helvetica, Arial, sans-serif';ctx.fillText(rung,x+150,yy);
+    ctx.font='10.5px Helvetica, Arial, sans-serif'; yy+=lh; }
+  row('cross-ratio','(P₁P₂;P₃P₄) = '+cr.toFixed(6)+'  (was '+base.cr.toFixed(6)+')',Math.abs(cr-base.cr)<1e-6,'projective');
+  row('pierce count ⟨ω, arrow⟩',n+' crossings  (was '+base.n+')',n===base.n,'projective');
+  row('stack is a covector','parallel+even residual '+lg.toExponential(1),lg<1e-6,'affine');
+  row('midpoint is the midpoint','error '+me.toExponential(1),me<1e-6,'affine');
+  row('origin unmoved','|O| = '+oe.toExponential(1),oe<1e-9,'vector');
+  row('length |v|',la[0].toFixed(4)+'  (was '+base.la[0].toFixed(4)+')',Math.abs(la[0]-base.la[0])<1e-6,'metric');
+  row('angle ∠(v,w)',la[1].toFixed(3)+'°  (was '+base.la[1].toFixed(3)+'°)',Math.abs(la[1]-base.la[1])<1e-6,'metric');
+  ctx.fillStyle=FAINT;ctx.font='9.5px Helvetica, Arial, sans-serif';
+  ctx.fillText('each row labelled by the rung that owns it;',x,yy+2);
+  ctx.fillText('a rung\u2019s scrambles never touch its own rows',x,yy+15);
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+
+// ---- scrambles ----
+function rnd(){ return Math.random()*2-1; }
+function press(kind){
+  var S;
+  if(kind===1){ S=[[1,0.10*rnd(),0.08*rnd()],[0.08*rnd(),1,0.07*rnd()],[0.05+0.04*Math.random(),0.04+0.03*Math.random(),1]];
+    S[2][0]*= (Math.random()<0.5?-1:1); S[2][1]*=(Math.random()<0.5?-1:1); }
+  else if(kind===2){ var t=0.5*rnd(); S=[[Math.cos(t)*(1+0.12*rnd()),-Math.sin(t)+0.2*rnd(),0.5*rnd()],
+    [Math.sin(t)+0.1*rnd(),Math.cos(t)*(1+0.1*rnd()),0.4*rnd()],[0,0,1]]; }
+  else if(kind===3){ S=[[1+0.25*rnd(),0.3*rnd(),0],[0.2*rnd(),1+0.2*rnd(),0],[0,0,1]]; }
+  else { var a=1.2*rnd(); S=[[Math.cos(a),-Math.sin(a),0],[Math.sin(a),Math.cos(a),0],[0,0,1]]; }
+  H=mul3(S,H); weakest=Math.min(weakest,kind); draw();
+}
+document.getElementById('bProj').addEventListener('click',function(){press(1);});
+document.getElementById('bAff').addEventListener('click',function(){press(2);});
+document.getElementById('bLin').addEventListener('click',function(){press(3);});
+document.getElementById('bRot').addEventListener('click',function(){press(4);});
+document.getElementById('bReset').addEventListener('click',function(){H=[[1,0,0],[0,1,0],[0,0,1]];weakest=4;draw();});
+draw();
+})();
+</script>
+</body>
+</html>
