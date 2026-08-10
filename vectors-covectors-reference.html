@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vectors &amp; Covectors — A Census Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6;
+    --ink:#23232A;
+    --graphite:#8E8E96;
+    --faint:#C9C9CE;
+    --violet:#7B2FBE;
+    --red:#C9372C;
+    --teal:#0F9B94;
+    --blue:#2C55D8;
+    --rule:#DDDCD5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Serif",Georgia,serif;
+    font-size:17px;
+    line-height:1.62;
+  }
+  .sheet{max-width:740px;margin:0 auto;padding:0 20px 96px;}
+  header{padding:64px 0 12px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--graphite);
+  }
+  h1{
+    font-weight:600;font-size:clamp(30px,6vw,44px);
+    line-height:1.12;letter-spacing:-.01em;margin:10px 0 14px;
+  }
+  .standing-def{
+    font-style:italic;font-size:clamp(17px,2.6vw,20px);line-height:1.55;
+    border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding:18px 2px;margin:22px 0 8px;
+  }
+  h2{
+    font-weight:600;font-size:23px;line-height:1.25;
+    margin:56px 0 14px;
+  }
+  h2 .num{
+    font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:13px;
+    letter-spacing:.18em;color:var(--graphite);display:block;margin-bottom:6px;
+  }
+  p{margin:0 0 16px;}
+  p+p{text-indent:0;}
+  em{font-style:italic;}
+  strong{font-weight:600;}
+  .term{color:var(--violet);font-weight:600;}
+  .aside{
+    font-size:15px;color:#55555E;border-left:2px solid var(--rule);
+    padding:2px 0 2px 16px;margin:20px 0;
+  }
+
+  /* ---------- plates ---------- */
+  .plate{
+    margin:30px 0 34px;
+    border:1px solid var(--ink);
+    background:#FFFFFE;
+  }
+  .plate-title{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:10px 14px;border-bottom:1px solid var(--ink);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    letter-spacing:.2em;text-transform:uppercase;
+  }
+  .plate-title .pn{color:var(--graphite);}
+  .plate svg{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .readout{
+    font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.7;
+    padding:10px 14px;border-top:1px solid var(--rule);
+    min-height:44px;
+  }
+  .readout b{font-weight:500;color:var(--violet);}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
+    padding:12px 14px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  }
+  .controls label{display:flex;align-items:center;gap:8px;}
+  input[type=range]{width:130px;accent-color:var(--violet);}
+  button{
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.04em;
+    background:none;border:1px solid var(--ink);color:var(--ink);
+    padding:7px 13px;cursor:pointer;border-radius:2px;
+  }
+  button:hover{background:var(--ink);color:var(--paper);}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+  .cap{
+    font-size:14.5px;color:#55555E;margin:-22px 0 26px;
+    padding:0 2px;
+  }
+  footer{
+    margin-top:72px;border-top:1px solid var(--ink);padding-top:22px;
+    font-style:italic;font-size:16px;color:#3A3A42;
+  }
+  footer .fin{font-family:"IBM Plex Mono",monospace;font-style:normal;font-size:11px;
+    letter-spacing:.24em;color:var(--graphite);margin-top:14px;text-transform:uppercase;}
+  @media (prefers-reduced-motion: no-preference){
+    .spawned{animation:arrive .35s ease-out;}
+    @keyframes arrive{from{opacity:0}to{opacity:1}}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Reference Plates · Affine Stratum</div>
+  <h1>Vectors &amp; Covectors</h1>
+  <p class="standing-def">A covector is an endless, even ruling of space into parallel levels, marked with a direction of ascent. A vector is any arrow. The pairing is flights climbed, counted with sign.</p>
+</header>
+
+<h2><span class="num">§ 1</span>The two objects</h2>
+<p>A <span class="term">vector</span> is a displacement — an arrow, a thing that goes. It has a length of travel, a heading, and one chosen head. It has no address: the drawn arrow is the vector plus a parking spot, and the parking spot is not part of the object.</p>
+<p>A <span class="term">covector</span> is an instrument — a ruling of all of space into parallel <em>levels</em>, evenly spaced, without end in either direction. Each level is one dimension down from the space it divides: a line on this page, a plane in a building. The ruling has no top floor and no basement; the drawn levels are where the figure stops, never where the instrument does. One additional bit completes it: the <strong>marked ascent</strong>, the choice of which way the labels grow. Levels alone are a ladder found lying in a field — order without up. The mark picks up.</p>
+<p>Neither object is made of the other. Their entire built-in relationship is one act, performed below.</p>
+
+<h2><span class="num">§ 2</span>The pairing — flights, not floors</h2>
+<p>Lay the arrow across the ruling and count, with sign, the levels crossed. The rule that never miscounts is <strong>head label minus tail label</strong>: the level you launch from is never counted, the level you land on always is, and every level strictly passed counts once. Ground floor to third floor is three flights though four floors are involved. An arrow travelling against the ascent scores negative — that is the mark doing its one job. And an endpoint resting mid-slab is honestly reported as a bracket, <em>between 2 and 3</em>, until a finer instrument is brought in (§&nbsp;4).</p>
+
+<div class="plate" id="plate1">
+  <div class="plate-title"><span>Plate I — The Pairing</span><span class="pn">drag tail · head · or the shaft</span></div>
+  <svg id="svg1" viewBox="0 0 700 400" aria-label="Interactive pairing figure: drag the arrow across a ruling of levels"></svg>
+  <div class="readout" id="read1"></div>
+  <div class="controls">
+    <label>spacing <input type="range" id="sp1" min="26" max="72" value="46" aria-label="level spacing"></label>
+    <button id="flip1">flip ascent</button>
+  </div>
+</div>
+<p class="cap">Drag the shaft to re-park the arrow: it pierces different levels and the count stands. Widen the spacing: fewer flights fit under the same arrow — the instrument weakened. Flip the ascent and every reading negates while the ink barely changes: <em>f</em> and −<em>f</em> share their levels and disagree about every arrow.</p>
+
+<h2><span class="num">§ 3</span>What the instrument cannot see</h2>
+<p>The covector grants two blindnesses, and both are structural. It cannot see a slide <em>along</em> its own levels — a level-parallel displacement crosses nothing and reads zero; those directions are its <span class="term">kernel</span>. And it cannot see <em>parking</em> — the ruling is the same everywhere, no slab distinguished from any other, so the census records how much was traversed and never where.</p>
+<p>Consequently many genuinely different vectors share a reading. The family scoring some fixed number — say 3 — is a <span class="term">coset</span>: any one member, plus anything reading zero. Its members differ by slides the instrument cannot detect. Read backwards, this defines the covector completely: the population of arrows scoring exactly 1 is the instrument's <strong>gap</strong>, its unit cell described from the arrow side — tell me which arrows score 1 and I can rebuild every level.</p>
+
+<div class="plate" id="plate2">
+  <div class="plate-title"><span>Plate II — One Coset</span><span class="pn">every arrow reads +3</span></div>
+  <svg id="svg2" viewBox="0 0 700 360" aria-label="Coset figure: arrows of different shapes and positions all reading three"></svg>
+  <div class="readout" id="read2"></div>
+  <div class="controls">
+    <button id="spawn2">add an arrow reading +3</button>
+    <button id="clear2">clear</button>
+  </div>
+</div>
+<p class="cap">Long and oblique, short and steep, parked anywhere, piercing different levels — three flights each. Their pairwise differences read zero: kernel slides and re-parkings, the two invisibilities on display.</p>
+
+<h2><span class="num">§ 4</span>Refinement — fractions as readings</h2>
+<p>A refinement is not a closer look at the instrument; it is a <em>second</em> instrument. Interleave <em>n</em>&nbsp;−&nbsp;1 new levels per slab, evenly, and you have built <em>n</em>&nbsp;·&nbsp;<em>f</em>: every old level retained, spacing 1/<em>n</em>, ascent inherited. Density is magnitude — that is the whole content of "bigger covector." The same arrow read on the finer instrument scores <em>n</em> times the count, and the ratio count/instrument is the invariant of the tower. A fraction is exactly that: a reading paired with a declaration of which instrument took it, which is why 1/2 and 3/6 are one fact, and why adding 1/2&nbsp;+&nbsp;1/3 requires the common refinement 6 — a common denominator <em>is</em> a common refinement, the coarsest ruling on which both readings become whole counts.</p>
+<p>Every refinement is drafting: the parallels-and-incidence ladder subdivides a slab into <em>n</em> equal parts with a straightedge, no perpendicular drawn and none missed. The tower has no final storey in either direction: no last level going up — beyond the furthest depth there is always an implied deeper level — and no final refinement going down. Rational depths eventually land on a level of some finite refinement; the rest are bracketed forever, ever more tightly, and exist as the limit of closing brackets. Infinity stays open at both ends, and the two opennesses are <em>n</em> and 1/<em>n</em>, one more time.</p>
+
+<div class="plate" id="plate3">
+  <div class="plate-title"><span>Plate III — Refinement</span><span class="pn">drag the head · refine the instrument</span></div>
+  <svg id="svg3" viewBox="0 0 700 380" aria-label="Refinement figure: a finer ruling interleaved in blue, with coarse and fine readings"></svg>
+  <div class="readout" id="read3"></div>
+  <div class="controls">
+    <label>refinement n <input type="range" id="rf3" min="1" max="8" value="1" aria-label="refinement factor"></label>
+  </div>
+</div>
+<p class="cap">At n&nbsp;=&nbsp;1 the coarse instrument brackets the head honestly. Refine, and the blue levels of n·f deliver the sharper census: the fraction fine-count/n closes in on the head's exact depth without ever being anything other than a count.</p>
+
+<h2><span class="num">§ 5</span>What must be purchased separately</h2>
+<p>Everything above lives at the affine stratum — parallels, incidence, even spacing within one direction. Two famous conveniences are <em>not</em> stocked here, and knowing why is most of the subject.</p>
+<p><strong>Comparing gaps across directions.</strong> "Equal spacing" is certifiable only within one stack's own direction. Whether a blue gap equals a red gap in a different heading is a question no parallel can answer; it is the circle's job — the metric's — and √2 is its signature purchase. Strip the circle (shear the page) and such comparisons are revoked while every count above survives untouched.</p>
+<p><strong>Turning an arrow into a ruling.</strong> With a metric you may trade a vector for the covector whose levels lie perpendicular to it, spacing reciprocal to its length — and in an orthonormal frame this trade is the silent content of writing v<sup>T</sup>. Without the metric, the transpose of a single column names a different ruling in every frame: not a fact about the arrow, a fact about the arrow-plus-frame. At this stratum the two kinds face each other permanently, with counting as their only common language.</p>
+<p class="aside">The two-slot cousin: feed the census <em>two</em> arrows instead of one and it counts cells instead of flights — the determinant, deciding whether two arrows genuinely span. Zero cells means one direction means proportion: a pair of equal fractions is a collapsed cell, cross-multiplication is the collapse test, and the schoolroom flip of the means is the transpose, preserving the (zero) area. One slot, level count, covector; two slots, cell count, determinant.</p>
+
+<footer>
+  <p>A covector is an endless even ruling of space with a marked ascent; a vector is any arrow; the pairing is flights climbed, signed. Everything else — gap, coset, refinement, bracket, census, determinant — hangs off that sentence without modification.</p>
+  <div class="fin">Drawn at the affine stratum · no perpendicular used</div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- shared: hand-wavered level paths ---------- */
+function waverPath(x0,x1,y,seed){
+  var pts=[], step=26;
+  for(var x=x0;x<=x1;x+=step){
+    var w = 1.4*Math.sin(x/53 + seed*2.1) + 0.8*Math.sin(x/19 + seed*5.7);
+    pts.push((x===x0?"M":"L")+x.toFixed(1)+" "+(y+w).toFixed(1));
+  }
+  return pts.join(" ");
+}
+function svgEl(name,attrs){
+  var e=document.createElementNS("http://www.w3.org/2000/svg",name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+function clearNode(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function fmtLevel(phi){
+  var r=Math.round(phi);
+  if(Math.abs(phi-r)<0.02) return "on level "+r;
+  return "between "+Math.floor(phi)+" and "+(Math.floor(phi)+1);
+}
+function signed(n){return (n>0?"+":"")+n;}
+
+/* =========================================================
+   PLATE I — the pairing
+========================================================= */
+(function(){
+  var svg=document.getElementById("svg1");
+  var read=document.getElementById("read1");
+  var spacingInput=document.getElementById("sp1");
+  var W=700,H=400, y0=330;          // y of level 0
+  var spacing=+spacingInput.value;  // px per slab
+  var ascent=1;                     // +1: labels grow upward
+  var tail={x:190,y:305}, head={x:475,y:120};
+
+  function phiOf(p){ return ascent*(y0-p.y)/spacing; }
+
+  function render(){
+    clearNode(svg);
+    // levels
+    var kMin=Math.ceil(ascent===1 ? (y0-H+10)/spacing*-1*-1 : 0); // compute via y sweep instead:
+    for(var y=y0%spacing - spacing*8; y<H+spacing; y+=spacing){
+      // find k for this y
+      var k=Math.round(ascent*(y0-y)/spacing);
+      var yy=y0-ascent*k*spacing*ascent; // consistent y for k
+    }
+    // simpler: iterate k over a generous range, draw those on canvas
+    for(var k=-12;k<=12;k++){
+      var y=y0-(k*spacing*ascent);
+      if(y<-6||y>H+6) continue;
+      var isZero=(k===0);
+      var p=svgEl("path",{d:waverPath(14,W-52,y,k+7),fill:"none",
+        stroke:isZero?"var(--teal)":"var(--graphite)",
+        "stroke-width":isZero?2:1.3,
+        "stroke-dasharray":isZero?"7 6":"none"});
+      svg.appendChild(p);
+      var t=svgEl("text",{x:W-40,y:y+4,"font-family":"IBM Plex Mono,monospace",
+        "font-size":"13","fill":isZero?"var(--teal)":"var(--ink)"});
+      t.textContent=k; svg.appendChild(t);
+    }
+    // ascent mark
+    var ax=34, aty=26, aby=64;
+    var aa=svgEl("path",{d:"M"+ax+" "+aby+" L"+ax+" "+aty+" M"+(ax-5)+" "+(aty+9)+" L"+ax+" "+aty+" L"+(ax+5)+" "+(aty+9),
+      fill:"none",stroke:"var(--ink)","stroke-width":1.6,"stroke-dasharray":"4 4"});
+    svg.appendChild(aa);
+    var at=svgEl("text",{x:ax+10,y:aty+14,"font-family":"IBM Plex Mono,monospace","font-size":"10.5",
+      fill:"var(--graphite)","letter-spacing":"2"});
+    at.textContent="ASCENT"; svg.appendChild(at);
+
+    // piercings
+    var pt=phiOf(tail), ph=phiOf(head);
+    var lo=Math.min(pt,ph), hi=Math.max(pt,ph);
+    for(var m=Math.ceil(lo+1e-9); m<=Math.floor(hi-1e-9)+ ( (Math.abs(hi-Math.round(hi))<1e-9)?0:0 ); m++){
+      // include level equal to hi if head lands on it
+      if(m<=lo) continue;
+      if(m>hi+1e-9) continue;
+      var t01=(m-pt)/(ph-pt);
+      if(t01<=0||t01>1.0001) continue;
+      var px=tail.x+(head.x-tail.x)*t01, py=tail.y+(head.y-tail.y)*t01;
+      svg.appendChild(svgEl("circle",{cx:px,cy:py,r:4.5,fill:"var(--violet)"}));
+    }
+    // arrow
+    var shaft=svgEl("line",{x1:tail.x,y1:tail.y,x2:head.x,y2:head.y,
+      stroke:"var(--violet)","stroke-width":3.4,"stroke-linecap":"round"});
+    svg.appendChild(shaft);
+    var ang=Math.atan2(head.y-tail.y,head.x-tail.x);
+    var hl=13;
+    var h1x=head.x-hl*Math.cos(ang-0.42), h1y=head.y-hl*Math.sin(ang-0.42);
+    var h2x=head.x-hl*Math.cos(ang+0.42), h2y=head.y-hl*Math.sin(ang+0.42);
+    svg.appendChild(svgEl("path",{d:"M"+h1x+" "+h1y+" L"+head.x+" "+head.y+" L"+h2x+" "+h2y,
+      fill:"none",stroke:"var(--violet)","stroke-width":3.4,"stroke-linecap":"round"}));
+    // handles
+    svg.appendChild(svgEl("circle",{cx:tail.x,cy:tail.y,r:7,fill:"#fff",stroke:"var(--violet)","stroke-width":2.4,id:"h-tail"}));
+    svg.appendChild(svgEl("circle",{cx:tail.x,cy:tail.y,r:22,fill:"transparent",id:"hit-tail"}));
+    svg.appendChild(svgEl("circle",{cx:head.x,cy:head.y,r:22,fill:"transparent",id:"hit-head"}));
+    svg.appendChild(svgEl("rect",{x:Math.min(tail.x,head.x)-16,y:Math.min(tail.y,head.y)-16,
+      width:Math.abs(head.x-tail.x)+32,height:Math.abs(head.y-tail.y)+32,fill:"transparent",id:"hit-shaft"}));
+    // reorder hit areas: shaft below endpoint hits
+    svg.appendChild(svg.querySelector("#hit-tail"));
+    svg.appendChild(svg.querySelector("#hit-head"));
+
+    var count=Math.floor(ph)-Math.floor(pt);
+    read.innerHTML="tail "+fmtLevel(pt)+" &nbsp;·&nbsp; head "+fmtLevel(ph)+
+      " &nbsp;·&nbsp; <b>count "+signed(count)+"</b> &nbsp;(flights, not floors)";
+  }
+
+  var drag=null, start=null, t0=null, h0=null;
+  function pos(ev){
+    var r=svg.getBoundingClientRect();
+    return {x:(ev.clientX-r.left)*(W/r.width), y:(ev.clientY-r.top)*(H/r.height)};
+  }
+  svg.addEventListener("pointerdown",function(ev){
+    var id=ev.target.id;
+    if(id==="hit-tail")drag="tail";
+    else if(id==="hit-head")drag="head";
+    else if(id==="hit-shaft")drag="shaft";
+    else return;
+    start=pos(ev); t0={x:tail.x,y:tail.y}; h0={x:head.x,y:head.y};
+    svg.setPointerCapture(ev.pointerId);
+    ev.preventDefault();
+  });
+  svg.addEventListener("pointermove",function(ev){
+    if(!drag)return;
+    var p=pos(ev), dx=p.x-start.x, dy=p.y-start.y;
+    function clampP(q){q.x=Math.max(20,Math.min(W-70,q.x));q.y=Math.max(16,Math.min(H-14,q.y));return q;}
+    if(drag==="tail") tail=clampP({x:t0.x+dx,y:t0.y+dy});
+    else if(drag==="head") head=clampP({x:h0.x+dx,y:h0.y+dy});
+    else{ tail=clampP({x:t0.x+dx,y:t0.y+dy}); head=clampP({x:h0.x+dx,y:h0.y+dy}); }
+    render();
+  });
+  svg.addEventListener("pointerup",function(){drag=null;});
+  svg.addEventListener("pointercancel",function(){drag=null;});
+  spacingInput.addEventListener("input",function(){spacing=+this.value;render();});
+  document.getElementById("flip1").addEventListener("click",function(){ascent*=-1;render();});
+  render();
+})();
+
+/* =========================================================
+   PLATE II — one coset
+========================================================= */
+(function(){
+  var svg=document.getElementById("svg2");
+  var read=document.getElementById("read2");
+  var W=700,H=360,y0=300,spacing=44;
+  var arrows=[];
+  function levels(){
+    for(var k=-2;k<=7;k++){
+      var y=y0-k*spacing;
+      if(y<-6||y>H+6)continue;
+      var isZero=(k===0);
+      svg.appendChild(svgEl("path",{d:waverPath(14,W-52,y,k+3),fill:"none",
+        stroke:isZero?"var(--teal)":"var(--graphite)",
+        "stroke-width":isZero?2:1.2,"stroke-dasharray":isZero?"7 6":"none"}));
+      var t=svgEl("text",{x:W-40,y:y+4,"font-family":"IBM Plex Mono,monospace","font-size":"13",
+        fill:isZero?"var(--teal)":"var(--ink)"});
+      t.textContent=k; svg.appendChild(t);
+    }
+  }
+  function drawArrow(a,cls){
+    var g=svgEl("g",cls?{"class":cls}:{});
+    g.appendChild(svgEl("line",{x1:a.x1,y1:a.y1,x2:a.x2,y2:a.y2,
+      stroke:"var(--violet)","stroke-width":2.8,"stroke-linecap":"round",opacity:.92}));
+    var ang=Math.atan2(a.y2-a.y1,a.x2-a.x1),hl=11;
+    g.appendChild(svgEl("path",{d:"M"+(a.x2-hl*Math.cos(ang-0.42))+" "+(a.y2-hl*Math.sin(ang-0.42))+
+      " L"+a.x2+" "+a.y2+" L"+(a.x2-hl*Math.cos(ang+0.42))+" "+(a.y2-hl*Math.sin(ang+0.42)),
+      fill:"none",stroke:"var(--violet)","stroke-width":2.8,"stroke-linecap":"round",opacity:.92}));
+    g.appendChild(svgEl("circle",{cx:a.x1,cy:a.y1,r:3.4,fill:"var(--violet)"}));
+    svg.appendChild(g);
+  }
+  function spawn(){
+    if(arrows.length>=11){arrows.shift();}
+    // choose tail phi fractional, head phi = tail + 3 exactly-in-floor terms
+    var fr=0.15+0.7*Math.random();
+    var kBase=Math.floor(Math.random()*2)-1; // tail slab: -1,0
+    var pt=kBase+fr;
+    var ph=pt+3 - 0.0; // floor diff = 3 given same fractional part; nudge fraction of head:
+    var fr2=0.12+0.76*Math.random();
+    ph=Math.floor(pt)+3+fr2;
+    var y1=y0-pt*spacing, y2=y0-ph*spacing;
+    var x1=30+Math.random()*(W-260);
+    var run=(Math.random()<0.5?-1:1)*(30+Math.random()*170);
+    var x2=Math.max(24,Math.min(W-80,x1+run));
+    arrows.push({x1:x1,y1:y1,x2:x2,y2:y2});
+    render(true);
+  }
+  function render(justSpawned){
+    clearNode(svg); levels();
+    arrows.forEach(function(a,i){
+      drawArrow(a,(justSpawned&&i===arrows.length-1)?"spawned":null);
+    });
+    read.innerHTML=arrows.length===0
+      ? "empty ruling — add members of the coset {reading = +3}"
+      : "<b>"+arrows.length+"</b> member"+(arrows.length>1?"s":"")+
+        " drawn · pairwise differences read 0 · kernel slides &amp; re-parkings";
+  }
+  document.getElementById("spawn2").addEventListener("click",spawn);
+  document.getElementById("clear2").addEventListener("click",function(){arrows=[];render();});
+  render();
+  spawn(); spawn();
+})();
+
+/* =========================================================
+   PLATE III — refinement
+========================================================= */
+(function(){
+  var svg=document.getElementById("svg3");
+  var read=document.getElementById("read3");
+  var rf=document.getElementById("rf3");
+  var W=700,H=380,y0=330,spacing=76;
+  var n=+rf.value;
+  var tail={x:150,y:y0}, head={x:470,y:132};
+
+  function phiOf(p){return (y0-p.y)/spacing;}
+  function gcd(a,b){return b?gcd(b,a%b):a;}
+
+  function render(){
+    clearNode(svg);
+    // fine levels first (under)
+    if(n>1){
+      for(var j=-2*n;j<=6*n;j++){
+        if(j%n===0)continue;
+        var y=y0-(j/n)*spacing;
+        if(y<-6||y>H+6)continue;
+        svg.appendChild(svgEl("path",{d:waverPath(14,W-52,y,j*1.3+11),fill:"none",
+          stroke:"var(--blue)","stroke-width":1,"opacity":.55}));
+      }
+    }
+    for(var k=-2;k<=6;k++){
+      var y=y0-k*spacing;
+      if(y<-6||y>H+6)continue;
+      var isZero=(k===0);
+      svg.appendChild(svgEl("path",{d:waverPath(14,W-52,y,k+5),fill:"none",
+        stroke:isZero?"var(--teal)":"var(--graphite)",
+        "stroke-width":isZero?2:1.3,"stroke-dasharray":isZero?"7 6":"none"}));
+      var t=svgEl("text",{x:W-40,y:y+4,"font-family":"IBM Plex Mono,monospace","font-size":"13",
+        fill:isZero?"var(--teal)":"var(--ink)"});
+      t.textContent=k; svg.appendChild(t);
+    }
+    // arrow
+    svg.appendChild(svgEl("line",{x1:tail.x,y1:tail.y,x2:head.x,y2:head.y,
+      stroke:"var(--violet)","stroke-width":3.4,"stroke-linecap":"round"}));
+    var ang=Math.atan2(head.y-tail.y,head.x-tail.x),hl=13;
+    svg.appendChild(svgEl("path",{d:"M"+(head.x-hl*Math.cos(ang-0.42))+" "+(head.y-hl*Math.sin(ang-0.42))+
+      " L"+head.x+" "+head.y+" L"+(head.x-hl*Math.cos(ang+0.42))+" "+(head.y-hl*Math.sin(ang+0.42)),
+      fill:"none",stroke:"var(--violet)","stroke-width":3.4,"stroke-linecap":"round"}));
+    svg.appendChild(svgEl("circle",{cx:tail.x,cy:tail.y,r:3.6,fill:"var(--violet)"}));
+    svg.appendChild(svgEl("circle",{cx:head.x,cy:head.y,r:22,fill:"transparent",id:"hit-head3"}));
+
+    var pt=phiOf(tail), ph=phiOf(head);
+    var coarse=Math.floor(ph)-Math.floor(pt);
+    var fine=Math.floor(n*ph)-Math.floor(n*pt);
+    var line1="coarse census: head "+fmtLevel(ph)+" · count "+signed(coarse);
+    var line2;
+    if(n===1){
+      line2="refine to sharpen the bracket →";
+    }else{
+      var g=gcd(Math.abs(fine),n)||1;
+      var red=(fine/g)+"/"+(n/g);
+      line2="fine census (n·f, n="+n+"): count "+signed(fine)+" of "+n+"ths · reading <b>"+fine+"/"+n+"</b>"+
+        ((n/g)!==n?" = "+red:"");
+    }
+    read.innerHTML=line1+"<br>"+line2;
+  }
+
+  var dragging=false,start=null,h0=null;
+  function pos(ev){
+    var r=svg.getBoundingClientRect();
+    return {x:(ev.clientX-r.left)*(W/r.width), y:(ev.clientY-r.top)*(H/r.height)};
+  }
+  svg.addEventListener("pointerdown",function(ev){
+    if(ev.target.id!=="hit-head3")return;
+    dragging=true;start=pos(ev);h0={x:head.x,y:head.y};
+    svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+  });
+  svg.addEventListener("pointermove",function(ev){
+    if(!dragging)return;
+    var p=pos(ev);
+    head={x:Math.max(40,Math.min(W-80,h0.x+p.x-start.x)),
+          y:Math.max(16,Math.min(H-14,h0.y+p.y-start.y))};
+    render();
+  });
+  svg.addEventListener("pointerup",function(){dragging=false;});
+  svg.addEventListener("pointercancel",function(){dragging=false;});
+  rf.addEventListener("input",function(){n=+this.value;render();});
+  render();
+})();
+
+})();
+</script>
+</body>
+</html>
