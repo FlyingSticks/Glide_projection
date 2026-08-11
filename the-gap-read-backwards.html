@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gap, Read Backwards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6;
+    --ink:#23232A;
+    --graphite:#8E8E96;
+    --rule:#DDDCD5;
+    --violet:#7B2FBE;
+    --teal:#0F9B94;
+    --blue:#2C55D8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;line-height:1.62;
+  }
+  .sheet{max-width:740px;margin:0 auto;padding:0 20px 88px;}
+  header{padding:56px 0 6px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--graphite);}
+  h1{font-weight:600;font-size:clamp(28px,6vw,42px);line-height:1.12;
+    letter-spacing:-.01em;margin:10px 0 16px;}
+  .lede{font-style:italic;font-size:clamp(16.5px,2.5vw,19px);line-height:1.55;
+    border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding:16px 2px;margin-bottom:8px;}
+  p{margin:0 0 15px;}
+  h2{font-weight:600;font-size:21px;margin:44px 0 12px;}
+  .term{color:var(--violet);font-weight:600;}
+  strong{font-weight:600;}
+
+  .plate{margin:28px 0 26px;border:1px solid var(--ink);background:#FFFFFE;}
+  .tabs{display:flex;border-bottom:1px solid var(--ink);}
+  .tabs button{
+    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;background:none;border:none;border-right:1px solid var(--rule);
+    padding:11px 4px;cursor:pointer;color:var(--graphite);line-height:1.3;
+  }
+  .tabs button:last-child{border-right:none;}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);}
+  .tabs button:hover:not([aria-selected="true"]){color:var(--ink);}
+  .plate svg{display:block;width:100%;height:auto;touch-action:none;
+    user-select:none;-webkit-user-select:none;}
+  .readout{font-size:15px;line-height:1.55;padding:13px 15px;border-top:1px solid var(--rule);
+    min-height:76px;}
+  .readout .step-name{font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--violet);display:block;margin-bottom:4px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;
+    padding:11px 15px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;}
+  .controls label{display:flex;align-items:center;gap:7px;}
+  input[type=range]{width:120px;accent-color:var(--violet);}
+  .controls button{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:none;border:1px solid var(--ink);color:var(--ink);
+    padding:6px 12px;cursor:pointer;border-radius:2px;}
+  .controls button:hover{background:var(--ink);color:var(--paper);}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+  .cap{font-size:14.5px;color:#55555E;margin:-16px 0 24px;}
+  footer{margin-top:56px;border-top:1px solid var(--ink);padding-top:20px;
+    font-style:italic;font-size:16px;color:#3A3A42;}
+  @media (prefers-reduced-motion:no-preference){
+    .fresh{animation:in .3s ease-out;}
+    @keyframes in{from{opacity:0}to{opacity:1}}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Reference Plate · Affine Stratum</div>
+  <h1>The Gap, Read Backwards</h1>
+  <p class="lede">The gap is the unit cell of a covector — the slab a reading of 1 spans. Described from the arrow side, it is the whole population of vectors scoring exactly 1. Hand over that population alone, with no levels drawn, and the instrument can be rebuilt from it.</p>
+</header>
+
+<div class="plate">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-step="0" aria-selected="true">1 · Population</button>
+    <button role="tab" data-step="1" aria-selected="false">2 · Differences</button>
+    <button role="tab" data-step="2" aria-selected="false">3 · Spacing</button>
+    <button role="tab" data-step="3" aria-selected="false">4 · Rebuilt</button>
+  </div>
+  <svg id="stage" viewBox="0 0 700 460" aria-label="Reconstructing a covector from the arrows that score one"></svg>
+  <div class="readout" id="readout"></div>
+  <div class="controls">
+    <label>spread <input type="range" id="spread" min="-32" max="32" value="-7" aria-label="spread of the family"></label>
+    <button id="add">add a member</button>
+    <button id="reset">reset</button>
+  </div>
+</div>
+<p class="cap">Drag the marked head to choose a different member — the whole family follows, and so does the instrument it rebuilds. <em>Spread</em> tilts the direction along which the members differ from one another.</p>
+
+<h2>What the four steps show</h2>
+<p><strong>1 · Population.</strong> Every arrow drawn shares a tail and scores exactly 1. Long and oblique, short and steep — the covector cannot tell them apart. No levels are on the page yet; this is all the evidence there is.</p>
+<p><strong>2 · Differences.</strong> Take any two members and subtract: the difference scores 1&nbsp;−&nbsp;1&nbsp;=&nbsp;0. Every such difference lies in the <span class="term">kernel</span>, so the heads are collinear and the line they sweep gives the direction the levels run. The family's own internal spread names it.</p>
+<p><strong>3 · Spacing.</strong> Now one member is enough. Its tail sits on a level; its head lands on the next. Level 0 through the common tail, level 1 through the heads — one specimen fixes the width of the slab.</p>
+<p><strong>4 · Rebuilt.</strong> Even spacing does the rest: repeat the translation in both directions, without end, and the full ruling appears. The ascent needs no separate evidence — the population scores +1, not −1, so tail-to-head is already uphill.</p>
+
+<p>Nothing is left over. Direction, spacing, and sign are all recovered, which is why the gap is not a property the covector <em>has</em> — it is the covector, described entirely from the arrow side.</p>
+
+<footer>
+  <p>One closure worth noticing: that population, drawn in the space of vectors rather than in space, is itself a level — the covector's own level 1, seen in the mirror. The kernel is the level through the origin; the scale is nothing but the decision about which parallel translate of it gets called one.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+var W=700,H=460;
+var svg=document.getElementById("stage");
+var readout=document.getElementById("readout");
+var spreadInput=document.getElementById("spread");
+
+var T={x:212,y:344};            // common tail
+var g={x:78,y:-126};            // the chosen member (tail T, head T+g)
+var spreadDeg=-7;               // direction the family spreads along
+var SPREAD=62;                  // px per unit of spread parameter
+var ts=[-2.05,-0.95,0,1.15,2.35];
+var step=0;
+
+var STEPS=[
+  {name:"Population",
+   text:"Five arrows, one tail, no levels. Each scores exactly 1 against an instrument that has not been drawn. This is the entire evidence."},
+  {name:"Differences",
+   text:"Head to head, each difference scores 1 − 1 = 0 — a kernel vector. The heads therefore lie on one line, and that line is the direction the levels run."},
+  {name:"Spacing",
+   text:"One member is now enough. Its tail rests on level 0; its head lands on level 1. The slab between them is the gap, and its width is fixed."},
+  {name:"Rebuilt",
+   text:"Translate the slab in both directions, without end. Direction, spacing and ascent all came from the population — nothing else was supplied."}
+];
+
+function u(){var a=spreadDeg*Math.PI/180;return {x:Math.cos(a),y:Math.sin(a)};}
+function cross(a,b){return a.x*b.y-a.y*b.x;}
+function el(n,at){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+  for(var k in at)e.setAttribute(k,at[k]);return e;}
+function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+
+function waverLine(P,d,half,seed){
+  var n={x:-d.y,y:d.x},out=[];
+  for(var s=-half;s<=half;s+=26){
+    var w=1.3*Math.sin(s/49+seed*2.3)+0.7*Math.sin(s/18+seed*4.7);
+    out.push((s===-half?"M":"L")+(P.x+d.x*s+n.x*w).toFixed(1)+" "+(P.y+d.y*s+n.y*w).toFixed(1));
+  }
+  return out.join(" ");
+}
+
+function arrowHead(p,ang,len,stroke,width){
+  return el("path",{d:"M"+(p.x-len*Math.cos(ang-0.42))+" "+(p.y-len*Math.sin(ang-0.42))+
+    " L"+p.x+" "+p.y+" L"+(p.x-len*Math.cos(ang+0.42))+" "+(p.y-len*Math.sin(ang+0.42)),
+    fill:"none",stroke:stroke,"stroke-width":width,"stroke-linecap":"round","stroke-linejoin":"round"});
+}
+
+function headOf(t){var d=u();return {x:T.x+g.x+d.x*t*SPREAD, y:T.y+g.y+d.y*t*SPREAD};}
+
+function render(fresh){
+  clear(svg);
+  var d=u();
+
+  // ---- levels ----
+  if(step>=2){
+    var kRange = (step===2)?[0,1]:[-4,-3,-2,-1,0,1,2,3,4,5];
+    kRange.forEach(function(k){
+      var P={x:T.x+k*g.x, y:T.y+k*g.y};
+      // visibility check at mid-canvas
+      if(Math.abs(d.x)>0.15){
+        var s=(W/2-P.x)/d.x, ym=P.y+d.y*s;
+        if(ym<-60||ym>H+60) return;
+      }
+      var zero=(k===0);
+      svg.appendChild(el("path",{d:waverLine(P,d,900,k+4),fill:"none",
+        stroke:zero?"var(--teal)":"var(--graphite)",
+        "stroke-width":zero?2:1.3,
+        "stroke-dasharray":zero?"7 6":"none",
+        "class":fresh?"fresh":""}));
+      if(step>=3&&Math.abs(d.x)>0.15){
+        var s2=(W-42-P.x)/d.x, yl=P.y+d.y*s2;
+        if(yl>16&&yl<H-10){
+          var t=el("text",{x:W-36,y:yl+4,"font-family":"IBM Plex Mono,monospace",
+            "font-size":"13",fill:zero?"var(--teal)":"var(--ink)"});
+          t.textContent=k; svg.appendChild(t);
+        }
+      }
+    });
+  }
+
+  // ---- ascent mark ----
+  if(step>=3&&Math.abs(d.x)>0.15){
+    var sA=(58-T.x)/d.x;
+    var base={x:T.x+d.x*sA, y:T.y+d.y*sA};
+    var tip={x:base.x+g.x*0.62, y:base.y+g.y*0.62};
+    svg.appendChild(el("line",{x1:base.x,y1:base.y,x2:tip.x,y2:tip.y,
+      stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"4 4"}));
+    svg.appendChild(arrowHead(tip,Math.atan2(tip.y-base.y,tip.x-base.x),9,"var(--ink)",1.5));
+    var at=el("text",{x:base.x-6,y:base.y+18,"font-family":"IBM Plex Mono,monospace",
+      "font-size":"10","letter-spacing":"1.6",fill:"var(--graphite)"});
+    at.textContent="ASCENT"; svg.appendChild(at);
+  }
+
+  // ---- difference chord ----
+  if(step===1){
+    var lo=headOf(Math.min.apply(null,ts)), hi=headOf(Math.max.apply(null,ts));
+    var ext=46;
+    var len=Math.hypot(hi.x-lo.x,hi.y-lo.y)||1;
+    var ux=(hi.x-lo.x)/len, uy=(hi.y-lo.y)/len;
+    svg.appendChild(el("line",{x1:lo.x-ux*ext,y1:lo.y-uy*ext,x2:hi.x+ux*ext,y2:hi.y+uy*ext,
+      stroke:"var(--teal)","stroke-width":2,"stroke-dasharray":"6 5","class":fresh?"fresh":""}));
+    var mid={x:(lo.x+hi.x)/2,y:(lo.y+hi.y)/2};
+    var lab=el("text",{x:mid.x,y:mid.y-14,"font-family":"IBM Plex Mono,monospace",
+      "font-size":"11.5",fill:"var(--teal)","text-anchor":"middle","letter-spacing":"1.2"});
+    lab.textContent="DIFFERENCES READ 0"; svg.appendChild(lab);
+  }
+
+  // ---- member arrows ----
+  ts.forEach(function(t,i){
+    var Hd=headOf(t), chosen=(t===0);
+    var ang=Math.atan2(Hd.y-T.y,Hd.x-T.x);
+    var wgt=chosen?3.4:2.4;
+    var op=(step>=2&&!chosen)?0.3:0.95;
+    svg.appendChild(el("line",{x1:T.x,y1:T.y,x2:Hd.x,y2:Hd.y,
+      stroke:"var(--violet)","stroke-width":wgt,"stroke-linecap":"round",opacity:op}));
+    var ah=arrowHead(Hd,ang,12,"var(--violet)",wgt); ah.setAttribute("opacity",op);
+    svg.appendChild(ah);
+    if(step===1){
+      var dot=el("circle",{cx:Hd.x,cy:Hd.y,r:4.6,fill:"var(--teal)"});
+      svg.appendChild(dot);
+    }
+  });
+
+  // common tail
+  svg.appendChild(el("circle",{cx:T.x,cy:T.y,r:5,fill:"var(--violet)"}));
+
+  // handle on the chosen member's head
+  var HC=headOf(0);
+  svg.appendChild(el("circle",{cx:HC.x,cy:HC.y,r:8,fill:"#fff",
+    stroke:"var(--violet)","stroke-width":2.2}));
+  svg.appendChild(el("circle",{cx:HC.x,cy:HC.y,r:24,fill:"transparent",id:"grab"}));
+
+  // reading badge on the chosen member
+  var mid2={x:(T.x+HC.x)/2+16,y:(T.y+HC.y)/2};
+  var rb=el("text",{x:mid2.x,y:mid2.y,"font-family":"IBM Plex Mono,monospace",
+    "font-size":"13",fill:"var(--violet)"});
+  rb.textContent="+1"; svg.appendChild(rb);
+
+  var s=STEPS[step];
+  readout.innerHTML='<span class="step-name">'+s.name+'</span>'+s.text;
+}
+
+/* ---- interaction ---- */
+var dragging=false,start=null,g0=null;
+function pos(ev){var r=svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(W/r.width),y:(ev.clientY-r.top)*(H/r.height)};}
+
+svg.addEventListener("pointerdown",function(ev){
+  if(ev.target.id!=="grab")return;
+  dragging=true;start=pos(ev);g0={x:g.x,y:g.y};
+  svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+});
+svg.addEventListener("pointermove",function(ev){
+  if(!dragging)return;
+  var p=pos(ev);
+  var cand={x:g0.x+p.x-start.x,y:g0.y+p.y-start.y};
+  // keep the member clear of the spread direction, and on the page
+  if(Math.abs(cross(u(),cand))<34)return;
+  var head={x:T.x+cand.x,y:T.y+cand.y};
+  if(head.x<40||head.x>W-70||head.y<26||head.y>H-26)return;
+  g=cand;render();
+});
+svg.addEventListener("pointerup",function(){dragging=false;});
+svg.addEventListener("pointercancel",function(){dragging=false;});
+
+spreadInput.addEventListener("input",function(){
+  spreadDeg=+this.value;
+  if(Math.abs(cross(u(),g))<34)return;
+  render();
+});
+
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll('.tabs button').forEach(function(o){
+      o.setAttribute("aria-selected", o===b ? "true":"false");});
+    step=+b.dataset.step;render(true);
+  });
+});
+
+document.getElementById("add").addEventListener("click",function(){
+  if(ts.length>=11)return;
+  var t=(Math.random()*6-3);
+  ts.push(Math.round(t*100)/100);
+  ts.sort(function(a,b){return a-b;});
+  render(true);
+});
+document.getElementById("reset").addEventListener("click",function(){
+  ts=[-2.05,-0.95,0,1.15,2.35];g={x:78,y:-126};
+  spreadDeg=-7;spreadInput.value=-7;render(true);
+});
+
+render();
+})();
+</script>
+</body>
+</html>
