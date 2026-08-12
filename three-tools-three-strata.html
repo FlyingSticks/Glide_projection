@@ -295,15 +295,28 @@ function renderT2(fresh){
   svg.appendChild(el("circle",{cx:BB.x,cy:BB.y,r:24,fill:"transparent",id:"grab2"}));
 
   var pt=phi2(TAIL), ph=phi2(Hd);
-  var coarse=Math.floor(ph)-Math.floor(pt);
-  var msg='purchase: one gap · propagated levels: '+(t2.extent*2)+' · coarse count of v: '+
+  var loD=-(t2.extent-1), hiD=Math.max(1,t2.extent);
+  function census(scale){
+    var a=Math.min(pt,ph)*scale, b=Math.max(pt,ph)*scale, c=0;
+    for(var m=Math.floor(a)+1;m<=Math.floor(b);m++){
+      if(m/scale<loD-1e-9||m/scale>hiD+1e-9)continue;
+      c++;
+    }
+    return (ph>=pt?c:-c);
+  }
+  var coarse=census(1);
+  var beyond=(Math.max(pt,ph)>hiD+1e-9)||(Math.min(pt,ph)<loD-1e-9);
+  var msg='purchase: one gap · drawn levels: '+(hiD-loD+1)+' · count of v against drawn levels: '+
     (coarse>0?"+":"")+coarse;
   if(t2.refine>1){
-    var fine=Math.floor(t2.refine*ph)-Math.floor(t2.refine*pt);
+    var fine=census(t2.refine);
     msg+=' · fine count: '+(fine>0?"+":"")+fine+'/'+t2.refine;
   }
+  if(beyond){
+    msg+='<br>An endpoint lies beyond the drawn ruling — the instrument continues, but the drawing doesn\u2019t yet. Propagate to finish the census.';
+  }
   readout.innerHTML='<span class="rt">II · Import the graduation</span>'+msg+
-    '<br>Every number here is a count, and every count survives the shear.';
+    (beyond?'':'<br>Every number here is a count, and every count survives the shear.');
   plateCap.textContent="One stamped gap; the straightedge does everything after. Propagate, refine, and shear — the levels stay parallel, the evenness along the direction persists, and the readouts never move.";
 }
 
