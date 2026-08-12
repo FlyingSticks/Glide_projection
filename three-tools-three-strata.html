@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three Tools, Three Strata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6; --ink:#23232A; --graphite:#8E8E96; --rule:#DDDCD5;
+    --violet:#7B2FBE; --teal:#0F9B94; --blue:#2C55D8; --red:#C9372C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;line-height:1.62;}
+  .sheet{max-width:740px;margin:0 auto;padding:0 20px 88px;}
+  header{padding:56px 0 4px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--graphite);}
+  h1{font-weight:600;font-size:clamp(28px,6vw,42px);line-height:1.12;
+    letter-spacing:-.01em;margin:10px 0 14px;}
+  .lede{font-style:italic;font-size:clamp(16.5px,2.5vw,19px);line-height:1.55;
+    margin-bottom:22px;}
+  p{margin:0 0 15px;}
+  h2{font-weight:600;font-size:21px;margin:42px 0 12px;}
+  .term{color:var(--violet);font-weight:600;}
+  strong{font-weight:600;}
+
+  /* inventory strip */
+  .inventory{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    margin:8px 0 30px;}
+  .inv-row{display:grid;grid-template-columns:34% 41% 25%;gap:8px;
+    padding:10px 2px;border-bottom:1px solid var(--rule);
+    font-size:14.5px;align-items:baseline;}
+  .inv-row:last-child{border-bottom:none;}
+  .inv-row .tool{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    letter-spacing:.14em;text-transform:uppercase;}
+  .inv-row .stratum{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    color:var(--graphite);text-align:right;letter-spacing:.08em;}
+
+  /* plate */
+  .plate{margin:26px 0 24px;border:1px solid var(--ink);background:#FFFFFE;}
+  .tabs{display:flex;border-bottom:1px solid var(--ink);}
+  .tabs button{flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;background:none;border:none;
+    border-right:1px solid var(--rule);padding:11px 4px;cursor:pointer;
+    color:var(--graphite);line-height:1.35;}
+  .tabs button:last-child{border-right:none;}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);}
+  .tabs button:hover:not([aria-selected="true"]){color:var(--ink);}
+  .plate svg{display:block;width:100%;height:auto;touch-action:none;
+    user-select:none;-webkit-user-select:none;}
+  .readout{font-size:15px;line-height:1.55;padding:12px 15px;
+    border-top:1px solid var(--rule);min-height:74px;}
+  .readout .rt{font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--violet);
+    display:block;margin-bottom:4px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;
+    padding:11px 15px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;}
+  .controls label{display:flex;align-items:center;gap:7px;}
+  input[type=range]{width:120px;accent-color:var(--violet);}
+  .controls button{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:none;border:1px solid var(--ink);color:var(--ink);
+    padding:6px 12px;cursor:pointer;border-radius:2px;}
+  .controls button:hover:not(:disabled){background:var(--ink);color:var(--paper);}
+  .controls button:disabled{opacity:.35;cursor:default;}
+  .shearbox{margin-left:auto;display:flex;align-items:center;gap:7px;
+    padding-left:14px;border-left:1px solid var(--rule);}
+  .shearbox input{accent-color:var(--ink);}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+  .cap{font-size:14.5px;color:#55555E;margin:-14px 0 24px;}
+  footer{margin-top:54px;border-top:1px solid var(--ink);padding-top:20px;
+    font-style:italic;font-size:16px;color:#3A3A42;}
+  @media (max-width:560px){
+    .inv-row{grid-template-columns:1fr;gap:2px;}
+    .inv-row .stratum{text-align:left;}
+    .shearbox{margin-left:0;padding-left:0;border-left:none;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .fresh{animation:in .3s ease-out;}
+    @keyframes in{from{opacity:0}to{opacity:1}}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Reference Plate · Tool Inventory</div>
+  <h1>Three Tools, Three Strata</h1>
+  <p class="lede">A ruler is a straightedge with evenly-spaced markings brought in from the outside. That sentence is the entire stratification of geometry, stated as shop practice — and "brought in from the outside" is a theorem, not a manufacturing detail.</p>
+</header>
+
+<div class="inventory">
+  <div class="inv-row"><span class="tool">Straightedge</span><span>joins and intersections — incidence, free of charge</span><span class="stratum">projective</span></div>
+  <div class="inv-row"><span class="tool">Graduation</span><span>one gap, imported once, propagated forever</span><span class="stratum">affine</span></div>
+  <div class="inv-row"><span class="tool">Compass</span><span>carries a length across directions</span><span class="stratum">metric</span></div>
+</div>
+
+<div class="plate">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="0" aria-selected="true">I · Straightedge alone</button>
+    <button role="tab" data-tab="1" aria-selected="false">II · Import the graduation</button>
+    <button role="tab" data-tab="2" aria-selected="false">III · The compass's cargo</button>
+  </div>
+  <svg id="stage" viewBox="0 0 700 440" aria-label="Interactive drafting figure with a shear control"></svg>
+  <div class="readout" id="readout"></div>
+  <div class="controls" id="controls">
+    <span id="tabControls" style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;"></span>
+    <span class="shearbox"><label>shear the page <input type="range" id="shear" min="-45" max="45" value="0" aria-label="shear"></label></span>
+  </div>
+</div>
+<p class="cap" id="plateCap"></p>
+
+<h2>The decomposition</h2>
+<p>Ruler&nbsp;=&nbsp;straightedge&nbsp;+&nbsp;external markings is exactly incidence&nbsp;+&nbsp;affine datum. The straightedge draws joins and intersections and can never do more: Panel&nbsp;I shows why. Every candidate line through P meets ℓ somewhere, and rotating the candidate only chases the meeting point along; nothing constructible distinguishes the one line that misses. That the graduation must arrive from elsewhere is Playfair's independence — the parallel axiom cannot be derived from incidence — worn as shop practice. The drafting teacher's phrase and the logician's theorem are one statement.</p>
+
+<h2>What the markings are</h2>
+<p>Once imported, look at them: evenly spaced, endless in principle, numbers printed ascending. The graduation is a <span class="term">covector</span>, restricted to the tool's edge — gap, evenness, marked ascent, all three, etched in aluminum. A ruler is a straightedge carrying one covector along itself, and using it is the standing vocabulary verbatim: laying the ruler against a line is <em>parking</em> the instrument, reading off a length is the <em>pairing</em>, and the etched unit interval is the <em>gap</em>, physically present.</p>
+
+<h2>The economics of the import</h2>
+<p>The outside purchase happens once. Panel&nbsp;II stamps a single gap — levels 0 and 1, one parallelogram's worth of data, the same gift as a marked midpoint in another currency — and from there the straightedge propagates it without limit: every further level, every subdivision, every refinement, the whole endless ruling of the plane. No second ruler is ever needed, which is why a drafting board carries one scale and many straightedges rather than the reverse. Slide the shear and watch the readouts hold: everything the graduation grants is stated in counts, and counts are shear-proof.</p>
+
+<h2>What even the ruler cannot do</h2>
+<p>Laid along one line and then along an oblique one, the claim that its marks "mean the same" in both positions is a further import — the compass's cargo, the circle. Panel&nbsp;III poses the question the affine page cannot answer, lets the compass answer it, and then shears the page: the circle goes elliptical and the cross-direction verdict leaves the page, while both rulings keep their internal evenness and every count survives. Three tools, three strata — straightedge, graduation, compass; projective, affine, metric. The covector project runs entirely on the first two. The third is the one it has been showing you how to decline.</p>
+
+<footer>
+  <p>One purchase, then incidence does the rest — and the shear is the assay that shows which claims were bought where.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+var W=700,H=440,CY=220;
+var svg=document.getElementById("stage");
+var readout=document.getElementById("readout");
+var plateCap=document.getElementById("plateCap");
+var tabControls=document.getElementById("tabControls");
+var shearInput=document.getElementById("shear");
+
+var tab=0;
+var k=0; // shear
+
+function S(p){return {x:p.x+k*(p.y-CY), y:p.y};}
+function el(n,at){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+  for(var q in at)e.setAttribute(q,at[q]);return e;}
+function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function line(a,b,at){var A=S(a),B=S(b);
+  var o={x1:A.x,y1:A.y,x2:B.x,y2:B.y};for(var q in at)o[q]=at[q];
+  return el("line",o);}
+function dot(p,r,fill){var P=S(p);return el("circle",{cx:P.x,cy:P.y,r:r,fill:fill});}
+function txt(p,str,at){var P=S(p);
+  var o={x:P.x,y:P.y,"font-family":"IBM Plex Mono,monospace","font-size":"12",fill:"var(--ink)"};
+  for(var q in at)o[q]=at[q];
+  var t=el("text",o);t.textContent=str;return t;}
+function waver(a,b,seed,at){
+  var A=S(a),B=S(b);
+  var dx=B.x-A.x,dy=B.y-A.y,len=Math.hypot(dx,dy)||1;
+  var ux=dx/len,uy=dy/len,nx=-uy,ny=ux,out=[];
+  for(var s=0;s<=len;s+=26){
+    var w=1.3*Math.sin(s/49+seed*2.3)+0.7*Math.sin(s/18+seed*4.7);
+    out.push((s===0?"M":"L")+(A.x+ux*s+nx*w).toFixed(1)+" "+(A.y+uy*s+ny*w).toFixed(1));
+  }
+  var o={d:out.join(" "),fill:"none"};for(var q in at)o[q]=at[q];
+  return el("path",o);
+}
+function arrowHead(p,ang,len,stroke,width){
+  var P=S(p);
+  return el("path",{d:"M"+(P.x-len*Math.cos(ang-0.42))+" "+(P.y-len*Math.sin(ang-0.42))+
+    " L"+P.x+" "+P.y+" L"+(P.x-len*Math.cos(ang+0.42))+" "+(P.y-len*Math.sin(ang+0.42)),
+    fill:"none",stroke:stroke,"stroke-width":width,"stroke-linecap":"round","stroke-linejoin":"round"});
+}
+function pos(ev){var r=svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(W/r.width),y:(ev.clientY-r.top)*(H/r.height)};}
+function unS(p){return {x:p.x-k*(p.y-CY), y:p.y};}
+
+/* =============== TAB I : straightedge alone =============== */
+var t1={theta:-14}; // degrees; 0 = parallel to ell
+var ELL_Y=312, P1={x:280,y:150};
+
+function renderT1(){
+  clear(svg);
+  svg.appendChild(waver({x:16,y:ELL_Y},{x:W-16,y:ELL_Y},3,
+    {stroke:"var(--graphite)","stroke-width":1.6}));
+  svg.appendChild(txt({x:W-52,y:ELL_Y-10},"ℓ",{"font-size":"14"}));
+
+  var th=t1.theta*Math.PI/180;
+  var d={x:Math.cos(th),y:Math.sin(th)};
+  var EXT=3000;
+  var a={x:P1.x-d.x*EXT,y:P1.y-d.y*EXT}, b={x:P1.x+d.x*EXT,y:P1.y+d.y*EXT};
+  svg.appendChild(line(a,b,{stroke:"var(--violet)","stroke-width":2.6,
+    "stroke-dasharray":"none"}));
+
+  // handle at fixed radius from P
+  var hp={x:P1.x+d.x*150,y:P1.y+d.y*150};
+  svg.appendChild(dot(P1,5,"var(--violet)"));
+  svg.appendChild(txt({x:P1.x-24,y:P1.y-10},"P",{"font-size":"14",fill:"var(--violet)"}));
+  var HP=S(hp);
+  svg.appendChild(el("circle",{cx:HP.x,cy:HP.y,r:8,fill:"#fff",
+    stroke:"var(--violet)","stroke-width":2.2}));
+  svg.appendChild(el("circle",{cx:HP.x,cy:HP.y,r:26,fill:"transparent",id:"grab1"}));
+
+  var msg,cap;
+  if(Math.abs(d.y)<0.0028){
+    msg="No meeting anywhere — and no mark on the page certifies it. Incidence cannot pick the line that misses.";
+    cap="The candidate is now parallel to ℓ, and the page looks no different than it did a degree ago.";
+  }else{
+    var t=(ELL_Y-P1.y)/d.y;
+    var ix=P1.x+d.x*t;
+    var Q={x:ix,y:ELL_Y};
+    if(t>0&&ix>-2000&&ix<4000){
+      if(ix>20&&ix<W-20){
+        svg.appendChild(dot(Q,4.5,"var(--ink)"));
+      }else{
+        var edge={x:ix<20?26:W-26,y:ELL_Y};
+        var E=S(edge);
+        svg.appendChild(arrowHead(edge,ix<20?Math.PI:0,10,"var(--ink)",1.6));
+      }
+      var dist=Math.round(Math.abs(t));
+      msg="The candidate meets ℓ "+(ix>20&&ix<W-20?"on the page":"off the page")+
+        " — "+dist+" units out. Rotate toward parallel and the meeting point flees; it never resigns.";
+      cap="Drag the handle. The meeting point runs along ℓ, faster and faster, and is still a meeting.";
+    }else{
+      msg="The meeting is behind the drawn segment now — still a meeting. Incidence only ever reports intersections.";
+      cap="Drag the handle to chase the meeting point the other way.";
+    }
+  }
+  readout.innerHTML='<span class="rt">I · Straightedge alone</span>'+msg;
+  plateCap.textContent=cap+" Shear the page: every incidence fact survives untouched — this stratum has nothing to lose.";
+}
+
+var drag1=false;
+function t1Down(ev){
+  if(ev.target.id!=="grab1")return;
+  drag1=true;svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+}
+function t1Move(ev){
+  if(!drag1)return;
+  var p=unS(pos(ev));
+  var th=Math.atan2(p.y-P1.y,p.x-P1.x)*180/Math.PI;
+  if(th>90)th-=180; if(th<-90)th+=180;
+  t1.theta=Math.max(-60,Math.min(60,th));
+  renderT1();
+}
+
+/* =============== TAB II : import the graduation =============== */
+var t2={extent:1, refine:1, head:{x:472,y:118}};
+var Y0=330, SP=64, TAIL={x:186,y:346};
+
+function phi2(p){return (Y0-p.y)/SP;}
+
+function renderT2(fresh){
+  clear(svg);
+  // fine levels
+  if(t2.refine>1){
+    for(var j=-2*t2.refine;j<=6*t2.refine;j++){
+      if(j%t2.refine===0)continue;
+      var lv=j/t2.refine;
+      var y=Y0-lv*SP;
+      if(y<10||y>H-8)continue;
+      if(lv>Math.max(1,t2.extent)+0.001||lv<Math.min(0,-(t2.extent-1))-0.001)continue;
+      svg.appendChild(waver({x:16,y:y},{x:W-56,y:y},j*1.3+11,
+        {stroke:"var(--blue)","stroke-width":1,opacity:.55}));
+    }
+  }
+  // coarse levels: imported 0,1 + propagated
+  for(var m=-(t2.extent-1);m<=Math.max(1,t2.extent);m++){
+    var y2=Y0-m*SP;
+    if(y2<10||y2>H-8)continue;
+    var zero=(m===0), imported=(m===0||m===1);
+    svg.appendChild(waver({x:16,y:y2},{x:W-56,y:y2},m+4,
+      {stroke:zero?"var(--teal)":"var(--graphite)",
+       "stroke-width":imported?2:1.3,
+       "stroke-dasharray":zero?"7 6":"none",
+       "class":fresh?"fresh":""}));
+    svg.appendChild(txt({x:W-44,y:y2+4},String(m),
+      {fill:zero?"var(--teal)":"var(--ink)","font-size":"13"}));
+  }
+  svg.appendChild(txt({x:22,y:Y0-SP/2+4},"IMPORTED ONCE",
+    {fill:"var(--teal)","font-size":"9.5","letter-spacing":"1.8"}));
+
+  // vector
+  var Hd=t2.head;
+  svg.appendChild(line(TAIL,Hd,{stroke:"var(--violet)","stroke-width":3.2,
+    "stroke-linecap":"round"}));
+  var A=S(TAIL),B=S(Hd);
+  svg.appendChild(arrowHead(Hd,Math.atan2(B.y-A.y,B.x-A.x),12,"var(--violet)",3.2));
+  svg.appendChild(dot(TAIL,4.5,"var(--violet)"));
+  var BB=S(Hd);
+  svg.appendChild(el("circle",{cx:BB.x,cy:BB.y,r:24,fill:"transparent",id:"grab2"}));
+
+  var pt=phi2(TAIL), ph=phi2(Hd);
+  var coarse=Math.floor(ph)-Math.floor(pt);
+  var msg='purchase: one gap · propagated levels: '+(t2.extent*2)+' · coarse count of v: '+
+    (coarse>0?"+":"")+coarse;
+  if(t2.refine>1){
+    var fine=Math.floor(t2.refine*ph)-Math.floor(t2.refine*pt);
+    msg+=' · fine count: '+(fine>0?"+":"")+fine+'/'+t2.refine;
+  }
+  readout.innerHTML='<span class="rt">II · Import the graduation</span>'+msg+
+    '<br>Every number here is a count, and every count survives the shear.';
+  plateCap.textContent="One stamped gap; the straightedge does everything after. Propagate, refine, and shear — the levels stay parallel, the evenness along the direction persists, and the readouts never move.";
+}
+
+var drag2=false,start2=null,h20=null;
+function t2Down(ev){
+  if(ev.target.id!=="grab2")return;
+  drag2=true;start2=pos(ev);h20={x:t2.head.x,y:t2.head.y};
+  svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+}
+function t2Move(ev){
+  if(!drag2)return;
+  var p=pos(ev),q=unS(p),s=unS(start2);
+  t2.head={x:Math.max(40,Math.min(W-90,h20.x+q.x-s.x)),
+           y:Math.max(20,Math.min(H-16,h20.y+q.y-s.y))};
+  renderT2();
+}
+
+/* =============== TAB III : the compass's cargo =============== */
+var t3={compass:false};
+var O={x:300,y:262};
+var RED_U=74, BLUE_U=56, BLUE_TH=-38*Math.PI/180;
+
+function renderT3(fresh){
+  clear(svg);
+  var rd={x:1,y:0}, bd={x:Math.cos(BLUE_TH),y:Math.sin(BLUE_TH)};
+
+  // two graduated lines
+  svg.appendChild(waver({x:O.x-3.2*RED_U,y:O.y},{x:O.x+4.6*RED_U,y:O.y},2,
+    {stroke:"var(--red)","stroke-width":1.8}));
+  svg.appendChild(waver({x:O.x-2.2*BLUE_U*bd.x,y:O.y-2.2*BLUE_U*bd.y},
+    {x:O.x+4.8*BLUE_U*bd.x,y:O.y+4.8*BLUE_U*bd.y},6,
+    {stroke:"var(--blue)","stroke-width":1.8}));
+
+  // ticks
+  function tick(P,d,color){
+    var n={x:-d.y,y:d.x};
+    svg.appendChild(line({x:P.x-6*n.x,y:P.y-6*n.y},{x:P.x+6*n.x,y:P.y+6*n.y},
+      {stroke:color,"stroke-width":2}));
+  }
+  for(var i=-2;i<=4;i++){ if(i===0)continue;
+    tick({x:O.x+i*RED_U,y:O.y},rd,"var(--red)");}
+  for(var j=-1;j<=4;j++){ if(j===0)continue;
+    tick({x:O.x+j*BLUE_U*bd.x,y:O.y+j*BLUE_U*bd.y},bd,"var(--blue)");}
+  svg.appendChild(dot(O,4.5,"var(--ink)"));
+  svg.appendChild(txt({x:O.x-10,y:O.y+22},"O",{"font-size":"13"}));
+  svg.appendChild(txt({x:O.x+RED_U-8,y:O.y+24},"1",{fill:"var(--red)","font-size":"12"}));
+  svg.appendChild(txt({x:O.x+BLUE_U*bd.x+10,y:O.y+BLUE_U*bd.y-8},"1",
+    {fill:"var(--blue)","font-size":"12"}));
+
+  var msg,cap;
+  if(t3.compass){
+    // circle radius RED_U about O, drawn under shear (ellipse as polyline)
+    var pts=[];
+    for(var a=0;a<=Math.PI*2+0.05;a+=Math.PI/48){
+      var P=S({x:O.x+RED_U*Math.cos(a),y:O.y+RED_U*Math.sin(a)});
+      pts.push((a===0?"M":"L")+P.x.toFixed(1)+" "+P.y.toFixed(1));
+    }
+    svg.appendChild(el("path",{d:pts.join(" "),fill:"none",
+      stroke:"var(--ink)","stroke-width":1.4,"stroke-dasharray":"5 4",
+      "class":fresh?"fresh":""}));
+    // transfer mark: circle ∩ blue line at distance RED_U along bd
+    var M={x:O.x+RED_U*bd.x,y:O.y+RED_U*bd.y};
+    svg.appendChild(dot(M,4.5,"var(--ink)"));
+    var ratio=(BLUE_U/RED_U).toFixed(2);
+    if(Math.abs(k)<0.02){
+      msg="The circle carries red's unit onto the blue line: the transferred mark misses blue's own tick. Verdict: blue's unit = "+ratio+" × red's. The question now has an answer — purchased.";
+      cap="The compass is the license to compare across directions. Note what it drew: a circle, the metric in person.";
+    }else{
+      msg="The witness is now an ellipse. On this sheared page the transferred mark is not \"the same length\" as anything — the verdict has left the page. Both rulings keep their internal evenness; every count survives.";
+      cap="Shear confiscates exactly the compass's cargo and nothing else. What was bought at the metric stratum is what the assay removes.";
+    }
+  }else{
+    msg="Two graduated lines through O, each evenly spaced within itself. Is red's unit equal to blue's? This page has no answer — not \"unknown,\" but unaskable: no construction here can compare spacings across directions.";
+    cap="Each ruling is internally certified by parallels. The comparison between them is not on sale at this stratum.";
+  }
+  readout.innerHTML='<span class="rt">III · The compass\u2019s cargo</span>'+msg;
+  plateCap.textContent=cap;
+}
+
+/* =============== shared chrome =============== */
+function buildControls(){
+  clear(tabControls);
+  if(tab===1){
+    var b1=document.createElement("button");
+    b1.textContent="propagate with straightedge";
+    b1.addEventListener("click",function(){
+      if(t2.extent<5){t2.extent++;renderT2(true);}
+    });
+    tabControls.appendChild(b1);
+    var lab=document.createElement("label");
+    lab.innerHTML='refine n <input type="range" min="1" max="6" value="'+t2.refine+'" aria-label="refinement">';
+    lab.querySelector("input").addEventListener("input",function(){
+      t2.refine=+this.value;renderT2();
+    });
+    tabControls.appendChild(lab);
+  }else if(tab===2){
+    var b2=document.createElement("button");
+    b2.textContent=t3.compass?"return the compass":"import the compass";
+    b2.addEventListener("click",function(){
+      t3.compass=!t3.compass;buildControls();render(true);
+    });
+    tabControls.appendChild(b2);
+  }
+}
+function render(fresh){
+  if(tab===0)renderT1();
+  else if(tab===1)renderT2(fresh);
+  else renderT3(fresh);
+}
+
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll('.tabs button').forEach(function(o){
+      o.setAttribute("aria-selected",o===b?"true":"false");});
+    tab=+b.dataset.tab;buildControls();render(true);
+  });
+});
+shearInput.addEventListener("input",function(){k=this.value/100;render();});
+
+svg.addEventListener("pointerdown",function(ev){t1Down(ev);t2Down(ev);});
+svg.addEventListener("pointermove",function(ev){t1Move(ev);t2Move(ev);});
+svg.addEventListener("pointerup",function(){drag1=false;drag2=false;});
+svg.addEventListener("pointercancel",function(){drag1=false;drag2=false;});
+
+buildControls();
+render();
+})();
+</script>
+</body>
+</html>
