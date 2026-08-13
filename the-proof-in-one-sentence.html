@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Proof in One Sentence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6; --ink:#23232A; --graphite:#8E8E96; --rule:#DDDCD5;
+    --violet:#7B2FBE; --teal:#0F9B94; --amber:#B26A00; --red:#C9372C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;line-height:1.62;}
+  .sheet{max-width:740px;margin:0 auto;padding:0 20px 88px;}
+  header{padding:56px 0 4px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--graphite);}
+  h1{font-weight:600;font-size:clamp(28px,6vw,42px);line-height:1.12;
+    letter-spacing:-.01em;margin:10px 0 14px;}
+  .lede{font-style:italic;font-size:clamp(17px,2.6vw,20px);line-height:1.55;
+    border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding:16px 2px;margin-bottom:24px;}
+  p{margin:0 0 15px;}
+  h2{font-weight:600;font-size:21px;margin:42px 0 12px;}
+  .term{color:var(--violet);font-weight:600;}
+  strong{font-weight:600;}
+  .op{font-family:"IBM Plex Mono",monospace;font-size:.94em;}
+
+  .plate{margin:26px 0 24px;border:1px solid var(--ink);background:#FFFFFE;}
+  .tabs{display:flex;border-bottom:1px solid var(--ink);}
+  .tabs button{flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;background:none;border:none;
+    border-right:1px solid var(--rule);padding:11px 4px;cursor:pointer;
+    color:var(--graphite);line-height:1.35;}
+  .tabs button:last-child{border-right:none;}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);}
+  .tabs button:hover:not([aria-selected="true"]){color:var(--ink);}
+  .plate svg{display:block;width:100%;height:auto;touch-action:none;
+    user-select:none;-webkit-user-select:none;}
+  .readout{font-size:15px;line-height:1.55;padding:12px 15px;
+    border-top:1px solid var(--rule);min-height:92px;}
+  .readout .rt{font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--violet);
+    display:block;margin-bottom:4px;}
+  .readout .mono{font-family:"IBM Plex Mono",monospace;font-size:13px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;
+    padding:11px 15px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;}
+  .controls label{display:flex;align-items:center;gap:7px;}
+  input[type=range]{width:150px;accent-color:var(--violet);}
+  .controls button{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:none;border:1px solid var(--ink);color:var(--ink);
+    padding:6px 12px;cursor:pointer;border-radius:2px;}
+  .controls button:hover{background:var(--ink);color:var(--paper);}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+  .cap{font-size:14.5px;color:#55555E;margin:-14px 0 24px;}
+  footer{margin-top:54px;border-top:1px solid var(--ink);padding-top:20px;
+    font-style:italic;font-size:16px;color:#3A3A42;}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Reference Plate · Non-Constructibility</div>
+  <h1>The Proof in One Sentence</h1>
+  <p class="lede">A construction made only of joins and meets can't produce anything that a join-and-meet-preserving map can destroy — and the Type B fan is such a map, destroying even spacing in plain sight.</p>
+</header>
+
+<div class="plate">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="0" aria-selected="true">Step one · The principle</button>
+    <button role="tab" data-tab="1" aria-selected="false">Step two · The counterexample</button>
+  </div>
+  <svg id="stage" viewBox="0 0 700 440" aria-label="Interactive proof figure"></svg>
+  <div class="readout" id="readout"></div>
+  <div class="controls" id="controls"></div>
+</div>
+<p class="cap" id="cap"></p>
+
+<h2>Step one — the recipe cannot tell</h2>
+<p>The panel runs a genuine straightedge recipe: from the givens <span class="op">A, B, C, P, F</span> it performs five joins and four meets and outputs the point <span class="op">D</span> — the harmonic conjugate, the quadrangle construction from your own sheets. Now transform the page projectively. Every given moves; every construction line moves; and the recipe, replayed from scratch on the moved givens, lands its output <em>exactly on the moved image of the old output</em>. The amber dot never leaves the amber ring.</p>
+<p>That is <span class="term">equivariance</span>, and the reason for it is almost too plain: the recipe is made of joins and meets, and the map preserves joins and meets, so the recipe passes through the map untouched — transform-then-construct equals construct-then-transform. The recipe has no way to notice it was transformed, because everything it can speak of is preserved. Consequence: <strong>anything a straightedge can construct from given data rides along with every projective map of that data.</strong> Constructible implies undestroyable.</p>
+
+<h2>Step two — one drawing refutes every procedure</h2>
+<p>Contrapositive: to prove that even spacing is <em>not</em> constructible, you need not examine any procedure at all. You need one join-and-meet-preserving map that destroys even spacing. The second panel is that map, and it is your drawing: the <span class="term">Type B fan</span>. Five equally spaced marks ride through a finite collector onto another line. Every join is still a join, every meet still a meet — the audit in the readout finds nothing broken — and the spacing arrives as a progression, ruined. Slide the collector to infinity and the fan becomes your Type A parallels: spacing restored, which is exactly why the affine datum is a point at infinity and nothing less.</p>
+<p>Were even spacing a creature of joins and meets, step one says no such map could touch it. The fan touches it. Therefore no straightedge procedure — tried, untried, or undreamt — ever outputs it. The graduation must be brought in from the outside: a theorem, proved by a drawing you had already made.</p>
+
+<h2>Why non-existence needs this shape</h2>
+<p>"There is no procedure" quantifies over every finite sequence of joins and meets, so it can never be settled by failing a few attempts. The invariance argument closes all routes at once: it finds the one property every route must have (equivariance) and exhibits one object without it (spacing, under the fan). Everything in the longer telling — homogeneous coordinates, harmonic conjugates, Playfair — was scaffolding around those two moves. The two panels are the two moves.</p>
+
+<footer>
+  <p>Step one: what the tool builds, the map carries. Step two: the map wrecks the spacing. Conclusion: the tool never built it.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+var W=700,H=440,CX=350,CY=220;
+var svg=document.getElementById("stage");
+var readout=document.getElementById("readout");
+var capEl=document.getElementById("cap");
+var controls=document.getElementById("controls");
+var tab=0, drag=null;
+
+/* ---------- homogeneous helpers (centered frame) ---------- */
+function h(p){return [p.x-CX,p.y-CY,1];}
+function pt(v){return {x:CX+v[0]/v[2], y:CY+v[1]/v[2]};}
+function cross3(a,b){return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];}
+function join(p,q){return cross3(h(p),h(q));}
+function meet(l1,l2){var v=cross3(l1,l2);return Math.abs(v[2])<1e-9?null:pt(v);}
+function Hmap(p,k){var v=h(p);var w=v[2]+k*v[0];
+  return Math.abs(w)<1e-6?null:{x:CX+v[0]/w,y:CY+v[1]/w};}
+function Hinv(p,k){return Hmap(p,-k);}
+
+function el(n,at){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+  for(var q in at)e.setAttribute(q,at[q]);return e;}
+function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function pos(ev){var r=svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(W/r.width),y:(ev.clientY-r.top)*(H/r.height)};}
+function txt(x,y,s,at){
+  var o={x:x,y:y,"font-family":"IBM Plex Mono,monospace","font-size":"13",fill:"var(--ink)"};
+  for(var q in at)o[q]=at[q];
+  var t=el("text",o);t.textContent=s;return t;}
+function seg(a,b,at){var o={x1:a.x,y1:a.y,x2:b.x,y2:b.y};
+  for(var q in at)o[q]=at[q];return el("line",o);}
+function lineThrough(a,b,at){
+  var dx=b.x-a.x,dy=b.y-a.y,m=Math.hypot(dx,dy)||1;
+  return seg({x:a.x-dx/m*2000,y:a.y-dy/m*2000},
+             {x:a.x+dx/m*2000,y:a.y+dy/m*2000},at);}
+function handle(p,color,id){
+  var f=document.createDocumentFragment();
+  f.appendChild(el("circle",{cx:p.x,cy:p.y,r:6,fill:"#fff",stroke:color,"stroke-width":2.2}));
+  f.appendChild(el("circle",{cx:p.x,cy:p.y,r:24,fill:"transparent",id:id}));
+  return f;}
+
+/* ============ TAB 0 : equivariance ============ */
+var LY=316;
+var G={A:{x:170,y:LY},B:{x:490,y:LY},C:{x:430,y:LY},P:{x:296,y:132},F:{x:452,y:214}};
+var k=0;
+
+function construct(g){
+  var lAP=join(g.A,g.P), lBP=join(g.B,g.P), lCF=join(g.C,g.F);
+  var X=meet(lCF,lAP), Y=meet(lCF,lBP);
+  if(!X||!Y)return null;
+  var Z=meet(join(g.A,Y),join(g.B,X));
+  if(!Z)return null;
+  return meet(join(g.P,Z),join(g.A,g.B));
+}
+
+function render0(){
+  clear(svg);
+  // transformed givens
+  var T={},ok=true;
+  ["A","B","C","P","F"].forEach(function(n){
+    var q=Hmap(G[n],k); if(!q)ok=false; T[n]=q;});
+  if(!ok){readout.textContent="degenerate transform";return;}
+
+  // scene: construction replayed on transformed givens
+  var lCF=[T.C,T.F], X=meet(join(T.C,T.F),join(T.A,T.P)),
+      Y=meet(join(T.C,T.F),join(T.B,T.P));
+  svg.appendChild(lineThrough(T.A,T.B,{stroke:"var(--graphite)","stroke-width":1.5}));
+  [[T.A,T.P],[T.B,T.P],[T.C,T.F]].forEach(function(pr){
+    svg.appendChild(lineThrough(pr[0],pr[1],{stroke:"var(--violet)","stroke-width":1.2,opacity:.55}));});
+  var Z=null, Dscene=null;
+  if(X&&Y){
+    svg.appendChild(lineThrough(T.A,Y,{stroke:"var(--violet)","stroke-width":1.2,opacity:.35}));
+    svg.appendChild(lineThrough(T.B,X,{stroke:"var(--violet)","stroke-width":1.2,opacity:.35}));
+    Z=meet(join(T.A,Y),join(T.B,X));
+    if(Z){
+      svg.appendChild(lineThrough(T.P,Z,{stroke:"var(--violet)","stroke-width":1.2,opacity:.55}));
+      Dscene=meet(join(T.P,Z),join(T.A,T.B));
+    }
+  }
+  // ring: image of the untransformed output
+  var D0=construct(G);
+  var ring=D0?Hmap(D0,k):null;
+  if(ring)svg.appendChild(el("circle",{cx:ring.x,cy:ring.y,r:9,fill:"none",
+    stroke:"var(--amber)","stroke-width":2.2}));
+  if(Dscene)svg.appendChild(el("circle",{cx:Dscene.x,cy:Dscene.y,r:3.6,fill:"var(--amber)"}));
+
+  // givens
+  [["A",-24,20],["B",12,20],["C",-8,24],["P",-26,-8],["F",14,-8]].forEach(function(nm){
+    var q=T[nm[0]];
+    svg.appendChild(el("circle",{cx:q.x,cy:q.y,r:4.4,fill:"var(--teal)"}));
+    svg.appendChild(txt(q.x+nm[1],q.y+nm[2],nm[0],{fill:"var(--teal)"}));
+  });
+  if(Dscene)svg.appendChild(txt(Dscene.x+14,Dscene.y+22,"D",{fill:"var(--amber)","font-size":"14"}));
+
+  // handles (only meaningful drags: C along the line, P, F)
+  svg.appendChild(handle(T.C,"var(--teal)","hC"));
+  svg.appendChild(handle(T.P,"var(--teal)","hP"));
+  svg.appendChild(handle(T.F,"var(--teal)","hF"));
+
+  var delta=(ring&&Dscene)?Math.hypot(ring.x-Dscene.x,ring.y-Dscene.y):NaN;
+  readout.innerHTML='<span class="rt">Step one · The principle</span>'+
+    'Amber ring: the old output, carried by the map. Amber dot: the recipe rerun from scratch on the moved givens. '+
+    '<span class="mono">Δ = '+(isFinite(delta)?delta.toFixed(3):"—")+' px</span> — they coincide at every setting of the slider. '+
+    'Transform-then-construct equals construct-then-transform: the recipe cannot tell.';
+  capEl.textContent="Slide to transform the page: the dot never escapes the ring — whatever joins and meets build, the map carries. Drag P or F and notice a bonus: the scaffolding moves and D does not. The output belongs to A, B, C; the auxiliaries were free choices, and the recipe owes them nothing.";
+}
+
+/* ============ TAB 1 : the Type B fan ============ */
+var marks=[], NM=5;
+(function(){for(var i=0;i<NM;i++)marks.push({x:130+i*96,y:344});})();
+var mA={x:96,y:186}, mB={x:648,y:96};      // the receiving line m
+var E={x:590,y:300};                        // finite collector
+var typeA=false;
+var dirA={x:0.16,y:-1};                     // Type A transfer direction
+
+function render1(){
+  clear(svg);
+  // lines
+  svg.appendChild(lineThrough(marks[0],marks[NM-1],{stroke:"var(--graphite)","stroke-width":1.5}));
+  svg.appendChild(lineThrough(mA,mB,{stroke:"var(--graphite)","stroke-width":1.5}));
+  svg.appendChild(txt(40,marks[0].y-12,"ℓ",{"font-size":"14"}));
+  svg.appendChild(txt(mB.x+8,mB.y+4,"m",{"font-size":"14"}));
+
+  var lm=join(mA,mB);
+  var B=[];
+  marks.forEach(function(Ai,i){
+    var lr = typeA ? join(Ai,{x:Ai.x+dirA.x*100,y:Ai.y+dirA.y*100})
+                   : join(E,Ai);
+    var Bi=meet(lr,lm);
+    B.push(Bi);
+    if(Bi){
+      svg.appendChild(seg(typeA?{x:Ai.x,y:Ai.y}:E,Bi,
+        {stroke:"var(--violet)","stroke-width":1.4,opacity:.6}));
+      if(!typeA)svg.appendChild(seg(E,Ai,{stroke:"var(--violet)","stroke-width":1.4,opacity:.6}));
+      svg.appendChild(el("circle",{cx:Bi.x,cy:Bi.y,r:4.4,fill:"var(--amber)"}));
+    }
+    svg.appendChild(el("circle",{cx:Ai.x,cy:Ai.y,r:4.4,fill:"var(--ink)"}));
+  });
+  if(!typeA){
+    svg.appendChild(el("circle",{cx:E.x,cy:E.y,r:5,fill:"var(--red)"}));
+    svg.appendChild(txt(E.x+12,E.y+5,"E",{fill:"var(--red)","font-size":"14"}));
+    svg.appendChild(handle(E,"var(--red)","hE"));
+  }
+
+  // gap ratios along m
+  var ratios=[],okAll=B.every(function(b){return !!b;});
+  if(okAll){
+    var g0=Math.hypot(B[1].x-B[0].x,B[1].y-B[0].y);
+    for(var i=1;i<NM;i++){
+      var g=Math.hypot(B[i].x-B[i-1].x,B[i].y-B[i-1].y);
+      ratios.push((g/g0).toFixed(2));
+    }
+  }
+  var even=okAll&&ratios.every(function(r){return Math.abs(r-1)<0.02;});
+  var audit='joins &amp; meets: <strong>all preserved</strong> · spacing carried onto m: '+
+    '<span class="mono">'+(okAll?ratios.join(" : "):"—")+'</span> — '+
+    (even?'<strong>preserved</strong>':'<strong style="color:var(--red)">destroyed</strong>');
+  readout.innerHTML='<span class="rt">Step two · The counterexample</span>'+audit+
+    (even?'<br>Collector at infinity — your Type A. Parallels transfer equal parts to equal parts; this is what the affine purchase buys.'
+         :'<br>Every incidence intact, the spacing ruined. Were even spacing a creature of joins and meets, this map could not have touched it.');
+  capEl.textContent=typeA
+    ?"Return the collector to a finite point and watch the progression reappear. The difference between destruction and preservation is exactly where E sits."
+    :"Drag E. The fan preserves every join and meet on the page and wrecks the one thing in question. One drawing refutes every possible procedure.";
+}
+
+/* ---------- chrome ---------- */
+function buildControls(){
+  clear(controls);
+  if(tab===0){
+    var lab=document.createElement("label");
+    lab.innerHTML='transform the page <input type="range" min="-60" max="60" value="'+Math.round(k*50000)+'" aria-label="projective transform">';
+    lab.querySelector("input").addEventListener("input",function(){
+      k=this.value/50000;render0();});
+    controls.appendChild(lab);
+  }else{
+    var b=document.createElement("button");
+    b.textContent=typeA?"finite collector (Type B)":"collector at infinity (Type A)";
+    b.addEventListener("click",function(){typeA=!typeA;buildControls();render1();});
+    controls.appendChild(b);
+  }
+}
+function render(){tab===0?render0():render1();}
+
+svg.addEventListener("pointerdown",function(ev){
+  var id=ev.target.id;if(!id)return;
+  drag=id;svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+});
+svg.addEventListener("pointermove",function(ev){
+  if(!drag)return;
+  var p=pos(ev);
+  p.x=Math.max(16,Math.min(W-16,p.x));p.y=Math.max(16,Math.min(H-16,p.y));
+  if(drag==="hE"){E=p;render1();return;}
+  // tab 0 handles live in transformed space: pull back through Hinv
+  var q=Hinv(p,k);if(!q)return;
+  if(drag==="hC"){G.C={x:Math.max(428,Math.min(620,q.x)),y:LY};render0();}
+  else if(drag==="hP"){G.P={x:q.x,y:Math.min(q.y,LY-40)};render0();}
+  else if(drag==="hF"){G.F={x:q.x,y:Math.min(q.y,LY-24)};render0();}
+});
+svg.addEventListener("pointerup",function(){drag=null;});
+svg.addEventListener("pointercancel",function(){drag=null;});
+
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll('.tabs button').forEach(function(o){
+      o.setAttribute("aria-selected",o===b?"true":"false");});
+    tab=+b.dataset.tab;buildControls();render();
+  });
+});
+
+buildControls();
+render();
+})();
+</script>
+</body>
+</html>
