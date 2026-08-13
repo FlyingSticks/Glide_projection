@@ -256,22 +256,24 @@ function phi2(p){return (Y0-p.y)/SP;}
 
 function renderT2(fresh){
   clear(svg);
+  var loD=-(t2.extent-1), hiD=Math.max(1,t2.extent);
+  var visLo=(Y0-(H-8))/SP, visHi=(Y0-10)/SP;
+  var lo=Math.max(loD,visLo), hi=Math.min(hiD,visHi);
+  var drawnCoarse=0;
+
   // fine levels
   if(t2.refine>1){
-    for(var j=-2*t2.refine;j<=6*t2.refine;j++){
+    for(var j=Math.ceil(lo*t2.refine-1e-9);j<=Math.floor(hi*t2.refine+1e-9);j++){
       if(j%t2.refine===0)continue;
-      var lv=j/t2.refine;
-      var y=Y0-lv*SP;
-      if(y<10||y>H-8)continue;
-      if(lv>Math.max(1,t2.extent)+0.001||lv<Math.min(0,-(t2.extent-1))-0.001)continue;
+      var y=Y0-(j/t2.refine)*SP;
       svg.appendChild(waver({x:16,y:y},{x:W-56,y:y},j*1.3+11,
         {stroke:"var(--blue)","stroke-width":1,opacity:.55}));
     }
   }
   // coarse levels: imported 0,1 + propagated
-  for(var m=-(t2.extent-1);m<=Math.max(1,t2.extent);m++){
+  for(var m=Math.ceil(lo-1e-9);m<=Math.floor(hi+1e-9);m++){
     var y2=Y0-m*SP;
-    if(y2<10||y2>H-8)continue;
+    drawnCoarse++;
     var zero=(m===0), imported=(m===0||m===1);
     svg.appendChild(waver({x:16,y:y2},{x:W-56,y:y2},m+4,
       {stroke:zero?"var(--teal)":"var(--graphite)",
@@ -295,25 +297,25 @@ function renderT2(fresh){
   svg.appendChild(el("circle",{cx:BB.x,cy:BB.y,r:24,fill:"transparent",id:"grab2"}));
 
   var pt=phi2(TAIL), ph=phi2(Hd);
-  var loD=-(t2.extent-1), hiD=Math.max(1,t2.extent);
   function census(scale){
     var a=Math.min(pt,ph)*scale, b=Math.max(pt,ph)*scale, c=0;
-    for(var m=Math.floor(a)+1;m<=Math.floor(b);m++){
-      if(m/scale<loD-1e-9||m/scale>hiD+1e-9)continue;
+    for(var m2=Math.floor(a)+1;m2<=Math.floor(b);m2++){
+      if(m2/scale<lo-1e-9||m2/scale>hi+1e-9)continue;
       c++;
     }
     return (ph>=pt?c:-c);
   }
   var coarse=census(1);
-  var beyond=(Math.max(pt,ph)>hiD+1e-9)||(Math.min(pt,ph)<loD-1e-9);
-  var msg='purchase: one gap · drawn levels: '+(hiD-loD+1)+' · count of v against drawn levels: '+
-    (coarse>0?"+":"")+coarse;
+  var beyond=(Math.max(pt,ph)>hi+1e-9)||(Math.min(pt,ph)<lo-1e-9);
+  var msg='purchase: one gap · coarse levels on the page: '+drawnCoarse+
+    ' · coarse count of v: '+(coarse>0?"+":"")+coarse;
   if(t2.refine>1){
     var fine=census(t2.refine);
-    msg+=' · fine count: '+(fine>0?"+":"")+fine+'/'+t2.refine;
+    msg+='<br>refined to n = '+t2.refine+' · fine crossings: '+(fine>0?"+":"")+fine+
+      ' · reading '+fine+'/'+t2.refine;
   }
   if(beyond){
-    msg+='<br>An endpoint lies beyond the drawn ruling — the instrument continues, but the drawing doesn\u2019t yet. Propagate to finish the census.';
+    msg+='<br>An endpoint lies beyond the levels on the page — the instrument continues, but the drawing doesn\u2019t yet. Propagate to finish the census.';
   }
   readout.innerHTML='<span class="rt">II · Import the graduation</span>'+msg+
     (beyond?'':'<br>Every number here is a count, and every count survives the shear.');
