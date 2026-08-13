@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join &amp; Meet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6; --ink:#23232A; --graphite:#8E8E96; --rule:#DDDCD5;
+    --violet:#7B2FBE; --teal:#0F9B94; --amber:#B26A00;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;line-height:1.62;}
+  .sheet{max-width:740px;margin:0 auto;padding:0 20px 88px;}
+  header{padding:56px 0 4px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--graphite);}
+  h1{font-weight:600;font-size:clamp(28px,6vw,42px);line-height:1.12;
+    letter-spacing:-.01em;margin:10px 0 14px;}
+  .lede{font-style:italic;font-size:clamp(16.5px,2.5vw,19px);line-height:1.55;
+    margin-bottom:24px;}
+  p{margin:0 0 15px;}
+  h2{font-weight:600;font-size:21px;margin:42px 0 12px;}
+  .term{color:var(--violet);font-weight:600;}
+  .op{font-family:"IBM Plex Mono",monospace;font-size:.94em;}
+  strong{font-weight:600;}
+
+  /* the dictionary — the page's spine */
+  .dict{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin:24px 0 30px;}
+  .dr{display:grid;grid-template-columns:1fr 26px 1fr;align-items:center;
+    border-bottom:1px solid var(--rule);}
+  .dr:last-child{border-bottom:none;}
+  .dr div{padding:9px 4px;font-size:14.5px;}
+  .dr .l{text-align:right;}
+  .dr .m{text-align:center;font-family:"IBM Plex Mono",monospace;
+    font-size:12px;color:var(--graphite);}
+  .dr.head div{font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--graphite);}
+
+  .plate{margin:26px 0 24px;border:1px solid var(--ink);background:#FFFFFE;}
+  .tabs{display:flex;border-bottom:1px solid var(--ink);}
+  .tabs button{flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;background:none;border:none;
+    border-right:1px solid var(--rule);padding:11px 4px;cursor:pointer;
+    color:var(--graphite);line-height:1.35;}
+  .tabs button:last-child{border-right:none;}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);}
+  .tabs button:hover:not([aria-selected="true"]){color:var(--ink);}
+  .plate svg{display:block;width:100%;height:auto;touch-action:none;
+    user-select:none;-webkit-user-select:none;}
+  .readout{font-size:15px;line-height:1.55;padding:12px 15px;
+    border-top:1px solid var(--rule);min-height:78px;}
+  .readout .rt{font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--violet);
+    display:block;margin-bottom:4px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;
+    padding:11px 15px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;}
+  .controls button{font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:none;border:1px solid var(--ink);color:var(--ink);
+    padding:6px 12px;cursor:pointer;border-radius:2px;}
+  .controls button:hover{background:var(--ink);color:var(--paper);}
+  button:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+  .cap{font-size:14.5px;color:#55555E;margin:-14px 0 24px;}
+  footer{margin-top:54px;border-top:1px solid var(--ink);padding-top:20px;
+    font-style:italic;font-size:16px;color:#3A3A42;}
+  @media (prefers-reduced-motion:no-preference){
+    .fresh{animation:in .3s ease-out;}
+    @keyframes in{from{opacity:0}to{opacity:1}}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <div class="eyebrow">Reference Plate · The Straightedge's Two Moves</div>
+  <h1>Join &amp; Meet</h1>
+  <p class="lede">A join is the line through two points — the mark the straightedge actually makes. A meet is the point where two lines cross — not drawn, found. Between them they are the entire repertoire of the tool, and each is the other read backwards.</p>
+</header>
+
+<div class="dict">
+  <div class="dr head"><div class="l">one reading</div><div class="m">↔</div><div>its dual</div></div>
+  <div class="dr"><div class="l">point</div><div class="m">↔</div><div>line</div></div>
+  <div class="dr"><div class="l">join <span class="op">A ∨ B</span></div><div class="m">↔</div><div>meet <span class="op">a ∧ b</span></div></div>
+  <div class="dr"><div class="l">a point lies on a line</div><div class="m">↔</div><div>a line passes through a point</div></div>
+  <div class="dr"><div class="l">two points determine one line</div><div class="m">↔</div><div>two lines determine one point</div></div>
+  <div class="dr"><div class="l">three points are collinear</div><div class="m">↔</div><div>three lines are concurrent</div></div>
+</div>
+
+<div class="plate">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="0" aria-selected="true">I · Join</button>
+    <button role="tab" data-tab="1" aria-selected="false">II · Meet</button>
+    <button role="tab" data-tab="2" aria-selected="false">III · Same ink, two readings</button>
+  </div>
+  <svg id="stage" viewBox="0 0 700 420" aria-label="Interactive figure for join and meet"></svg>
+  <div class="readout" id="readout"></div>
+  <div class="controls" id="controls"></div>
+</div>
+<p class="cap" id="cap"></p>
+
+<h2>The two moves</h2>
+<p>A <span class="term">join</span> takes two points and returns the line through them, written <span class="op">A ∨ B</span>. This is the straightedge's only mark-making act: lay the edge against two marks, draw. A <span class="term">meet</span> takes two lines and returns the point they share, written <span class="op">a ∧ b</span>. Nothing is drawn for a meet — the crossing is already there once both lines are; you only notice it.</p>
+<p>So the two run in opposite directions: join manufactures a line out of points, meet extracts a point out of lines. Alternate them — join to get new lines, meet to get new points, repeat — and you have every straightedge construction there is, the complete quadrangle and its equal-spacing ladder included.</p>
+
+<h2>Why they are dual, and not merely opposite</h2>
+<p>Two operations are opposite if one undoes the other. These do not undo each other; they are <em>dual</em>, which is stronger and stranger. Take any true statement of incidence, swap every "point" for "line" and every "join" for "meet," and what results is another true statement — a different theorem, proved for free. The dictionary above is that swap in miniature, and each row is its own mirror: reading it right-to-left gives the same dictionary back.</p>
+<p>Duality is why projective results arrive in matched pairs: Desargues' theorem converts into its own converse, Pappus into a partner, the complete quadrangle into the complete quadrilateral. Two vocabularies describe one geometry, and neither has a claim to being the original — which is the same indifference the pairing of vectors and covectors runs on, appearing here one level down, at the level of the tool.</p>
+
+<h2>What duality costs, and who pays</h2>
+<p>The symmetry is exact only in the projective plane. On an ordinary drafting sheet the two rows disagree: two points always join, but two <em>parallel</em> lines never meet, so "two lines determine a point" fails and the mirror cracks. Completing the plane with a line at infinity repairs it — parallels meet at their shared point at infinity, every pair of lines has a meet, and duality holds without exception. Panel&nbsp;II is where you can watch the repair being needed: swing one line toward parallel and the meet runs off the page rather than disappearing.</p>
+<p>Which reverses the usual telling. The point at infinity is not an exotic addition to geometry; it is the price of keeping join and meet symmetrical, and it was owed the moment the straightedge had two moves instead of one.</p>
+
+<footer>
+  <p>Join makes a line from two points; meet makes a point from two lines. Neither is the primitive. The straightedge has been performing a duality every time it touches the page.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+var W=700,H=420;
+var svg=document.getElementById("stage");
+var readout=document.getElementById("readout");
+var capEl=document.getElementById("cap");
+var controls=document.getElementById("controls");
+var tab=0, drag=null;
+
+function el(n,at){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+  for(var q in at)e.setAttribute(q,at[q]);return e;}
+function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function pos(ev){var r=svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(W/r.width),y:(ev.clientY-r.top)*(H/r.height)};}
+function txt(x,y,s,at){
+  var o={x:x,y:y,"font-family":"IBM Plex Mono,monospace","font-size":"13",fill:"var(--ink)"};
+  for(var q in at)o[q]=at[q];
+  var t=el("text",o);t.textContent=s;return t;}
+function fullLine(P,d,at){
+  var E=4000;
+  var o={x1:P.x-d.x*E,y1:P.y-d.y*E,x2:P.x+d.x*E,y2:P.y+d.y*E};
+  for(var q in at)o[q]=at[q];
+  return el("line",o);
+}
+function handle(p,color,id){
+  var g=document.createDocumentFragment();
+  g.appendChild(el("circle",{cx:p.x,cy:p.y,r:6.5,fill:"#fff",
+    stroke:color,"stroke-width":2.4}));
+  g.appendChild(el("circle",{cx:p.x,cy:p.y,r:24,fill:"transparent",id:id}));
+  return g;
+}
+function norm(d){var m=Math.hypot(d.x,d.y)||1;return {x:d.x/m,y:d.y/m};}
+
+/* ---------------- I · JOIN ---------------- */
+var A={x:214,y:286}, B={x:472,y:150};
+function renderJoin(fresh){
+  clear(svg);
+  var d=norm({x:B.x-A.x,y:B.y-A.y});
+  svg.appendChild(fullLine(A,d,{stroke:"var(--violet)","stroke-width":2.6,
+    "class":fresh?"fresh":""}));
+  svg.appendChild(el("circle",{cx:A.x,cy:A.y,r:5,fill:"var(--violet)"}));
+  svg.appendChild(el("circle",{cx:B.x,cy:B.y,r:5,fill:"var(--violet)"}));
+  svg.appendChild(txt(A.x-22,A.y+20,"A",{fill:"var(--violet)","font-size":"14"}));
+  svg.appendChild(txt(B.x+12,B.y-10,"B",{fill:"var(--violet)","font-size":"14"}));
+  svg.appendChild(txt(W/2-58,44,"A ∨ B",{"font-size":"16",fill:"var(--violet)"}));
+  svg.appendChild(handle(A,"var(--violet)","gA"));
+  svg.appendChild(handle(B,"var(--violet)","gB"));
+  readout.innerHTML='<span class="rt">I · Join</span>'+
+    'Two points, one line — always, everywhere, no exceptions. This is the only mark the straightedge makes. Drag either point: the join follows and never fails to exist.';
+  capEl.textContent="The join is manufactured. Move A and B as close together as you like — until they coincide there is exactly one line, and the straightedge draws it.";
+}
+
+/* ---------------- II · MEET ---------------- */
+var P1={x:172,y:322}, P2={x:540,y:322};
+var th1=-0.44, th2=-2.62;   // radians
+function renderMeet(fresh){
+  clear(svg);
+  var d1={x:Math.cos(th1),y:Math.sin(th1)}, d2={x:Math.cos(th2),y:Math.sin(th2)};
+  svg.appendChild(fullLine(P1,d1,{stroke:"var(--violet)","stroke-width":2.4,
+    "class":fresh?"fresh":""}));
+  svg.appendChild(fullLine(P2,d2,{stroke:"var(--teal)","stroke-width":2.4,
+    "class":fresh?"fresh":""}));
+  svg.appendChild(txt(30,H-26,"a",{fill:"var(--violet)","font-size":"15"}));
+  svg.appendChild(txt(W-40,H-26,"b",{fill:"var(--teal)","font-size":"15"}));
+
+  var det=d1.x*d2.y-d1.y*d2.x;
+  var msg,cap;
+  if(Math.abs(det)<1e-4){
+    msg='The lines are parallel — and the meet has not vanished, it has receded past every finite distance. Projectively they share a point at infinity, Ω, so <span class="op">a ∧ b</span> still exists. This is the one repair duality requires.';
+    cap="At dead parallel the drafting sheet says \"no meet\" and the projective plane says \"a meet at infinity.\" The second is what keeps the dictionary honest.";
+    svg.appendChild(txt(W/2-92,44,"a ∧ b = Ω  (at infinity)",{"font-size":"15",fill:"var(--amber)"}));
+  }else{
+    var t=((P2.x-P1.x)*d2.y-(P2.y-P1.y)*d2.x)/det;
+    var M={x:P1.x+d1.x*t,y:P1.y+d1.y*t};
+    var onPage=(M.x>8&&M.x<W-8&&M.y>8&&M.y<H-8);
+    if(onPage){
+      svg.appendChild(el("circle",{cx:M.x,cy:M.y,r:5.5,fill:"var(--amber)"}));
+      svg.appendChild(txt(M.x+12,M.y-10,"a ∧ b",{fill:"var(--amber)","font-size":"14"}));
+      msg='The crossing is found, not drawn — it was already there the moment both lines were. Nothing was added to the page to produce it.';
+      cap="Swing a line toward parallel and watch the meet run for the edge. It never resigns; it only travels.";
+    }else{
+      var side=(M.x<W/2)?"left":"right";
+      msg='The meet has left the page, off past the '+side+' edge — but it is still a meet. Nearly-parallel lines have distant crossings, not absent ones. How distant is not a projective question: nothing on this page measures.';
+      cap="Keep going. The crossing travels without bound, and only at exact parallel does the answer change its kind.";
+    }
+  }
+  svg.appendChild(handle({x:P1.x+d1.x*128,y:P1.y+d1.y*128},"var(--violet)","gL1"));
+  svg.appendChild(handle({x:P2.x+d2.x*128,y:P2.y+d2.y*128},"var(--teal)","gL2"));
+  svg.appendChild(el("circle",{cx:P1.x,cy:P1.y,r:3.4,fill:"var(--violet)",opacity:.6}));
+  svg.appendChild(el("circle",{cx:P2.x,cy:P2.y,r:3.4,fill:"var(--teal)",opacity:.6}));
+  readout.innerHTML='<span class="rt">II · Meet</span>'+msg;
+  capEl.textContent=cap;
+}
+
+/* ---------------- III · SAME INK ---------------- */
+var T=[{x:214,y:314},{x:486,y:296},{x:352,y:126}];
+var reading=0; // 0 = points joined, 1 = lines met
+function renderDual(fresh){
+  clear(svg);
+  var pairs=[[0,1],[1,2],[2,0]];
+  pairs.forEach(function(pr,i){
+    var Pa=T[pr[0]],Pb=T[pr[1]];
+    var d=norm({x:Pb.x-Pa.x,y:Pb.y-Pa.y});
+    svg.appendChild(fullLine(Pa,d,{stroke:reading===1?"var(--teal)":"var(--violet)",
+      "stroke-width":reading===1?2.6:2.2,opacity:reading===1?1:.85,
+      "class":fresh?"fresh":""}));
+  });
+  T.forEach(function(P,i){
+    svg.appendChild(el("circle",{cx:P.x,cy:P.y,r:reading===0?5.5:4.5,
+      fill:reading===0?"var(--violet)":"var(--amber)"}));
+  });
+  var names=reading===0?["A","B","C"]:["a∧b","b∧c","c∧a"];
+  var offs=[[-30,20],[14,20],[-14,-16]];
+  T.forEach(function(P,i){
+    svg.appendChild(txt(P.x+offs[i][0],P.y+offs[i][1],names[i],
+      {fill:reading===0?"var(--violet)":"var(--amber)","font-size":"13"}));
+  });
+  if(reading===1){
+    svg.appendChild(txt(46,H-30,"a",{fill:"var(--teal)","font-size":"15"}));
+    svg.appendChild(txt(W-52,H-30,"b",{fill:"var(--teal)","font-size":"15"}));
+    svg.appendChild(txt(W/2-8,26,"c",{fill:"var(--teal)","font-size":"15"}));
+  }
+  if(reading===0){
+    readout.innerHTML='<span class="rt">III · Read as points joined</span>'+
+      'Three points. Join them pairwise — <span class="op">A∨B</span>, <span class="op">B∨C</span>, <span class="op">C∨A</span> — and three lines appear. The points were given; the lines were made.';
+    capEl.textContent="Now switch the reading. Not one stroke of ink will change.";
+  }else{
+    readout.innerHTML='<span class="rt">III · Read as lines met</span>'+
+      'Three lines. Meet them pairwise — <span class="op">a∧b</span>, <span class="op">b∧c</span>, <span class="op">c∧a</span> — and three points appear. The lines were given; the points were found. Identical figure, opposite account of what came first.';
+    capEl.textContent="A triangle is self-dual: its dual is a triangle. That is why one drawing can carry both readings at once — and why neither reading is the true one.";
+  }
+  T.forEach(function(P,i){svg.appendChild(handle(P,
+    reading===0?"var(--violet)":"var(--amber)","gT"+i));});
+}
+
+/* ---------------- chrome ---------------- */
+function buildControls(){
+  clear(controls);
+  if(tab===2){
+    var b=document.createElement("button");
+    b.textContent=reading===0?"read as lines met":"read as points joined";
+    b.addEventListener("click",function(){reading=1-reading;buildControls();renderDual(true);});
+    controls.appendChild(b);
+    var note=document.createElement("span");
+    note.style.color="var(--graphite)";
+    note.textContent="the ink does not change";
+    controls.appendChild(note);
+  }else if(tab===1){
+    var r=document.createElement("button");
+    r.textContent="set exactly parallel";
+    r.addEventListener("click",function(){th2=th1+Math.PI;renderMeet(true);});
+    controls.appendChild(r);
+  }else{
+    var s=document.createElement("span");
+    s.style.color="var(--graphite)";
+    s.textContent="drag A or B";
+    controls.appendChild(s);
+  }
+}
+function render(fresh){
+  if(tab===0)renderJoin(fresh);
+  else if(tab===1)renderMeet(fresh);
+  else renderDual(fresh);
+}
+
+svg.addEventListener("pointerdown",function(ev){
+  var id=ev.target.id;
+  if(!id)return;
+  drag=id;svg.setPointerCapture(ev.pointerId);ev.preventDefault();
+});
+svg.addEventListener("pointermove",function(ev){
+  if(!drag)return;
+  var p=pos(ev);
+  p.x=Math.max(18,Math.min(W-18,p.x));p.y=Math.max(18,Math.min(H-18,p.y));
+  if(drag==="gA"){A=p;renderJoin();}
+  else if(drag==="gB"){B=p;renderJoin();}
+  else if(drag==="gL1"){th1=Math.atan2(p.y-P1.y,p.x-P1.x);renderMeet();}
+  else if(drag==="gL2"){th2=Math.atan2(p.y-P2.y,p.x-P2.x);renderMeet();}
+  else if(drag.indexOf("gT")===0){T[+drag.slice(2)]=p;renderDual();}
+});
+svg.addEventListener("pointerup",function(){drag=null;});
+svg.addEventListener("pointercancel",function(){drag=null;});
+
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll('.tabs button').forEach(function(o){
+      o.setAttribute("aria-selected",o===b?"true":"false");});
+    tab=+b.dataset.tab;buildControls();render(true);
+  });
+});
+
+buildControls();
+render();
+})();
+</script>
+</body>
+</html>

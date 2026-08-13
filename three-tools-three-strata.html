@@ -208,7 +208,7 @@ function renderT1(){
   var msg,cap;
   if(Math.abs(d.y)<0.0028){
     msg="No meeting anywhere — and no mark on the page certifies it. Incidence cannot pick the line that misses.";
-    cap="The candidate is now parallel to ℓ, and the page looks no different than it did a degree ago.";
+    cap="The candidate is now parallel to ℓ, and the page looks no different than it did a degree ago. No number told you, because none was ever on offer.";
   }else{
     var t=(ELL_Y-P1.y)/d.y;
     var ix=P1.x+d.x*t;
@@ -221,10 +221,10 @@ function renderT1(){
         var E=S(edge);
         svg.appendChild(arrowHead(edge,ix<20?Math.PI:0,10,"var(--ink)",1.6));
       }
-      var dist=Math.round(Math.abs(t));
-      msg="The candidate meets ℓ "+(ix>20&&ix<W-20?"on the page":"off the page")+
-        " — "+dist+" units out. Rotate toward parallel and the meeting point flees; it never resigns.";
-      cap="Drag the handle. The meeting point runs along ℓ, faster and faster, and is still a meeting.";
+      var side=(ix<20)?"left":"right";
+      msg="The candidate meets ℓ "+(ix>20&&ix<W-20?"on the page":"off the page, past the "+side+" edge")+
+        ". How far along? The straightedge cannot say — no graduation has been bought, so there are no units to report. Only the meeting itself is certified.";
+      cap="Drag the handle. You can watch the meeting point run along ℓ, faster and faster, without any number ever being available for how far it has gone.";
     }else{
       msg="The meeting is behind the drawn segment now — still a meeting. Incidence only ever reports intersections.";
       cap="Drag the handle to chase the meeting point the other way.";
