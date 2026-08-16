@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>the two verbs — v1</title>
+<style>
+  :root{ color-scheme: light; }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; padding:18px 16px 40px;
+    background:#fbfaf6; color:#26261f;
+    font:15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  header{ max-width:1180px; margin:0 auto 10px; }
+  h1{
+    font-size:21px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; margin:0 0 2px;
+  }
+  .thesis{ color:#6b6a61; font-size:14px; margin:0; }
+  .wrap{ max-width:1180px; margin:0 auto; display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+  .sheet{ flex:1 1 640px; min-width:340px; }
+  svg{ width:100%; height:auto; display:block; background:#fdfcf9;
+       border:1px solid #dedbd0; border-radius:4px; touch-action:none; }
+  .panel{ flex:0 1 320px; min-width:290px; display:flex; flex-direction:column; gap:14px; }
+  .card{ background:#fdfcf9; border:1px solid #dedbd0; border-radius:4px; padding:12px 14px; }
+  .card h2{
+    font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+    margin:0 0 8px; color:#6b6a61;
+  }
+  .row{ display:flex; align-items:center; gap:8px; margin:4px 0; }
+  .row label{ width:34px; font-size:13px; color:#26261f; font-variant-numeric:tabular-nums; }
+  .row input[type=range]{ flex:1; accent-color:#8a877c; }
+  .row .val{ width:58px; text-align:right; font:12px ui-monospace, Menlo, monospace; color:#8a877c; }
+  button{
+    font:13px -apple-system, sans-serif; letter-spacing:.04em;
+    background:#f2efe6; color:#26261f; border:1px solid #c9c5b8; border-radius:4px;
+    padding:6px 10px; cursor:pointer;
+  }
+  button:hover{ background:#e9e5d8; }
+  button:focus-visible, input:focus-visible{ outline:2px solid #2447c4; outline-offset:1px; }
+  button.on{ background:#26261f; color:#fbfaf6; border-color:#26261f; }
+  .btnrow{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  table.ledger{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.ledger td{ padding:3px 4px; border-bottom:1px solid #eeebe0; vertical-align:baseline; }
+  table.ledger td.num{ text-align:right; font:13px ui-monospace, Menlo, monospace; white-space:nowrap; }
+  .honest{ color:#2e7d40; font-weight:600; }
+  .gauge{ color:#9a9789; }
+  .dot{ display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:baseline; }
+  .drift{ font:11px ui-monospace, Menlo, monospace; color:#2e7d40; }
+  .drift.bad{ color:#c62b1f; font-weight:700; }
+  .note{ font-size:12.5px; color:#6b6a61; margin-top:8px; }
+  section.explain{ max-width:1180px; margin:26px auto 0; }
+  section.explain h2{
+    font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+    color:#6b6a61; margin:22px 0 6px;
+  }
+  section.explain p{ max-width:74ch; margin:6px 0; }
+  section.explain .k{ font-weight:600; }
+  @media (prefers-reduced-motion: reduce){ .noanim{ transition:none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Two Verbs — v1</h1>
+  <p class="thesis">Level lines are measured. Depth lines are counted. Nothing is both — move the gauge and watch the honest numbers hold still.</p>
+</header>
+
+<div class="wrap">
+  <div class="sheet"><svg id="sv" viewBox="0 0 1000 700" aria-label="Top view and front view of the apparatus"></svg></div>
+
+  <div class="panel">
+    <div class="card">
+      <h2>Gauge &nbsp;(the apparatus group)</h2>
+      <div class="row"><label>φ</label><input id="sphi" type="range" min="-180" max="180" step="0.5" value="0"><span class="val" id="vphi">0.0°</span></div>
+      <div class="row"><label>aₓ</label><input id="sax" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vax">0.00</span></div>
+      <div class="row"><label>a_y</label><input id="say" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vay">0.00</span></div>
+      <div class="row"><label>bₓ</label><input id="sbx" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vbx">0.00</span></div>
+      <div class="row"><label>b_y</label><input id="sby" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vby">0.00</span></div>
+      <div class="btnrow">
+        <button id="breset">Reset gauge</button>
+        <button id="bspin">Spin the glide</button>
+        <button id="bcanon">Send selected line to the post</button>
+        <button id="broll">Re-roll the field</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label style="width:auto">grain</label>
+        <button class="grain" data-g="2">2</button>
+        <button class="grain on" data-g="4">4</button>
+        <button class="grain" data-g="8">8</button>
+      </div>
+      <p class="note">Rotate and translate the picture; <em>b</em> is the glide shear. Drag the square handles to edit the scene itself (that re-bases the ledger). Tap a blue line to select it.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ledger &nbsp;— honest vs gauge</h2>
+      <table class="ledger" id="ledger"></table>
+      <p class="note">Honest readings are invariants of the apparatus group — their drift meters track the largest deviation since the scene was last edited. Gauge readings spin freely.</p>
+    </div>
+  </div>
+</div>
+
+<section class="explain">
+  <h2>What this is</h2>
+  <p>The three-panel drawing, made live. One scene sits in the apparatus — an affine slab with a calibrated stack of level planes and a metric that lives only <em>in</em> those planes — and the sliders act by the apparatus group of <span class="k">the-two-verbs-v1</span>, Theorem&nbsp;2.1: rotations and translations of the picture, and glides. Top view above, front view below, cyan projectors between, exactly as on the sheet. The picture plane is the top of the stack (ratio&nbsp;1); the doc's h runs the other way — h&nbsp;=&nbsp;1&nbsp;−&nbsp;ratio, which is itself the Complement, an element of the extended gauge group.</p>
+
+  <h2>The theorem, in one line</h2>
+  <p>Under the gauge, a level line keeps its <span class="honest">length</span> and reads count zero; a depth line keeps its <span class="honest">count</span> and its shadow is <span class="gauge">pure gauge</span>. One noun, one verb, never both (Exclusivity, Thm&nbsp;3.1).</p>
+
+  <h2>Three experiments</h2>
+  <p><span class="k">1 — Spin the glide.</span> The blue field writhes, every shadow readout spins, and every honest number sits at drift ≈ 1e−15. The red line does not feel the glide at all: the shear coefficient vanishes on the picture plane.</p>
+  <p><span class="k">2 — Send a line to the post.</span> Corollary 3.2: every depth line is congruent to the vertical post. Select any wild blue line and send it; the gauge spends itself making that one line canonical, and the rest of the field stays wild — relative invariants survive (watch |T| not move). Then send a different one. Each in turn can be the canon; none of them is.</p>
+  <p><span class="k">3 — Twist the patch.</span> Drag one corner of the green patch. The level rulings change length — the vector verb varying along the covector graduation, linearly (Thm&nbsp;6.2) — and the diagonal bows with sagitta exactly |T|/4, live-checked. Then gauge hard: |T| and every ruling length hold still. Twist is relative content the gauge cannot touch.</p>
+
+  <h2>The checks</h2>
+  <p>Every honest quantity carries a drift meter against its baseline; the sagitta row live-checks sagitta&nbsp;−&nbsp;|T|/4&nbsp;≈&nbsp;0. All formulas were verified in Node before this page was built (smoke_instrument.js, 12/12) and the theorems in Python (verify_two_verbs.py, 16/16).</p>
+</section>
+
+<script>
+"use strict";
+/* ---------- gauge math (smoke-tested, smoke_instrument.js, ALL PASS) ---- */
+function rot(phi){const c=Math.cos(phi),s=Math.sin(phi);return [c,-s,s,c];}
+function mul(R,p){return {x:R[0]*p.x+R[1]*p.y, y:R[2]*p.x+R[3]*p.y};}
+function applyG(g,p){const R=rot(g.phi),q=mul(R,{x:p.x,y:p.y}),f=1-p.r;
+  return {x:q.x+g.ax+f*g.bx, y:q.y+g.ay+f*g.by, r:p.r};}
+function invApply(g,p){const R=rot(-g.phi),f=1-p.r;
+  const q=mul(R,{x:p.x-g.ax-f*g.bx, y:p.y-g.ay-f*g.by});
+  return {x:q.x, y:q.y, r:p.r};}
+function compose(g2,g1){const R2=rot(g2.phi);
+  const a=mul(R2,{x:g1.ax,y:g1.ay}), b=mul(R2,{x:g1.bx,y:g1.by});
+  return {phi:g2.phi+g1.phi, ax:a.x+g2.ax, ay:a.y+g2.ay, bx:b.x+g2.bx, by:b.y+g2.by};}
+function sendToCanon(G,B,P,c){
+  const Bv=applyG(G,B), Pv=applyG(G,P);
+  const e={phi:0, ax:c.x-Pv.x, ay:c.y-Pv.y, bx:Pv.x-Bv.x, by:Pv.y-Bv.y};
+  return compose(e,G);}
+const d2=(p,q)=>Math.hypot(p.x-q.x,p.y-q.y);
+function patchFn(B0,B1,T0,T1){return (s,t)=>({
+  x:(1-t)*((1-s)*B0.x+s*B1.x)+t*((1-s)*T0.x+s*T1.x),
+  y:(1-t)*((1-s)*B0.y+s*B1.y)+t*((1-s)*T0.y+s*T1.y), r:t});}
+function twist(B0,B1,T0,T1){return {x:B0.x-B1.x+T1.x-T0.x, y:B0.y-B1.y+T1.y-T0.y};}
+
+/* ---------- scene (apparatus coordinates; r=1 picture plane) ------------ */
+let grain=4;
+const post={x:7.6,y:6.2};
+const scene={
+  // the patch: bottom (back plane, r=0) and top (picture plane, r=1) corners
+  B0:{x:-7.2,y:2.6,r:0}, B1:{x:-2.6,y:1.9,r:0},
+  T0:{x:-6.4,y:8.8,r:1}, T1:{x:-1.2,y:9.9,r:1},
+  // a free true-length line in the picture plane
+  R0:{x:2.2,y:10.4,r:1}, R1:{x:6.4,y:8.2,r:1},
+  field:[]
+};
+let rngS=17;
+function rnd(){ rngS=(rngS*1103515245+12345)&0x7fffffff; return rngS/0x7fffffff; }
+function rollField(){
+  scene.field=[];
+  for(let i=0;i<5;i++){
+    scene.field.push({
+      B:{x:0.6+8.6*rnd(), y:0.6+10.8*rnd(), r:0},
+      P:{x:0.6+8.6*rnd(), y:0.6+10.8*rnd(), r:1}
+    });
+  }
+  if(selected>=scene.field.length) selected=0;
+}
+let selected=0;
+rollField();
+
+/* ---------- gauge state -------------------------------------------------- */
+let G={phi:0,ax:0,ay:0,bx:0,by:0};
+let spin=false, spinT=0, spinAnchor=null, animReq=null;
+const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- view mapping ------------------------------------------------- */
+const X0=60, X1=955, W=22;                 // world x in [-11,11]
+const sx=(X1-X0)/W;
+const TY0=368, TY1=34;                      // top view: world y in [0,12.4]
+const sy=(TY0-TY1)/12.4;
+const FY1=436, FY0=648;                     // front view: r=1 top, r=0 bottom
+const mx=x=>X0+(x+11)*sx;
+const myT=y=>TY0-y*sy;
+const myF=r=>FY0+(FY1-FY0)*r;
+const ixT=(X,Y)=>({x:(X-X0)/sx-11, y:(TY0-Y)/sy});
+
+/* ---------- svg scaffolding ---------------------------------------------- */
+const NS="http://www.w3.org/2000/svg";
+const sv=document.getElementById("sv");
+function el(tag,attrs,parent){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  (parent||sv).appendChild(e); return e;
+}
+// static furniture
+el("line",{x1:14,y1:402,x2:986,y2:402,stroke:"#c4c1b4","stroke-width":1.4});
+el("text",{x:18,y:394,fill:"#8a877c","font-size":"13","letter-spacing":"2"}).textContent="TOP VIEW";
+el("text",{x:18,y:420,fill:"#8a877c","font-size":"13","letter-spacing":"2"}).textContent="FRONT VIEW";
+const gProj=el("g",{});     // cyan projectors
+const gLevels=el("g",{});   // green level lines + scales
+const gPatch=el("g",{});
+const gField=el("g",{});
+const gRed=el("g",{});
+const gPost=el("g",{});
+const gHandles=el("g",{});
+
+/* level lines + count/ratio scales */
+function drawLevels(){
+  gLevels.replaceChildren();
+  for(let k=0;k<=grain;k++){
+    const r=k/grain, Y=myF(r);
+    el("line",{x1:X0-6,y1:Y,x2:X1,y2:Y,stroke:"#3fa053","stroke-width":r===1||r===0?1.6:0.9,opacity:r===1||r===0?0.9:0.55},gLevels);
+    el("text",{x:X0-14,y:Y+4,fill:"#3fa053","font-size":"12","text-anchor":"end"},gLevels).textContent=String(k);
+  }
+  el("text",{x:X0-34,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
+     transform:`rotate(-90 ${X0-34} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels).textContent="COUNT";
+  for(const [r,t] of [[0,"0"],[0.5,"½"],[1,"1"]])
+    el("text",{x:X1+10,y:myF(r)+4,fill:"#3fa053","font-size":"12"},gLevels).textContent=t;
+  el("text",{x:X1+30,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
+     transform:`rotate(90 ${X1+30} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels).textContent="RATIO";
+  el("text",{x:(X0+X1)/2,y:myF(1)-8,fill:"#3fa053","font-size":"11","letter-spacing":"1.5","text-anchor":"middle"},gLevels)
+    .textContent="PICTURE PLANE — STACKED PARALLEL PLANES BELOW";
+}
+drawLevels();
+
+/* post */
+el("circle",{cx:mx(post.x),cy:myT(post.y),r:7,fill:"none",stroke:"#8a877c","stroke-dasharray":"3 3"},gPost);
+el("line",{x1:mx(post.x)-10,y1:myT(post.y),x2:mx(post.x)+10,y2:myT(post.y),stroke:"#8a877c","stroke-width":0.8},gPost);
+el("line",{x1:mx(post.x),y1:myT(post.y)-10,x2:mx(post.x),y2:myT(post.y)+10,stroke:"#8a877c","stroke-width":0.8},gPost);
+el("text",{x:mx(post.x)+11,y:myT(post.y)-8,fill:"#8a877c","font-size":"11","letter-spacing":"1"},gPost).textContent="THE POST";
+el("line",{x1:mx(post.x),y1:myF(1),x2:mx(post.x),y2:myF(0),stroke:"#8a877c","stroke-width":0.8,"stroke-dasharray":"3 4"},gPost);
+
+/* ---------- baselines & ledger ------------------------------------------- */
+let base={}, drift={};
+function measure(){
+  const S=scene;
+  const vB0=applyG(G,S.B0), vB1=applyG(G,S.B1), vT0=applyG(G,S.T0), vT1=applyG(G,S.T1);
+  const Tw={x:vB0.x-vB1.x+vT1.x-vT0.x, y:vB0.y-vB1.y+vT1.y-vT0.y};
+  const Sf=patchFn(vB0,vB1,vT0,vT1);
+  const mid=Sf(.5,.5), ch={x:(Sf(0,0).x+Sf(1,1).x)/2, y:(Sf(0,0).y+Sf(1,1).y)/2};
+  const sel=S.field[selected], vB=applyG(G,sel.B), vP=applyG(G,sel.P);
+  const vR0=applyG(G,S.R0), vR1=applyG(G,S.R1);
+  return {
+    count: grain*(sel.P.r-sel.B.r),
+    redLen: d2(vR0,vR1),
+    absT: Math.hypot(Tw.x,Tw.y),
+    L1: d2(Sf(0,1),Sf(1,1)),
+    Lh: d2(Sf(0,.5),Sf(1,.5)),
+    L0: d2(Sf(0,0),Sf(1,0)),
+    sagRes: Math.abs(d2(mid,ch)-Math.hypot(Tw.x,Tw.y)/4),
+    shadow: d2({x:vB.x,y:vB.y},{x:vP.x,y:vP.y}),
+    bearing: Math.atan2(vR1.y-vR0.y, vR1.x-vR0.x)*180/Math.PI
+  };
+}
+const HONEST=[["count","count of selected line","#2447c4"],
+              ["redLen","length of the red line","#d3372c"],
+              ["absT","|T| twist of the patch","#3fa053"],
+              ["L1","ruling length at ratio 1","#3fa053"],
+              ["Lh","ruling length at ratio ½","#3fa053"],
+              ["L0","ruling length at ratio 0","#3fa053"],
+              ["sagRes","sagitta − |T|/4","#3fa053"]];
+function rebase(){
+  const m=measure(); base={}; drift={};
+  for(const [k] of HONEST){ base[k]=m[k]; drift[k]=0; }
+}
+rebase();
+const ledger=document.getElementById("ledger");
+function fmtDrift(v){ return v<1e-9 ? v.toExponential(1) : v.toExponential(2); }
+function renderLedger(m){
+  let h="";
+  for(const [k,name,col] of HONEST){
+    drift[k]=Math.max(drift[k], Math.abs(m[k]-base[k]));
+    const bad=drift[k]>1e-9;
+    h+=`<tr><td><span class="dot" style="background:${col}"></span>${name}</td>
+        <td class="num honest">${k==="count"?m[k].toFixed(0)+" / "+grain:m[k].toFixed(3)}</td>
+        <td class="num"><span class="drift${bad?" bad":""}">drift ${fmtDrift(drift[k])}</span></td></tr>`;
+  }
+  h+=`<tr><td><span class="dot" style="background:#2447c4"></span>shadow of selected line</td>
+      <td class="num gauge">${m.shadow.toFixed(3)}</td><td class="num gauge">gauge</td></tr>`;
+  h+=`<tr><td><span class="dot" style="background:#d3372c"></span>bearing of the red line</td>
+      <td class="num gauge">${m.bearing.toFixed(1)}°</td><td class="num gauge">gauge</td></tr>`;
+  ledger.innerHTML=h;
+}
+
+/* ---------- drawing the scene -------------------------------------------- */
+function lineBoth(g, p, q, attrsT, attrsF){
+  const vp=applyG(G,p), vq=applyG(G,q);
+  el("line",{x1:mx(vp.x),y1:myT(vp.y),x2:mx(vq.x),y2:myT(vq.y),...attrsT},g);
+  el("line",{x1:mx(vp.x),y1:myF(vp.r),x2:mx(vq.x),y2:myF(vq.r),...attrsF||attrsT},g);
+  return [vp,vq];
+}
+function projector(vp){
+  el("line",{x1:mx(vp.x),y1:myT(vp.y),x2:mx(vp.x),y2:myF(vp.r),
+             stroke:"#8fd8d6","stroke-width":1,opacity:0.75},gProj);
+}
+function draw(){
+  gProj.replaceChildren(); gPatch.replaceChildren(); gField.replaceChildren();
+  gRed.replaceChildren(); gHandles.replaceChildren();
+  const S=scene;
+  const vB0=applyG(G,S.B0), vB1=applyG(G,S.B1), vT0=applyG(G,S.T0), vT1=applyG(G,S.T1);
+  const Sf=patchFn(vB0,vB1,vT0,vT1);
+
+  /* patch fill, both views */
+  const quadT=[vB0,vB1,vT1,vT0].map(p=>`${mx(p.x)},${myT(p.y)}`).join(" ");
+  el("polygon",{points:quadT,fill:"#3fa053",opacity:0.13},gPatch);
+  const quadF=[vB0,vB1,vT1,vT0].map(p=>`${mx(p.x)},${myF(p.r)}`).join(" ");
+  el("polygon",{points:quadF,fill:"#3fa053",opacity:0.13},gPatch);
+  /* level rulings at grain marks (vector verb: honest per-level lengths) */
+  for(let k=0;k<=grain;k++){
+    const t=k/grain, a=Sf(0,t), b=Sf(1,t);
+    el("line",{x1:mx(a.x),y1:myT(a.y),x2:mx(b.x),y2:myT(b.y),stroke:"#3fa053","stroke-width":t===1?0:1.2,opacity:0.85},gPatch);
+    el("line",{x1:mx(a.x),y1:myF(t),x2:mx(b.x),y2:myF(t),stroke:"#3fa053","stroke-width":t===1?0:1.4,opacity:0.9},gPatch);
+  }
+  /* edges: sides blue (depth rulings, covector verb), top red (picture plane), bottom blue dashed */
+  for(const [p,q] of [[vB0,vT0],[vB1,vT1]])
+    for(const [Y1v,Y2v,view] of [[myT(p.y),myT(q.y),"T"],[myF(p.r),myF(q.r),"F"]])
+      el("line",{x1:mx(p.x),y1:Y1v,x2:mx(q.x),y2:Y2v,stroke:"#2447c4","stroke-width":2.6},gPatch);
+  el("line",{x1:mx(vT0.x),y1:myT(vT0.y),x2:mx(vT1.x),y2:myT(vT1.y),stroke:"#d3372c","stroke-width":3},gPatch);
+  el("line",{x1:mx(vT0.x),y1:myF(1),x2:mx(vT1.x),y2:myF(1),stroke:"#d3372c","stroke-width":3},gPatch);
+  el("line",{x1:mx(vB0.x),y1:myT(vB0.y),x2:mx(vB1.x),y2:myT(vB1.y),stroke:"#2447c4","stroke-width":1.6,"stroke-dasharray":"6 4"},gPatch);
+  el("line",{x1:mx(vB0.x),y1:myF(0),x2:mx(vB1.x),y2:myF(0),stroke:"#2447c4","stroke-width":1.6,"stroke-dasharray":"6 4"},gPatch);
+  /* diagonal S(u,u): bows with sagitta |T|/4; chord dashed */
+  let dT="",dF="";
+  for(let i=0;i<=32;i++){const u=i/32,p=Sf(u,u);
+    dT+=(i?"L":"M")+mx(p.x)+" "+myT(p.y)+" "; dF+=(i?"L":"M")+mx(p.x)+" "+myF(u)+" ";}
+  el("path",{d:dT,fill:"none",stroke:"#1d5c2c","stroke-width":1.5},gPatch);
+  el("path",{d:dF,fill:"none",stroke:"#1d5c2c","stroke-width":1.5},gPatch);
+  el("line",{x1:mx(vB0.x),y1:myT(vB0.y),x2:mx(vT1.x),y2:myT(vT1.y),stroke:"#8a877c","stroke-width":0.9,"stroke-dasharray":"2 4"},gPatch);
+
+  /* wild depth-line field */
+  S.field.forEach((L,i)=>{
+    const w=i===selected?3.4:2;
+    const [vB,vP]=lineBoth(gField,L.B,L.P,
+      {stroke:"#2447c4","stroke-width":w,"stroke-linecap":"round",opacity:i===selected?1:0.55,style:"cursor:pointer"},
+      {stroke:"#2447c4","stroke-width":w,"stroke-linecap":"round",opacity:i===selected?1:0.55,style:"cursor:pointer"});
+    // click targets
+    const hitT=el("line",{x1:mx(vB.x),y1:myT(vB.y),x2:mx(vP.x),y2:myT(vP.y),stroke:"transparent","stroke-width":16},gField);
+    hitT.addEventListener("pointerdown",()=>{selected=i; rebase(); tick();});
+    projector(vB); projector(vP);
+    if(i===selected){
+      el("circle",{cx:mx(vB.x),cy:myT(vB.y),r:4,fill:"#2447c4"},gField);
+      el("circle",{cx:mx(vP.x),cy:myT(vP.y),r:4,fill:"none",stroke:"#2447c4","stroke-width":2},gField);
+    }
+  });
+
+  /* red picture-plane line */
+  const [vR0,vR1]=lineBoth(gRed,S.R0,S.R1,{stroke:"#d3372c","stroke-width":3,"stroke-linecap":"round"});
+  projector(vR0); projector(vR1); projector(vT0); projector(vT1); projector(vB0); projector(vB1);
+
+  /* handles (scene editing, top view only) */
+  for(const key of ["B0","B1","T0","T1","R0","R1"]){
+    const v=applyG(G,S[key]);
+    const h=el("rect",{x:mx(v.x)-5.5,y:myT(v.y)-5.5,width:11,height:11,rx:2,
+      fill:"#fdfcf9",stroke:key[0]==="R"?"#d3372c":(key[0]==="T"?"#d3372c":"#2447c4"),
+      "stroke-width":1.6,style:"cursor:grab"},gHandles);
+    h.addEventListener("pointerdown",ev=>startDrag(ev,key));
+  }
+}
+
+/* ---------- dragging ------------------------------------------------------ */
+let dragKey=null;
+function svgPoint(ev){
+  const pt=sv.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+  return pt.matrixTransform(sv.getScreenCTM().inverse());
+}
+function startDrag(ev,key){
+  ev.preventDefault(); dragKey=key;
+  ev.target.setPointerCapture(ev.pointerId);
+  ev.target.addEventListener("pointermove",moveDrag);
+  ev.target.addEventListener("pointerup",endDrag,{once:true});
+}
+function moveDrag(ev){
+  if(!dragKey) return;
+  const P=svgPoint(ev), w=ixT(P.x,P.y);
+  const r=scene[dragKey].r;
+  const s=invApply(G,{x:w.x,y:w.y,r});
+  scene[dragKey]={x:s.x,y:s.y,r};
+  rebase(); tick();
+}
+function endDrag(ev){
+  dragKey=null;
+  ev.target.removeEventListener("pointermove",moveDrag);
+}
+
+/* ---------- controls ------------------------------------------------------ */
+const S_=id=>document.getElementById(id);
+const sliders={phi:S_("sphi"),ax:S_("sax"),ay:S_("say"),bx:S_("sbx"),by:S_("sby")};
+function syncSliders(){
+  sliders.phi.value=G.phi*180/Math.PI;
+  sliders.ax.value=G.ax; sliders.ay.value=G.ay; sliders.bx.value=G.bx; sliders.by.value=G.by;
+  S_("vphi").textContent=(G.phi*180/Math.PI).toFixed(1)+"°";
+  S_("vax").textContent=G.ax.toFixed(2); S_("vay").textContent=G.ay.toFixed(2);
+  S_("vbx").textContent=G.bx.toFixed(2); S_("vby").textContent=G.by.toFixed(2);
+}
+for(const k in sliders) sliders[k].addEventListener("input",()=>{
+  G={phi:parseFloat(sliders.phi.value)*Math.PI/180,
+     ax:parseFloat(sliders.ax.value), ay:parseFloat(sliders.ay.value),
+     bx:parseFloat(sliders.bx.value), by:parseFloat(sliders.by.value)};
+  syncSliders(); tick();
+});
+S_("breset").addEventListener("click",()=>{stopSpin(); animateTo({phi:0,ax:0,ay:0,bx:0,by:0});});
+S_("broll").addEventListener("click",()=>{rollField(); rebase(); tick();});
+S_("bcanon").addEventListener("click",()=>{
+  stopSpin();
+  const L=scene.field[selected];
+  animateTo(sendToCanon(G,L.B,L.P,post));
+});
+document.querySelectorAll(".grain").forEach(b=>b.addEventListener("click",()=>{
+  grain=parseInt(b.dataset.g,10);
+  document.querySelectorAll(".grain").forEach(x=>x.classList.toggle("on",x===b));
+  drawLevels(); rebase(); tick();
+}));
+
+/* spin the glide */
+const bspin=S_("bspin");
+bspin.addEventListener("click",()=>{ spin?stopSpin():startSpin(); });
+function startSpin(){ spin=true; spinT=0; spinAnchor={bx:G.bx,by:G.by}; bspin.classList.add("on"); loop(); }
+function stopSpin(){ spin=false; bspin.classList.remove("on"); }
+function loop(){
+  if(!spin) return;
+  spinT+=reduced?0.05:0.02;
+  G.bx=spinAnchor.bx+3.2*Math.cos(spinT);
+  G.by=spinAnchor.by+3.2*Math.sin(spinT);
+  syncSliders(); tick();
+  requestAnimationFrame(loop);
+}
+
+/* animated gauge moves (canon send, reset) */
+function animateTo(target){
+  if(animReq) cancelAnimationFrame(animReq);
+  const from={...G}, dur=reduced?0:700, t0=performance.now();
+  function step(t){
+    const u=dur?Math.min(1,(t-t0)/dur):1, e=u*u*(3-2*u);
+    G={phi:from.phi+(target.phi-from.phi)*e,
+       ax:from.ax+(target.ax-from.ax)*e, ay:from.ay+(target.ay-from.ay)*e,
+       bx:from.bx+(target.bx-from.bx)*e, by:from.by+(target.by-from.by)*e};
+    syncSliders(); tick();
+    if(u<1) animReq=requestAnimationFrame(step); else animReq=null;
+  }
+  animReq=requestAnimationFrame(step);
+}
+
+/* ---------- main tick ------------------------------------------------------ */
+function tick(){ draw(); renderLedger(measure()); }
+syncSliders(); tick();
+</script>
+</body>
+</html>
