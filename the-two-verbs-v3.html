@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>the two verbs — v3 · transition</title>
+<style>
+  :root{ color-scheme: light; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; padding:18px 16px 40px; background:#fbfaf6; color:#26261f;
+        font:15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  header{ max-width:1180px; margin:0 auto 10px; }
+  h1{ font-size:21px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; margin:0 0 2px; }
+  .thesis{ color:#6b6a61; font-size:14px; margin:0; }
+  .wrap{ max-width:1180px; margin:0 auto; display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+  .sheet{ flex:1 1 620px; min-width:340px; }
+  svg.main{ width:100%; height:auto; display:block; background:#fdfcf9;
+       border:1px solid #dedbd0; border-radius:4px; touch-action:none; }
+  .panel{ flex:0 1 330px; min-width:300px; display:flex; flex-direction:column; gap:14px; }
+  .card{ background:#fdfcf9; border:1px solid #dedbd0; border-radius:4px; padding:12px 14px; }
+  .card h2{ font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+            margin:0 0 8px; color:#6b6a61; }
+  .row{ display:flex; align-items:center; gap:8px; margin:4px 0; }
+  .row label{ width:34px; font-size:13px; }
+  .row input[type=range]{ flex:1; accent-color:#8a877c; }
+  .row .val{ width:58px; text-align:right; font:12px ui-monospace, Menlo, monospace; color:#8a877c; }
+  button{ font:13px -apple-system, sans-serif; letter-spacing:.04em; background:#f2efe6;
+          color:#26261f; border:1px solid #c9c5b8; border-radius:4px; padding:6px 10px; cursor:pointer; }
+  button:hover{ background:#e9e5d8; }
+  button:focus-visible, input:focus-visible{ outline:2px solid #2447c4; outline-offset:1px; }
+  button.on{ background:#26261f; color:#fbfaf6; border-color:#26261f; }
+  .btnrow{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center; }
+  .btnrow .lab{ font-size:12px; color:#6b6a61; letter-spacing:.08em; }
+  .census{ font:12px ui-monospace, Menlo, monospace; color:#6b6a61; margin-top:8px; }
+  table.ledger{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.ledger td{ padding:3px 4px; border-bottom:1px solid #eeebe0; vertical-align:baseline; }
+  table.ledger td.num{ text-align:right; font:13px ui-monospace, Menlo, monospace; white-space:nowrap; }
+  .honest{ color:#2e7d40; font-weight:600; }
+  .gauge{ color:#9a9789; }
+  .dot{ display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; }
+  .drift{ font:11px ui-monospace, Menlo, monospace; color:#2e7d40; }
+  .drift.bad{ color:#c62b1f; font-weight:700; }
+  .note{ font-size:12.5px; color:#6b6a61; margin-top:8px; }
+  .Areadout{ font:14px ui-monospace, Menlo, monospace; color:#2e7d40; }
+  section.explain{ max-width:1180px; margin:26px auto 0; }
+  section.explain h2{ font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+                      color:#6b6a61; margin:22px 0 6px; }
+  section.explain p{ max-width:74ch; margin:6px 0; }
+  section.explain .k{ font-weight:600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Two Verbs — v3 · Transition</h1>
+  <p class="thesis">Unequal ends: an n₁-gon in the picture plane, an n₀-gon on the slab floor, joined by a ladder of warped quads and flat triangles. The pairing is data; the identities are not.</p>
+</header>
+
+<div class="wrap">
+  <div class="sheet"><svg id="sv" class="main" viewBox="0 0 1000 700" aria-label="Top view and front view of the transition volume"></svg></div>
+
+  <div class="panel">
+    <div class="card">
+      <h2>Gauge &nbsp;(the apparatus group)</h2>
+      <div class="row"><label>φ</label><input id="sphi" type="range" min="-180" max="180" step="0.5" value="0"><span class="val" id="vphi">0.0°</span></div>
+      <div class="row"><label>aₓ</label><input id="sax" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vax">0.00</span></div>
+      <div class="row"><label>a_y</label><input id="say" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vay">0.00</span></div>
+      <div class="row"><label>bₓ</label><input id="sbx" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vbx">0.00</span></div>
+      <div class="row"><label>b_y</label><input id="sby" type="range" min="-12" max="12" step="0.05" value="0"><span class="val" id="vby">0.00</span></div>
+      <div class="btnrow">
+        <button id="breset">Reset gauge</button>
+        <button id="bspin">Spin the glide</button>
+        <button id="broll">Re-roll the volume</button>
+      </div>
+      <div class="btnrow">
+        <span class="lab">TOP</span>
+        <button class="n1sel on" data-n="3">3</button><button class="n1sel" data-n="4">4</button>
+        <button class="n1sel" data-n="5">5</button><button class="n1sel" data-n="6">6</button>
+        <span class="lab" style="margin-left:8px">FLOOR</span>
+        <button class="n0sel" data-n="3">3</button><button class="n0sel on" data-n="4">4</button>
+        <button class="n0sel" data-n="5">5</button><button class="n0sel" data-n="6">6</button>
+      </div>
+      <div class="btnrow">
+        <span class="lab">GRAIN</span>
+        <button class="grain" data-g="2">2</button><button class="grain on" data-g="4">4</button>
+        <button class="grain" data-g="8">8</button>
+      </div>
+      <p class="note">Red squares drag the picture-plane polygon (ratio 1); blue squares drag the floor polygon (ratio 0). Dragging edits the scene and re-bases the ledger.</p>
+    </div>
+
+    <div class="card">
+      <h2>The ladder &nbsp;(pairing = data)</h2>
+      <div class="btnrow">
+        <span class="lab">MODE</span>
+        <button id="bquads" class="on">Quads first</button>
+        <button id="btris">Triangulated</button>
+        <span class="lab" style="margin-left:8px">OFFSET</span>
+        <button id="boffm">−</button><span class="val" id="voff" style="width:44px;text-align:center">0</span><button id="boffp">+</button>
+      </div>
+      <div class="census" id="vcensus">—</div>
+      <p class="note">The ladder is the tinsmith's correspondence: which floor vertex each picture-plane vertex "sees." Change the offset and V changes — the two boundary polygons alone do not determine the volume.</p>
+    </div>
+
+    <div class="card">
+      <h2>The slice &nbsp;— A(ratio)</h2>
+      <div class="row"><label style="width:42px">ratio</label><input id="st" type="range" min="0" max="1" step="0.005" value="0.5"><span class="val" id="vt">0.500</span></div>
+      <div class="row"><span>slice area A(t):&nbsp;</span><span class="Areadout" id="vA">—</span></div>
+      <svg id="inset" viewBox="0 0 300 150" style="width:100%;height:auto;background:#fdfcf9;border:1px solid #eeebe0;border-radius:3px"></svg>
+      <p class="note">Every slice vertex still moves linearly in the count — one end pinned on triangle panels — so A(t) remains exactly a parabola and Simpson reads the volume exactly, even though the slice has more sides than either boundary.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ledger &nbsp;— honest vs gauge</h2>
+      <table class="ledger" id="ledger"></table>
+      <p class="note">Honest readings are invariants of the apparatus group; drift meters track the largest deviation since the scene (polygons <em>or ladder</em>) was last edited. The two circuit rows are live identities.</p>
+    </div>
+  </div>
+</div>
+
+<section class="explain">
+  <h2>What this is</h2>
+  <p>The classical transition piece, carried into the two-verbs apparatus. The bounding data are an n₁-gon in the picture plane (red, ratio 1) and an n₀-gon in the back plane (blue, ratio 0) — generally with <em>different</em> vertex counts, so no vertexwise interpolation exists. The lateral surface is built from a <em>ladder</em>: a cyclic monotone pairing of the two vertex rings. A rung joins a floor vertex to a picture-plane vertex; between consecutive rungs sits a panel — a warped quad where both rings advance, a flat triangle where only one does. "Quads first" is the Bresenham ladder (min(n₁,n₀) hypars, |n₁−n₀| triangles); "Triangulated" is the tinsmith's all-triangle development ladder.</p>
+
+  <h2>What survives, what becomes data</h2>
+  <p><span class="k">Survives:</span> every slice vertex is (1−t)·B + t·T for its rung, hence linear in the count; the slice is an (n₁+n₀−q)-gon whose shoelace is exactly quadratic, so V = (A₁ + 4A½ + A₀)/6 is still an identity (checked live against a 64-panel integral, and pre-build in smoke_v3.js, 7/7). The twist circuit still telescopes: ΣT⃗ = 0 over the full ladder, triangles included. A₁ and A₀ are ladder-invariant — repeated slice vertices at the collapsed ends cost the shoelace nothing.</p>
+  <p><span class="k">Becomes data:</span> the volume itself. A½, and hence V, depend on the ladder. Two fixed boundary polygons admit many transition volumes — rotate the offset and watch V move in the ledger while A₁ and A₀ hold still. This is the choice the sheet-metal chapters were really teaching: the development you cut depends on the correspondence you drew.</p>
+
+  <h2>Three experiments</h2>
+  <p><span class="k">1 — Rotate the offset.</span> A₁ and A₀ freeze; A½ and V jump. The boundary figures are vector nouns; the ladder is covector plumbing — transport data joining them, with real consequences one dimension up.</p>
+  <p><span class="k">2 — Switch Quads first ↔ Triangulated.</span> The warp census collapses toward the triangle panels' zero — flat panels carry twist in the circuit but no warp — while the circuit identity |ΣT⃗| = 0 holds through the change. Warp is a property of the panels; the circuit is a property of the ladder.</p>
+  <p><span class="k">3 — Spin the glide.</span> As in v2: V, all three areas, and the census hold at drift ≈ 1e−15. The apparatus group does not see the ladder either — pairing and gauge are independent layers of data.</p>
+
+  <h2>Provenance</h2>
+  <p>Ladder machinery smoke-tested in Node before build (smoke_v3.js, 7/7); gauge machinery inherited from v1/v2. Square-to-round and polygon-to-polygon transition pieces with triangulated developments are standard descriptive-geometry and sheet-metal material; the Bresenham ladder is the max-quad refinement of that triangulation, keeping Candela's hypar panels wherever the two rings advance together.</p>
+</section>
+
+<script>
+"use strict";
+/* ---------- gauge math (inherited v1) ------------------------------------ */
+function rot(phi){const c=Math.cos(phi),s=Math.sin(phi);return [c,-s,s,c];}
+function mul(R,p){return {x:R[0]*p.x+R[1]*p.y, y:R[2]*p.x+R[3]*p.y};}
+function applyG(g,p){const R=rot(g.phi),q=mul(R,{x:p.x,y:p.y}),f=1-p.r;
+  return {x:q.x+g.ax+f*g.bx, y:q.y+g.ay+f*g.by, r:p.r};}
+function invApply(g,p){const R=rot(-g.phi),f=1-p.r;
+  const q=mul(R,{x:p.x-g.ax-f*g.bx, y:p.y-g.ay-f*g.by});
+  return {x:q.x, y:q.y, r:p.r};}
+/* ---------- ladder math (smoke-tested v3, smoke_v3.js ALL PASS) ---------- */
+function shoelace(P){let a=0;for(let i=0;i<P.length;i++){const q=P[(i+1)%P.length];
+  a+=P[i].x*q.y-q.x*P[i].y;}return a/2;}
+function buildLadder(n1,n0,offset,mode){
+  const rungs=[{i:0,j:0}];
+  let i=0,j=0;
+  if(mode==="quads"){
+    const M=Math.max(n1,n0), m=Math.min(n1,n0), topLong=n1>=n0;
+    for(let k=0;k<M;k++){
+      const adv=Math.floor((k+1)*m/M)-Math.floor(k*m/M);
+      if(topLong){ i++; j+=adv; } else { j++; i+=adv; }
+      if(k<M-1) rungs.push({i,j});
+    }
+  }else{
+    while(i<n1||j<n0){
+      const pi=(i+1)/n1, pj=(j+1)/n0;
+      if(i<n1 && (j>=n0 || pi<=pj)) i++; else j++;
+      if(i<n1||j<n0) rungs.push({i,j});
+    }
+  }
+  return rungs.map(r=>({i:r.i%n1, j:(r.j+offset)%n0}));
+}
+function ladderSteps(L,n1,n0){
+  return L.map((a,k)=>{
+    const b=L[(k+1)%L.length];
+    return {a,b, di:(b.i-a.i+n1)%n1, dj:(b.j-a.j+n0)%n0};
+  });
+}
+function sliceL(Q0,Q1,L,t){
+  return L.map(r=>({x:(1-t)*Q0[r.j].x+t*Q1[r.i].x, y:(1-t)*Q0[r.j].y+t*Q1[r.i].y}));
+}
+function stepTwist(Q0,Q1,s){
+  return {x:(Q1[s.b.i].x-Q1[s.a.i].x)-(Q0[s.b.j].x-Q0[s.a.j].x),
+          y:(Q1[s.b.i].y-Q1[s.a.i].y)-(Q0[s.b.j].y-Q0[s.a.j].y)};}
+function simpsonIntL(Q0,Q1,L,n){
+  let s=shoelace(sliceL(Q0,Q1,L,0))+shoelace(sliceL(Q0,Q1,L,1));
+  for(let i=1;i<n;i++) s+=(i%2?4:2)*shoelace(sliceL(Q0,Q1,L,i/n));
+  return s/(3*n);}
+
+/* ---------- scene -------------------------------------------------------- */
+let n1=3, n0=4, grain=4, tSlice=0.5;
+let lMode="quads", lOff=0;
+let rngS=23;
+function rnd(){ rngS=(rngS*1103515245+12345)&0x7fffffff; return rngS/0x7fffffff; }
+function rpoly(n,cx,cy,r0,r1,r){
+  const th=[...Array(n)].map(()=>2*Math.PI*rnd()).sort((a,b)=>a-b);
+  return th.map(t=>({x:cx+(r0+(r1-r0)*rnd())*Math.cos(t), y:cy+(r0+(r1-r0)*rnd())*Math.sin(t), r}));
+}
+let P1=[], P0=[];
+function roll1(){ P1=rpoly(n1,1.8,8.2,1.7,3.5,1); }
+function roll0(){ P0=rpoly(n0,-3.2,3.6,1.5,3.2,0); }
+roll1(); roll0();
+function ladder(){ return buildLadder(n1,n0,lOff,lMode); }
+
+/* ---------- gauge state --------------------------------------------------- */
+let G={phi:0,ax:0,ay:0,bx:0,by:0};
+let spin=false, spinT=0, spinAnchor=null, animReq=null;
+const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- view mapping -------------------------------------------------- */
+const X0=60, X1=955, W=24, sx=(X1-X0)/W;
+const TY0=368, TY1=34, sy=(TY0-TY1)/13.2;
+const FY1=436, FY0=648;
+const mx=x=>X0+(x+12)*sx;
+const myT=y=>TY0-(y+1)*sy;
+const myF=r=>FY0+(FY1-FY0)*r;
+const ixT=(X,Y)=>({x:(X-X0)/sx-12, y:(TY0-Y)/sy-1});
+
+/* ---------- svg scaffolding ----------------------------------------------- */
+const NS="http://www.w3.org/2000/svg";
+const sv=document.getElementById("sv");
+function el(tag,attrs,parent){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  (parent||sv).appendChild(e); return e;
+}
+el("line",{x1:14,y1:402,x2:986,y2:402,stroke:"#c4c1b4","stroke-width":1.4});
+el("text",{x:18,y:394,fill:"#8a877c","font-size":"13","letter-spacing":"2"}).textContent="TOP VIEW";
+el("text",{x:18,y:420,fill:"#8a877c","font-size":"13","letter-spacing":"2"}).textContent="FRONT VIEW";
+const gProj=el("g",{}), gLevels=el("g",{}), gVol=el("g",{}), gHandles=el("g",{});
+function drawLevels(){
+  gLevels.replaceChildren();
+  for(let k=0;k<=grain;k++){
+    const r=k/grain, Y=myF(r);
+    el("line",{x1:X0-6,y1:Y,x2:X1,y2:Y,stroke:"#3fa053","stroke-width":r===1||r===0?1.6:0.9,opacity:r===1||r===0?0.9:0.55},gLevels);
+    el("text",{x:X0-14,y:Y+4,fill:"#3fa053","font-size":"12","text-anchor":"end"},gLevels).textContent=String(k);
+  }
+  el("text",{x:X0-34,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
+     transform:`rotate(-90 ${X0-34} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels).textContent="COUNT";
+  for(const [r,t] of [[0,"0"],[0.5,"½"],[1,"1"]])
+    el("text",{x:X1+10,y:myF(r)+4,fill:"#3fa053","font-size":"12"},gLevels).textContent=t;
+  el("text",{x:X1+30,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
+     transform:`rotate(90 ${X1+30} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels).textContent="RATIO";
+  el("text",{x:(X0+X1)/2,y:myF(1)-8,fill:"#3fa053","font-size":"11","letter-spacing":"1.5","text-anchor":"middle"},gLevels)
+    .textContent="PICTURE PLANE — STACKED LEVEL PLANES BELOW";
+}
+drawLevels();
+
+/* ---------- measurement, baselines, ledger --------------------------------- */
+function gauged(){ return [P0.map(p=>applyG(G,p)), P1.map(p=>applyG(G,p))]; }
+function measure(){
+  const [Q0,Q1]=gauged(), L=ladder(), S=ladderSteps(L,n1,n0);
+  const A0=shoelace(sliceL(Q0,Q1,L,0)), Ah=shoelace(sliceL(Q0,Q1,L,0.5)), A1=shoelace(sliceL(Q0,Q1,L,1));
+  const V=(A0+4*Ah+A1)/6;
+  let sag=0, tx=0, ty=0, q=0;
+  for(const s of S){
+    const T=stepTwist(Q0,Q1,s); tx+=T.x; ty+=T.y;
+    if(s.di&&s.dj){ q++; sag+=Math.hypot(T.x,T.y)/4; }
+  }
+  const c1=Q1.reduce((s,p)=>({x:s.x+p.x,y:s.y+p.y}),{x:0,y:0});
+  const c0=Q0.reduce((s,p)=>({x:s.x+p.x,y:s.y+p.y}),{x:0,y:0});
+  return { V, A1, Ah, A0, sag, q, R:L.length, tri:S.length-q,
+    resPr: Math.abs(V - simpsonIntL(Q0,Q1,L,64)),
+    resTw: Math.hypot(tx,ty),
+    lean: Math.hypot(c1.x/n1-c0.x/n0, c1.y/n1-c0.y/n0),
+    At: shoelace(sliceL(Q0,Q1,L,tSlice)) };
+}
+const HONEST=[["V","volume (A₁+4A½+A₀)/6","#26261f"],
+              ["A1","area at ratio 1","#d3372c"],
+              ["Ah","area at ratio ½","#3fa053"],
+              ["A0","area at ratio 0","#2447c4"],
+              ["sag","warp census Σ|T|/4 (quads)","#8b3fa0"]];
+let base={}, drift={};
+function rebase(){ const m=measure(); base={}; drift={};
+  for(const [k] of HONEST){ base[k]=m[k]; drift[k]=0; } }
+rebase();
+const ledger=document.getElementById("ledger");
+function renderLedger(m){
+  let h="";
+  for(const [k,name,col] of HONEST){
+    drift[k]=Math.max(drift[k], Math.abs(m[k]-base[k]));
+    const bad=drift[k]>1e-9;
+    h+=`<tr><td><span class="dot" style="background:${col}"></span>${name}</td>
+        <td class="num honest">${m[k].toFixed(3)}</td>
+        <td class="num"><span class="drift${bad?" bad":""}">drift ${drift[k].toExponential(1)}</span></td></tr>`;
+  }
+  h+=`<tr><td><span class="dot" style="background:#3fa053"></span>prismatoid − ∫A dh</td>
+      <td class="num honest">${m.resPr.toExponential(1)}</td><td class="num"><span class="drift${m.resPr>1e-9?" bad":""}">identity</span></td></tr>`;
+  h+=`<tr><td><span class="dot" style="background:#8b3fa0"></span>|ΣT⃗| circuit of twists</td>
+      <td class="num honest">${m.resTw.toExponential(1)}</td><td class="num"><span class="drift${m.resTw>1e-9?" bad":""}">identity</span></td></tr>`;
+  h+=`<tr><td><span class="dot" style="background:#9a9789"></span>lean of the volume</td>
+      <td class="num gauge">${m.lean.toFixed(3)}</td><td class="num gauge">gauge</td></tr>`;
+  ledger.innerHTML=h;
+}
+
+/* ---------- drawing -------------------------------------------------------- */
+function polyPtsT(Q){ return Q.map(p=>`${mx(p.x)},${myT(p.y)}`).join(" "); }
+function draw(){
+  gProj.replaceChildren(); gVol.replaceChildren(); gHandles.replaceChildren();
+  const [Q0,Q1]=gauged(), L=ladder(), S=ladderSteps(L,n1,n0);
+  /* panels: green fill in both views; purple bows on warped quads only */
+  for(const s of S){
+    const c00=Q0[s.a.j], c10=Q0[s.b.j], c11=Q1[s.b.i], c01=Q1[s.a.i];
+    const quad=s.di&&s.dj;
+    const pts=[c00,c10,c11,c01];
+    el("polygon",{points:polyPtsT(pts),fill:"#3fa053",opacity:quad?0.10:0.06},gVol);
+    el("polygon",{points:pts.map(p=>`${mx(p.x)},${myF(p.r)}`).join(" "),fill:"#3fa053",opacity:quad?0.08:0.05},gVol);
+    if(quad){
+      let dT="";
+      for(let u16=0;u16<=16;u16++){const u=u16/16;
+        const B={x:(1-u)*c00.x+u*c10.x, y:(1-u)*c00.y+u*c10.y};
+        const T={x:(1-u)*c01.x+u*c11.x, y:(1-u)*c01.y+u*c11.y};
+        const p={x:(1-u)*B.x+u*T.x, y:(1-u)*B.y+u*T.y};
+        dT+=(u16?"L":"M")+mx(p.x)+" "+myT(p.y)+" ";
+      }
+      el("path",{d:dT,fill:"none",stroke:"#8b3fa0","stroke-width":1.2,opacity:0.8},gVol);
+    }
+  }
+  /* nested grain slices (the Type A web) */
+  for(let k=1;k<grain;k++){
+    const Sl=sliceL(Q0,Q1,L,k/grain);
+    el("polygon",{points:polyPtsT(Sl),fill:"none",stroke:"#3fa053","stroke-width":1,opacity:0.55},gVol);
+  }
+  /* seams: the ladder rungs, both views */
+  for(const r of L){
+    el("line",{x1:mx(Q0[r.j].x),y1:myT(Q0[r.j].y),x2:mx(Q1[r.i].x),y2:myT(Q1[r.i].y),stroke:"#2447c4","stroke-width":2.2},gVol);
+    el("line",{x1:mx(Q0[r.j].x),y1:myF(0),x2:mx(Q1[r.i].x),y2:myF(1),stroke:"#2447c4","stroke-width":2},gVol);
+  }
+  /* projectors */
+  for(const p of Q0) el("line",{x1:mx(p.x),y1:myT(p.y),x2:mx(p.x),y2:myF(0),stroke:"#8fd8d6","stroke-width":1,opacity:0.7},gProj);
+  for(const p of Q1) el("line",{x1:mx(p.x),y1:myT(p.y),x2:mx(p.x),y2:myF(1),stroke:"#8fd8d6","stroke-width":1,opacity:0.7},gProj);
+  /* the two boundary polygons */
+  el("polygon",{points:polyPtsT(Q0),fill:"none",stroke:"#2447c4","stroke-width":1.8,"stroke-dasharray":"6 4"},gVol);
+  el("polygon",{points:polyPtsT(Q1),fill:"none",stroke:"#d3372c","stroke-width":3},gVol);
+  /* front-view boundary extents */
+  const xs0=Q0.map(p=>mx(p.x)), xs1=Q1.map(p=>mx(p.x));
+  el("line",{x1:Math.min(...xs1),y1:myF(1),x2:Math.max(...xs1),y2:myF(1),stroke:"#d3372c","stroke-width":3},gVol);
+  el("line",{x1:Math.min(...xs0),y1:myF(0),x2:Math.max(...xs0),y2:myF(0),stroke:"#2447c4","stroke-width":1.8,"stroke-dasharray":"6 4"},gVol);
+  /* current slice */
+  const Sl=sliceL(Q0,Q1,L,tSlice), xsS=Sl.map(p=>mx(p.x));
+  el("polygon",{points:polyPtsT(Sl),fill:"#3fa053",opacity:0.14},gVol);
+  el("polygon",{points:polyPtsT(Sl),fill:"none",stroke:"#1d5c2c","stroke-width":2.2},gVol);
+  el("line",{x1:Math.min(...xsS),y1:myF(tSlice),x2:Math.max(...xsS),y2:myF(tSlice),stroke:"#1d5c2c","stroke-width":2.6},gVol);
+  /* handles */
+  P1.forEach((p,i)=>handle(p,i,"P1","#d3372c"));
+  P0.forEach((p,i)=>handle(p,i,"P0","#2447c4"));
+}
+function handle(p,i,which,col){
+  const v=applyG(G,p);
+  const h=el("rect",{x:mx(v.x)-5.5,y:myT(v.y)-5.5,width:11,height:11,rx:2,
+    fill:"#fdfcf9",stroke:col,"stroke-width":1.6,style:"cursor:grab"},gHandles);
+  h.addEventListener("pointerdown",ev=>startDrag(ev,which,i));
+}
+
+/* ---------- parabola inset -------------------------------------------------- */
+const inset=document.getElementById("inset");
+function drawInset(m){
+  inset.replaceChildren();
+  const e=(tag,attrs)=>{const x=document.createElementNS(NS,tag);
+    for(const k in attrs)x.setAttribute(k,attrs[k]); inset.appendChild(x); return x;};
+  const Lm=34,Rr=290,T=12,B=128;
+  const [Q0,Q1]=gauged(), Ld=ladder();
+  const A=t=>shoelace(sliceL(Q0,Q1,Ld,t));
+  const samples=[...Array(33)].map((_,i)=>A(i/32));
+  const lo=Math.min(0,...samples), hi=Math.max(1e-9,...samples)*1.08;
+  const gx=t=>Lm+(Rr-Lm)*t, gy=a=>B-(B-T)*(a-lo)/(hi-lo);
+  e("line",{x1:Lm,y1:gy(0),x2:Rr,y2:gy(0),stroke:"#c4c1b4","stroke-width":1});
+  e("line",{x1:Lm,y1:T,x2:Lm,y2:B,stroke:"#c4c1b4","stroke-width":1});
+  let d="",fill=`M ${gx(0)} ${gy(0)} `;
+  samples.forEach((a,i)=>{const t=i/32; d+=(i?"L":"M")+gx(t)+" "+gy(a)+" "; fill+=`L ${gx(t)} ${gy(a)} `;});
+  fill+=`L ${gx(1)} ${gy(0)} Z`;
+  e("path",{d:fill,fill:"#3fa053",opacity:0.15});
+  e("path",{d,fill:"none",stroke:"#2e7d40","stroke-width":2});
+  for(const [t,a,c] of [[0,m.A0,"#2447c4"],[0.5,m.Ah,"#3fa053"],[1,m.A1,"#d3372c"]]){
+    e("circle",{cx:gx(t),cy:gy(a),r:3.4,fill:c});
+    e("line",{x1:gx(t),y1:gy(0),x2:gx(t),y2:gy(a),stroke:c,"stroke-width":0.8,"stroke-dasharray":"2 3"});
+  }
+  e("circle",{cx:gx(tSlice),cy:gy(m.At),r:4.6,fill:"none",stroke:"#1d5c2c","stroke-width":2});
+  e("text",{x:Rr-2,y:B+0,fill:"#8a877c","font-size":"10","text-anchor":"end"}).textContent="ratio →";
+  e("text",{x:Lm+4,y:T+9,fill:"#8a877c","font-size":"10"}).textContent="A";
+  e("text",{x:(Lm+Rr)/2,y:gy(0)-6,fill:"#2e7d40","font-size":"11","text-anchor":"middle"})
+    .textContent="V = "+m.V.toFixed(3);
+}
+
+/* ---------- dragging -------------------------------------------------------- */
+let dragW=null, dragI=-1;
+function svgPoint(ev){
+  const pt=sv.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+  return pt.matrixTransform(sv.getScreenCTM().inverse());
+}
+function startDrag(ev,which,i){
+  ev.preventDefault(); dragW=which; dragI=i;
+  /* Capture on the svg root, not the handle: draw() rebuilds gHandles every
+     tick, destroying the handle mid-drag and silently killing its listeners. */
+  sv.setPointerCapture(ev.pointerId);
+  sv.addEventListener("pointermove",moveDrag);
+  sv.addEventListener("pointerup",endDrag);
+  sv.addEventListener("pointercancel",endDrag);
+}
+function moveDrag(ev){
+  if(!dragW) return;
+  const P=svgPoint(ev), w=ixT(P.x,P.y);
+  const arr=dragW==="P1"?P1:P0, r=arr[dragI].r;
+  const s=invApply(G,{x:w.x,y:w.y,r});
+  arr[dragI]={x:s.x,y:s.y,r};
+  rebase(); tick();
+}
+function endDrag(ev){
+  dragW=null;
+  sv.removeEventListener("pointermove",moveDrag);
+  sv.removeEventListener("pointerup",endDrag);
+  sv.removeEventListener("pointercancel",endDrag);
+}
+
+/* ---------- controls --------------------------------------------------------- */
+const S_=id=>document.getElementById(id);
+const sliders={phi:S_("sphi"),ax:S_("sax"),ay:S_("say"),bx:S_("sbx"),by:S_("sby")};
+function syncSliders(){
+  sliders.phi.value=G.phi*180/Math.PI;
+  sliders.ax.value=G.ax; sliders.ay.value=G.ay; sliders.bx.value=G.bx; sliders.by.value=G.by;
+  S_("vphi").textContent=(G.phi*180/Math.PI).toFixed(1)+"°";
+  S_("vax").textContent=G.ax.toFixed(2); S_("vay").textContent=G.ay.toFixed(2);
+  S_("vbx").textContent=G.bx.toFixed(2); S_("vby").textContent=G.by.toFixed(2);
+}
+for(const k in sliders) sliders[k].addEventListener("input",()=>{
+  G={phi:parseFloat(sliders.phi.value)*Math.PI/180,
+     ax:parseFloat(sliders.ax.value), ay:parseFloat(sliders.ay.value),
+     bx:parseFloat(sliders.bx.value), by:parseFloat(sliders.by.value)};
+  syncSliders(); tick();
+});
+S_("st").addEventListener("input",()=>{ tSlice=parseFloat(S_("st").value);
+  S_("vt").textContent=tSlice.toFixed(3); tick(); });
+S_("breset").addEventListener("click",()=>{stopSpin(); animateTo({phi:0,ax:0,ay:0,bx:0,by:0});});
+S_("broll").addEventListener("click",()=>{roll1(); roll0(); rebase(); tick();});
+document.querySelectorAll(".n1sel").forEach(b=>b.addEventListener("click",()=>{
+  n1=parseInt(b.dataset.n,10);
+  document.querySelectorAll(".n1sel").forEach(x=>x.classList.toggle("on",x===b));
+  roll1(); lOff=lOff%n0; rebase(); tick();
+}));
+document.querySelectorAll(".n0sel").forEach(b=>b.addEventListener("click",()=>{
+  n0=parseInt(b.dataset.n,10);
+  document.querySelectorAll(".n0sel").forEach(x=>x.classList.toggle("on",x===b));
+  roll0(); lOff=lOff%n0; rebase(); tick();
+}));
+document.querySelectorAll(".grain").forEach(b=>b.addEventListener("click",()=>{
+  grain=parseInt(b.dataset.g,10);
+  document.querySelectorAll(".grain").forEach(x=>x.classList.toggle("on",x===b));
+  drawLevels(); tick();
+}));
+S_("bquads").addEventListener("click",()=>{ lMode="quads";
+  S_("bquads").classList.add("on"); S_("btris").classList.remove("on"); rebase(); tick(); });
+S_("btris").addEventListener("click",()=>{ lMode="tris";
+  S_("btris").classList.add("on"); S_("bquads").classList.remove("on"); rebase(); tick(); });
+S_("boffm").addEventListener("click",()=>{ lOff=(lOff-1+n0)%n0; rebase(); tick(); });
+S_("boffp").addEventListener("click",()=>{ lOff=(lOff+1)%n0; rebase(); tick(); });
+const bspin=S_("bspin");
+bspin.addEventListener("click",()=>{ spin?stopSpin():startSpin(); });
+function startSpin(){ spin=true; spinT=0; spinAnchor={bx:G.bx,by:G.by}; bspin.classList.add("on"); loop(); }
+function stopSpin(){ spin=false; bspin.classList.remove("on"); }
+function loop(){
+  if(!spin) return;
+  spinT+=reduced?0.05:0.02;
+  G.bx=spinAnchor.bx+3.2*Math.cos(spinT);
+  G.by=spinAnchor.by+3.2*Math.sin(spinT);
+  syncSliders(); tick();
+  requestAnimationFrame(loop);
+}
+function animateTo(target){
+  if(animReq) cancelAnimationFrame(animReq);
+  const from={...G}, dur=reduced?0:700, t0=performance.now();
+  function step(t){
+    const u=dur?Math.min(1,(t-t0)/dur):1, e2=u*u*(3-2*u);
+    G={phi:from.phi+(target.phi-from.phi)*e2,
+       ax:from.ax+(target.ax-from.ax)*e2, ay:from.ay+(target.ay-from.ay)*e2,
+       bx:from.bx+(target.bx-from.bx)*e2, by:from.by+(target.by-from.by)*e2};
+    syncSliders(); tick();
+    if(u<1) animReq=requestAnimationFrame(step); else animReq=null;
+  }
+  animReq=requestAnimationFrame(step);
+}
+
+/* ---------- main tick ---------------------------------------------------------- */
+function tick(){
+  const m=measure();
+  draw(); renderLedger(m); drawInset(m);
+  S_("vA").textContent=m.At.toFixed(3);
+  S_("voff").textContent=String(lOff)+"/"+String(n0);
+  S_("vcensus").textContent=`${m.q} warped quads + ${m.tri} flat triangles · slice = ${m.R}-gon · rungs = ${m.R}`;
+}
+syncSliders(); S_("vt").textContent="0.500"; tick();
+</script>
+</body>
+</html>
