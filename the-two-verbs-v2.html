@@ -327,9 +327,12 @@ function svgPoint(ev){
 }
 function startDrag(ev,which,i){
   ev.preventDefault(); dragW=which; dragI=i;
-  ev.target.setPointerCapture(ev.pointerId);
-  ev.target.addEventListener("pointermove",moveDrag);
-  ev.target.addEventListener("pointerup",endDrag,{once:true});
+  /* Capture on the svg root, not the handle: draw() rebuilds gHandles every
+     tick, destroying the handle mid-drag and silently killing its listeners. */
+  sv.setPointerCapture(ev.pointerId);
+  sv.addEventListener("pointermove",moveDrag);
+  sv.addEventListener("pointerup",endDrag);
+  sv.addEventListener("pointercancel",endDrag);
 }
 function moveDrag(ev){
   if(!dragW) return;
@@ -339,7 +342,12 @@ function moveDrag(ev){
   arr[dragI]={x:s.x,y:s.y,r};
   rebase(); tick();
 }
-function endDrag(ev){ dragW=null; ev.target.removeEventListener("pointermove",moveDrag); }
+function endDrag(ev){
+  dragW=null;
+  sv.removeEventListener("pointermove",moveDrag);
+  sv.removeEventListener("pointerup",endDrag);
+  sv.removeEventListener("pointercancel",endDrag);
+}
 
 /* ---------- controls --------------------------------------------------------- */
 const S_=id=>document.getElementById(id);
