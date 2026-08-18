@@ -83,6 +83,9 @@
         <span class="lab">GRAIN</span>
         <button class="grain" data-g="2">2</button><button class="grain on" data-g="4">4</button>
         <button class="grain" data-g="8">8</button>
+        <span class="lab" style="margin-left:8px">HARMONIC</span>
+        <button class="gharm" data-m="up">1/k ↑</button>
+        <button class="gharm" data-m="down">1/k ↓</button>
       </div>
       <p class="note">Red squares drag the picture-plane polygon (ratio 1); blue squares drag the floor polygon (ratio 0). Dragging edits the scene and re-bases the ledger.</p>
     </div>
@@ -183,7 +186,27 @@ function simpsonIntL(Q0,Q1,L,n){
   return s/(3*n);}
 
 /* ---------- scene -------------------------------------------------------- */
-let n1=3, n0=4, grain=4, tSlice=0.5;
+let n1=3, n0=4, grain=4, grainMode="uniform", tSlice=0.5;
+/* Level sets: uniform k/grain, or the harmonic progression 1/k.
+   "up": levels at height 1/k — accumulation point at the floor (ratio 0).
+   "down": mirrored, levels 1/k below the picture plane — accumulation at ratio 1.
+   Interior labels in the harmonic modes name the fraction 1/k, measured from
+   whichever end the progression hangs from. */
+const HK=8, FRAC=["","1","½","⅓","¼","⅕","⅙","⅐","⅛"];
+function levelList(){
+  if(grainMode==="uniform")
+    return [...Array(grain+1)].map((_,k)=>({r:k/grain, label:String(k)}));
+  const L=[];
+  if(grainMode==="up"){
+    L.push({r:0,label:"0"});
+    for(let k=HK;k>=1;k--) L.push({r:1/k, label:FRAC[k]});
+  }else{
+    L.push({r:0,label:"0"});
+    for(let k=2;k<=HK;k++) L.push({r:1-1/k, label:FRAC[k]});
+    L.push({r:1,label:"1"});
+  }
+  return L;
+}
 let lMode="quads", lOff=0;
 let rngS=23;
 function rnd(){ rngS=(rngS*1103515245+12345)&0x7fffffff; return rngS/0x7fffffff; }
@@ -225,13 +248,25 @@ el("text",{x:18,y:420,fill:"#8a877c","font-size":"13","letter-spacing":"2"}).tex
 const gProj=el("g",{}), gLevels=el("g",{}), gVol=el("g",{}), gHandles=el("g",{});
 function drawLevels(){
   gLevels.replaceChildren();
-  for(let k=0;k<=grain;k++){
-    const r=k/grain, Y=myF(r);
-    el("line",{x1:X0-6,y1:Y,x2:X1,y2:Y,stroke:"#3fa053","stroke-width":r===1||r===0?1.6:0.9,opacity:r===1||r===0?0.9:0.55},gLevels);
-    el("text",{x:X0-14,y:Y+4,fill:"#3fa053","font-size":"12","text-anchor":"end"},gLevels).textContent=String(k);
+  const Ls=levelList();
+  for(const o of Ls){
+    const Y=myF(o.r), end=o.r===0||o.r===1;
+    el("line",{x1:X0-6,y1:Y,x2:X1,y2:Y,stroke:"#3fa053","stroke-width":end?1.6:0.9,opacity:end?0.9:0.55},gLevels);
+  }
+  /* Labels walk from the sparse end toward the accumulation point, so the
+     canonical fractions (½, ⅓, ¼) survive decluttering; crowded ones yield. */
+  const order=grainMode==="up"?[...Ls].reverse():Ls;
+  const labYs=[];
+  for(const o of order){
+    const Y=myF(o.r), end=o.r===0||o.r===1;
+    if(end || labYs.every(y=>Math.abs(y-Y)>=13)){
+      el("text",{x:X0-14,y:Y+4,fill:"#3fa053","font-size":"12","text-anchor":"end"},gLevels).textContent=o.label;
+      labYs.push(Y);
+    }
   }
   el("text",{x:X0-34,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
-     transform:`rotate(-90 ${X0-34} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels).textContent="COUNT";
+     transform:`rotate(-90 ${X0-34} ${(myF(0)+myF(1))/2})`,"text-anchor":"middle"},gLevels)
+    .textContent=grainMode==="uniform"?"COUNT":"HARMONIC 1/k";
   for(const [r,t] of [[0,"0"],[0.5,"½"],[1,"1"]])
     el("text",{x:X1+10,y:myF(r)+4,fill:"#3fa053","font-size":"12"},gLevels).textContent=t;
   el("text",{x:X1+30,y:(myF(0)+myF(1))/2,fill:"#3fa053","font-size":"11","letter-spacing":"1.5",
@@ -291,7 +326,7 @@ function renderLedger(m){
 /* ---------- drawing -------------------------------------------------------- */
 function polyPtsT(Q){ return Q.map(p=>`${mx(p.x)},${myT(p.y)}`).join(" "); }
 function draw(){
-  gProj.replaceChildren(); gVol.replaceChildren(); gHandles.replaceChildren();
+  gProj.replaceChildren(); gVol.replaceChildren();
   const [Q0,Q1]=gauged(), L=ladder(), S=ladderSteps(L,n1,n0);
   /* panels: green fill in both views; purple bows on warped quads only */
   for(const s of S){
@@ -312,8 +347,9 @@ function draw(){
     }
   }
   /* nested grain slices (the Type A web) */
-  for(let k=1;k<grain;k++){
-    const Sl=sliceL(Q0,Q1,L,k/grain);
+  for(const o of levelList()){
+    if(o.r<=0||o.r>=1) continue;
+    const Sl=sliceL(Q0,Q1,L,o.r);
     el("polygon",{points:polyPtsT(Sl),fill:"none",stroke:"#3fa053","stroke-width":1,opacity:0.55},gVol);
   }
   /* seams: the ladder rungs, both views */
@@ -336,15 +372,28 @@ function draw(){
   el("polygon",{points:polyPtsT(Sl),fill:"#3fa053",opacity:0.14},gVol);
   el("polygon",{points:polyPtsT(Sl),fill:"none",stroke:"#1d5c2c","stroke-width":2.2},gVol);
   el("line",{x1:Math.min(...xsS),y1:myF(tSlice),x2:Math.max(...xsS),y2:myF(tSlice),stroke:"#1d5c2c","stroke-width":2.6},gVol);
-  /* handles */
-  P1.forEach((p,i)=>handle(p,i,"P1","#d3372c"));
-  P0.forEach((p,i)=>handle(p,i,"P0","#2447c4"));
+  placeHandles();
 }
-function handle(p,i,which,col){
-  const v=applyG(G,p);
-  const h=el("rect",{x:mx(v.x)-5.5,y:myT(v.y)-5.5,width:11,height:11,rx:2,
-    fill:"#fdfcf9",stroke:col,"stroke-width":1.6,style:"cursor:grab"},gHandles);
-  h.addEventListener("pointerdown",ev=>startDrag(ev,which,i));
+/* Persistent handles: created once per side-count change, positions updated
+   in place. The element under a finger is never destroyed mid-gesture, so
+   implicit touch capture survives every redraw (incl. during spin). */
+let handleEls=[];
+function rebuildHandles(){
+  gHandles.replaceChildren(); handleEls=[];
+  const mk=(which,i,col)=>{
+    const h=el("rect",{width:11,height:11,rx:2,
+      fill:"#fdfcf9",stroke:col,"stroke-width":1.6,style:"cursor:grab"},gHandles);
+    h.addEventListener("pointerdown",ev=>startDrag(ev,which,i));
+    handleEls.push({h,which,i});
+  };
+  P1.forEach((_,i)=>mk("P1",i,"#d3372c"));
+  P0.forEach((_,i)=>mk("P0",i,"#2447c4"));
+}
+function placeHandles(){
+  for(const e of handleEls){
+    const p=(e.which==="P1"?P1:P0)[e.i], v=applyG(G,p);
+    e.h.setAttribute("x",mx(v.x)-5.5); e.h.setAttribute("y",myT(v.y)-5.5);
+  }
 }
 
 /* ---------- parabola inset -------------------------------------------------- */
@@ -378,34 +427,31 @@ function drawInset(m){
 }
 
 /* ---------- dragging -------------------------------------------------------- */
-let dragW=null, dragI=-1;
+let dragW=null, dragI=-1, dragPid=null;
 function svgPoint(ev){
   const pt=sv.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
   return pt.matrixTransform(sv.getScreenCTM().inverse());
 }
 function startDrag(ev,which,i){
-  ev.preventDefault(); dragW=which; dragI=i;
-  /* Capture on the svg root, not the handle: draw() rebuilds gHandles every
-     tick, destroying the handle mid-drag and silently killing its listeners. */
-  sv.setPointerCapture(ev.pointerId);
-  sv.addEventListener("pointermove",moveDrag);
-  sv.addEventListener("pointerup",endDrag);
-  sv.addEventListener("pointercancel",endDrag);
+  ev.preventDefault(); dragW=which; dragI=i; dragPid=ev.pointerId;
+  try{ sv.setPointerCapture(ev.pointerId); }catch(_){/* capture is a nicety, not a dependency */}
 }
-function moveDrag(ev){
-  if(!dragW) return;
+/* Listeners live on window for the life of the page and filter by pointerId:
+   the drag no longer depends on any particular element surviving a redraw,
+   nor on capture transferring on schedule. */
+window.addEventListener("pointermove",ev=>{
+  if(dragW===null || ev.pointerId!==dragPid) return;
   const P=svgPoint(ev), w=ixT(P.x,P.y);
   const arr=dragW==="P1"?P1:P0, r=arr[dragI].r;
   const s=invApply(G,{x:w.x,y:w.y,r});
   arr[dragI]={x:s.x,y:s.y,r};
   rebase(); tick();
-}
+});
 function endDrag(ev){
-  dragW=null;
-  sv.removeEventListener("pointermove",moveDrag);
-  sv.removeEventListener("pointerup",endDrag);
-  sv.removeEventListener("pointercancel",endDrag);
+  if(ev.pointerId===dragPid){ dragW=null; dragPid=null; }
 }
+window.addEventListener("pointerup",endDrag);
+window.addEventListener("pointercancel",endDrag);
 
 /* ---------- controls --------------------------------------------------------- */
 const S_=id=>document.getElementById(id);
@@ -430,17 +476,26 @@ S_("broll").addEventListener("click",()=>{roll1(); roll0(); rebase(); tick();});
 document.querySelectorAll(".n1sel").forEach(b=>b.addEventListener("click",()=>{
   n1=parseInt(b.dataset.n,10);
   document.querySelectorAll(".n1sel").forEach(x=>x.classList.toggle("on",x===b));
-  roll1(); lOff=lOff%n0; rebase(); tick();
+  roll1(); lOff=lOff%n0; rebuildHandles(); rebase(); tick();
 }));
 document.querySelectorAll(".n0sel").forEach(b=>b.addEventListener("click",()=>{
   n0=parseInt(b.dataset.n,10);
   document.querySelectorAll(".n0sel").forEach(x=>x.classList.toggle("on",x===b));
-  roll0(); lOff=lOff%n0; rebase(); tick();
+  roll0(); lOff=lOff%n0; rebuildHandles(); rebase(); tick();
 }));
+function setGrainButtons(){
+  document.querySelectorAll(".grain").forEach(x=>
+    x.classList.toggle("on", grainMode==="uniform" && parseInt(x.dataset.g,10)===grain));
+  document.querySelectorAll(".gharm").forEach(x=>
+    x.classList.toggle("on", grainMode===x.dataset.m));
+}
 document.querySelectorAll(".grain").forEach(b=>b.addEventListener("click",()=>{
-  grain=parseInt(b.dataset.g,10);
-  document.querySelectorAll(".grain").forEach(x=>x.classList.toggle("on",x===b));
-  drawLevels(); tick();
+  grainMode="uniform"; grain=parseInt(b.dataset.g,10);
+  setGrainButtons(); drawLevels(); tick();
+}));
+document.querySelectorAll(".gharm").forEach(b=>b.addEventListener("click",()=>{
+  grainMode=b.dataset.m;
+  setGrainButtons(); drawLevels(); tick();
 }));
 S_("bquads").addEventListener("click",()=>{ lMode="quads";
   S_("bquads").classList.add("on"); S_("btris").classList.remove("on"); rebase(); tick(); });
@@ -482,7 +537,7 @@ function tick(){
   S_("voff").textContent=String(lOff)+"/"+String(n0);
   S_("vcensus").textContent=`${m.q} warped quads + ${m.tri} flat triangles · slice = ${m.R}-gon · rungs = ${m.R}`;
 }
-syncSliders(); S_("vt").textContent="0.500"; tick();
+rebuildHandles(); syncSliders(); S_("vt").textContent="0.500"; tick();
 </script>
 </body>
 </html>
