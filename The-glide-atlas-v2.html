@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The glide atlas · Tetra Engine Drafting Board</title>
+<style>
+ html,body{margin:0;padding:0;background:#B4B2A6;color:#151310;font-family:Helvetica, Arial, sans-serif;}
+ .wrap{max-width:1240px;margin:0 auto;padding:26px 22px 40px;}
+ .eyebrow{font-size:12px;letter-spacing:0.3em;color:#8E8C80;margin:0 0 8px;}
+ h1{font-size:27px;margin:0 0 10px;font-weight:bold;} h1 em{font-style:italic;font-weight:normal;}
+ .sub{font-size:13.5px;line-height:1.55;max-width:1080px;margin:0 0 16px;}
+ button{background:#EBE9DA;border:1.5px solid #151310;border-radius:0;color:#151310;font-family:Helvetica, Arial, sans-serif;font-size:12px;padding:6px 10px;margin:3px 7px 3px 0;cursor:pointer;}
+ button:focus{outline:2px solid #151310;outline-offset:2px;}
+ /* P9: responsive canvases (localXY already handles CSS scaling) */
+ canvas{display:block;background:#BEBCB0;touch-action:none;cursor:crosshair;margin:0 auto;max-width:100%;height:auto;}
+ .hint{font-size:11px;color:#8E8C80;margin:6px 0 14px;text-align:center;}
+ table{border-collapse:collapse;width:100%;font-size:12px;margin:6px 0 12px;background:#BEBCB0;}
+ th,td{border:1px solid #151310;padding:6px 8px;text-align:left;vertical-align:top;}
+ th{background:#EBE9DA;font-weight:bold;}
+ tr.hl td{background:#EBE9DA;box-shadow:inset 0 0 0 2px #ED3121;}
+ .inv{font-size:12.5px;line-height:1.5;background:#BEBCB0;border:1.5px solid #151310;padding:10px 14px;margin:0 0 14px;}
+ .foot{border-top:1.5px solid #151310;padding-top:14px;margin-top:6px;} .foot .one{font-size:13px;line-height:1.5;max-width:1080px;}
+ .verify{font-size:11.5px;color:#8E8C80;margin-top:10px;}
+ .k{padding:1px 5px;border:1px solid #151310;font-size:11px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p class="eyebrow">TETRA ENGINE · DRAFTING BOARD · THE GLIDE ATLAS</p>
+ <h1>The glide atlas — <em>the whole family on one square</em></h1>
+ <!-- P4: affine removed -->
+ <p class="sub">Every projection in the family is a point in the <b>(r<sub>u</sub>, r<sub>v</sub>)</b> square — the two channel rates.
+ The <b style="color:#3A7D44">diagonal</b> is the isotropic glides, the <b style="color:#8A4FD6">r = 1 edges</b> are the vanishing-axis
+ glides, the <b style="color:#2456B0">r = 0 edges</b> are pushbroom, the corners are one-point / orthographic / pushbroom,
+ and the whole interior is the general glide. Drag the marker: the armature on the right shows the directing structure, and the table
+ below highlights where you are. Two things never change — the picture plane is true-size, and one reciprocal depth law runs through
+ all of it. Only the directing structure moves.</p>
+ <div style="margin:0 0 12px;">
+  <button id="pGen">general glide</button><button id="pIso">isotropic</button><button id="pVax">vanishing-axis</button><button id="pOne">one-point</button><button id="pPush">pushbroom</button><button id="pOrtho">orthographic</button>
+ </div>
+ <!-- P2: height 520 -> 540 -->
+ <canvas id="scene" style="width:1180px;height:540px;" role="img" aria-label="left: the (r_u, r_v) square with named regions and a draggable marker; right: the live armature diagram for the current point"></canvas>
+ <!-- P8 caption folded into the hint -->
+ <p class="hint">Drag the marker in the square (left) · arrow keys nudge · the armature (right) and the highlighted table row update live · dashed line on the square: the paper's D-dial, a one-parameter path through this two-parameter family</p>
+ <table>
+  <tr><th>Projection</th><th>(r<sub>u</sub>, r<sub>v</sub>)</th><th>Vanishing points</th><th>Directing structure</th><th>Element</th><th>Depth measure</th></tr>
+  <tr id="r_one"><td>One-point perspective</td><td>(1, 1)</td><td>all at one centre C</td><td>on C (with the vanishing point)</td><td>trivial</td><td>reciprocal — depth = 1/n</td></tr>
+  <tr id="r_ortho"><td>Orthographic</td><td>(0, 0)</td><td>= picture points (no convergence)</td><td>at infinity</td><td>trivial</td><td>uniform — true size into depth</td></tr>
+  <!-- P4: pushbroom row corrected to match classify() — whole edge named, corners distinguished -->
+  <tr id="r_push"><td>Pushbroom</td><td>r<sub>u</sub> = 0 or r<sub>v</sub> = 0</td><td>corners (1,0),(0,1): on an axis, one direction parallel; edge interior: no convergence either axis</td><td>corners: one at infinity, one on the vanishing point; edge interior: both slits parallel</td><td>single</td><td>mixed (flat / perspective)</td></tr>
+  <tr id="r_iso"><td>Isotropic glide</td><td>(r, r)</td><td>a scaled quad</td><td>a single point (the centre)</td><td>single</td><td>crowds toward scale 1−r</td></tr>
+  <tr id="r_vax"><td>Vanishing-axis glide</td><td>(1, r) or (r, 1)</td><td>doubled up on one axis</td><td>one axis (the other merges into the vanishing points)</td><td>single</td><td>mixed anisotropic</td></tr>
+  <tr id="r_gen"><td>General glide</td><td>r<sub>u</sub> ≠ r<sub>v</sub>, both finite</td><td>a quad (four distinct)</td><td>two perpendicular axes, at two depths</td><td><b>split</b></td><td>crowds toward 1−r<sub>u</sub> and 1−r<sub>v</sub></td></tr>
+ </table>
+ <div class="inv"><b>Invariant everywhere.</b> The <span class="k">picture plane</span> is true-size — a square is a square, at every point of the square.
+ And one <span class="k">projective depth law</span> runs through the whole family: equal depth steps divide picture&rarr;vanishing at the same
+ proportion &lambda; = k/(k+1), so the cross-ratio is preserved — depth = 1/n at perspective, its reciprocal face elsewhere. Only the
+ directing structure changes from point to point.</div>
+ <div class="foot">
+  <p class="one">Read the atlas as one statement. The picture plane anchors the metric; the depth law fixes the recession; and where the
+  directing points sit — collapsed to a centre, strung on one axis, or split across two — is the single steering wheel that turns
+  perspective into orthographic, pushbroom, the vanishing-axis glide, and the fully general glide. The single line element covers the
+  diagonal and the edges; the split element covers the interior. That is the entire family, corner to corner.</p>
+  <!-- P7: unified audit total -->
+  <p class="verify">Verified in check_atlas.js (8: the directing-axis count from the real geometry matches the region and the element
+  needed; the diagonal is isotropic, the r=1 edges vanishing-axis, the interior the general split glide; and both invariants — true-size
+  picture, universal λ = k/(k+1) — hold across the square). Built on check_directing_construction, check_picture_metric,
+  check_depth_measure, check_isotropy, check_vaxis and check_split. Audit total 317 · snapshot 2026-07 · matches axioms page.</p>
+ </div>
+</div>
+<script id="atlas-core">
+// ---------- the one channel law (Sheet 39's makeProj, per channel; seat 0, shear 0 -- the sigma = 0 chart) ----------
+// GAUGE CONVENTION (this page): image = preimage / chanScale(...).
+// chanScale is the forward face of the channel gauge; the paper's AR(z0)
+// factor is its reciprocal evaluated at the working depth. (The axioms page
+// exposes the reciprocal face: image = preimage x sc, sc = 1/chanScale.)
+function chanScale(Zc,Zg,r,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return (1-r)*pg + r*p; }
+function leafW(Zc,Zg,r,w0,Z){ return w0/chanScale(Zc,Zg,r,Z); }            // preimage: the leaf of pixel w0
+function gaugeOf(Zc,Zg,Z){ var pg=-Zc/(Zg-Zc), p=-Zc/(Z-Zc); return 1-p/pg; } // pp. 77-78 device, closed form
+function panelChannels(name,Zp,Zg,Zv,Zh,k){
+  if(name==='persp') return {u:{Zc:Zp,Zg:Zg,r:1},  v:{Zc:Zp,Zg:Zg,r:1}};   // two merges, one depth
+  if(name==='cross') return {u:{Zc:Zv,Zg:Zg,r:1},  v:{Zc:Zh,Zg:Zg,r:1}};   // two merges, two depths
+  if(name==='push')  return {u:{Zc:Zp,Zg:Zg,r:0},  v:{Zc:Zp,Zg:Zg,r:1}};   // one merge + one banishment
+  return             {u:{Zc:Zp,Zg:Zg,r:1-k},       v:{Zc:Zp,Zg:Zg,r:1}};   // 'glide': one merge + one SEPARATION
+}
+// ---------- the orthographic turntable (what the eye sees; straightness-preserving, assertion 16) ----------
+function viewBasis(yaw,pitch){ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return { R:[cy,0,-sy], U:[sy*sp,cp,cy*sp], F:[sy*cp,-sp,cy*cp] }; }
+function project(B,C,s,cx,cy,p){ var qx=p[0]-C[0],qy=p[1]-C[1],qz=p[2]-C[2];
+  return [ cx + s*(qx*B.R[0]+qy*B.R[1]+qz*B.R[2]),
+           cy - s*(qx*B.U[0]+qy*B.U[1]+qz*B.U[2]),
+           qx*B.F[0]+qy*B.F[1]+qz*B.F[2] ]; }
+// P6: railD/railV/thickness/rayPt/rayPtQ/directingDepth/mapPoint/leafWQ/chanScaleQ
+// removed here (unused on this page). panelChannels retained: load-bearing via dialPath below.
+</script>
+<script>
+
+(function(){
+'use strict';
+var PANEL='#BEBCB0',SURFACE='#EBE9DA',INK='#151310',FAINT='#8E8C80';
+var PIC='#ED3121', VAN='#8A4FD6', DU='#12A6A6', DV='#2456B0', AFF='#3A7D44', RED='#ED3121';
+/* P6: unused GROUND removed */
+var CW=1180, CH=540, SPLITX=540;                       /* P2 */
+/* P3: the declared datum — one tolerance for every named-region test on this page */
+var EPS = 0.02;
+var state={ru:0.4, rv:0.7};
+
+// glide-line geometry (same as the split element)
+function Vp(p){ return [p[0]*(1-state.ru), p[1]*(1-state.rv)]; }
+function Du(p){ var v=Vp(p), l=1/state.ru; return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }
+function Dv(p){ var v=Vp(p), l=1/state.rv; return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }
+function markImg(p,k){ var v=Vp(p); return [(p[0]+k*v[0])/(1+k), (p[1]+k*v[1])/(1+k)]; }
+function farDir(p){ var l=Math.max(1/state.ru,1/state.rv), v=Vp(p); return [p[0]+l*(v[0]-p[0]), p[1]+l*(v[1]-p[1])]; }
+function reorder(pts){ var cx=0,cy=0,i; for(i=0;i<pts.length;i++){cx+=pts[i][0];cy+=pts[i][1];} cx/=pts.length;cy/=pts.length;
+  return pts.slice().sort(function(a,b){return Math.atan2(a[1]-cy,a[0]-cx)-Math.atan2(b[1]-cy,b[0]-cx);}); }
+/* P3/P4: classify on the shared EPS; the whole r=0 edge is pushbroom (no affine branch) */
+function classify(ru,rv){ var u1=ru>1-EPS,u0=ru<EPS,v1=rv>1-EPS,v0=rv<EPS,iso=Math.abs(ru-rv)<EPS;
+  if(u1&&v1)return 'one-point'; if(u0&&v0)return 'orthographic'; if((u1&&v0)||(u0&&v1))return 'pushbroom';
+  if(u1||v1)return 'vanishing-axis'; if(u0||v0)return 'pushbroom'; if(iso)return 'isotropic'; return 'general'; }
+var NAMES={ 'one-point':'One-point perspective','orthographic':'Orthographic','pushbroom':'Pushbroom',
+  'vanishing-axis':'Vanishing-axis glide','isotropic':'Isotropic glide','general':'General glide \u2014 split element' };
+var ROW={ 'one-point':'r_one','orthographic':'r_ortho','pushbroom':'r_push','vanishing-axis':'r_vax','isotropic':'r_iso','general':'r_gen' };
+
+// ================= the (r_u, r_v) map =================
+var MX=72, MY=54, MS=392;
+function mxOf(ru){ return MX+ru*MS; } function myOf(rv){ return MY+(1-rv)*MS; }
+/* P8: the paper's D-dial as a PATH through this square:
+   rv fixed at 1, ru = 1-k for k in [0, kMax] — the perspective<->glide slice */
+function dialPath(k){ return { ru: Math.max(0,1-k), rv: 1 }; }
+var KMAX = 1.55;                                       // dial range shown on the map
+function drawMap(ctx){
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE MAP \u2014 every projection is a point in the (r\u1d64, r\u1d65) square',14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('drag the marker \u00b7 the diagonal, edges and corners are the named projections',14,40);
+  // interior fill (general / split territory)
+  ctx.fillStyle=SURFACE;ctx.globalAlpha=0.5;ctx.fillRect(MX,MY,MS,MS);ctx.globalAlpha=1;
+  // r=0 edges (pushbroom): bottom + left
+  ctx.strokeStyle=DV;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(MX,MY+MS);ctx.lineTo(MX+MS,MY+MS);ctx.moveTo(MX,MY);ctx.lineTo(MX,MY+MS);ctx.stroke();
+  // r=1 edges (vanishing-axis): top + right
+  ctx.strokeStyle=VAN;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(MX,MY);ctx.lineTo(MX+MS,MY);ctx.moveTo(MX+MS,MY);ctx.lineTo(MX+MS,MY+MS);ctx.stroke();
+  // diagonal (isotropic)
+  ctx.strokeStyle=AFF;ctx.lineWidth=2.4;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(mxOf(0),myOf(0));ctx.lineTo(mxOf(1),myOf(1));ctx.stroke();
+  /* P8: the paper's D-dial drawn live */
+  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1.6;ctx.setLineDash([4,4]);ctx.beginPath();
+  var di;for(di=0;di<=60;di++){ var dp=dialPath(di/60*KMAX), dq=[mxOf(dp.ru),myOf(dp.rv)];
+    di?ctx.lineTo(dq[0],dq[1]):ctx.moveTo(dq[0],dq[1]); }
+  ctx.stroke();ctx.setLineDash([]);
+  // border
+  ctx.strokeStyle=INK;ctx.lineWidth=1.4;ctx.strokeRect(MX,MY,MS,MS);
+  // ticks + axis labels
+  ctx.fillStyle=INK;ctx.font='10px Helvetica, Arial, sans-serif';ctx.textAlign='center';
+  var t;for(t=0;t<=1;t+=0.5){ ctx.fillText(t.toFixed(1),mxOf(t),MY+MS+16); ctx.textAlign='right';ctx.fillText(t.toFixed(1),MX-6,myOf(t)+3);ctx.textAlign='center'; }
+  ctx.fillText('r\u1d64  (horizontal channel rate)',MX+MS/2,MY+MS+32);
+  ctx.save();ctx.translate(MX-30,MY+MS/2);ctx.rotate(-Math.PI/2);ctx.fillText('r\u1d65  (vertical channel rate)',0,0);ctx.restore();
+  ctx.textAlign='left';
+  // region labels
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=AFF;ctx.save();ctx.translate(mxOf(0.5)+34,myOf(0.5)-2);ctx.rotate(-Math.PI/4);ctx.textAlign='center';ctx.fillText('isotropic glides',0,0);ctx.restore();ctx.textAlign='left';
+  ctx.fillStyle=VAN;ctx.textAlign='center';ctx.fillText('vanishing-axis',mxOf(0.5),MY-6);ctx.textAlign='left';
+  ctx.save();ctx.translate(MX+MS+16,myOf(0.5));ctx.rotate(Math.PI/2);ctx.fillStyle=VAN;ctx.textAlign='center';ctx.fillText('vanishing-axis',0,0);ctx.restore();ctx.textAlign='left';
+  /* P4/C1: affine removed; label moved clear of border and ticks */
+  ctx.fillStyle=DV;ctx.textAlign='center';ctx.fillText('pushbroom',mxOf(0.5)+70,MY+MS+34);ctx.textAlign='left';
+  ctx.fillStyle=INK;ctx.globalAlpha=0.75;ctx.font='italic 11px Helvetica, Arial, sans-serif';ctx.fillText('interior = general glide (split element)',mxOf(0.32),myOf(0.30));ctx.globalAlpha=1;ctx.font='10px Helvetica, Arial, sans-serif';
+  // corners
+  function corner(ru,rv,txt,ax,ay){ ctx.fillStyle=INK;ctx.beginPath();ctx.arc(mxOf(ru),myOf(rv),4,0,6.2832);ctx.fill();
+    ctx.fillStyle=INK;ctx.font='9px Helvetica, Arial, sans-serif';ctx.textAlign=ax;ctx.fillText(txt,mxOf(ru)+(ax==='right'?-7:7),myOf(rv)+ay);ctx.textAlign='left'; }
+  corner(0,0,'orthographic','left',14); corner(1,1,'one-point','right',-8);
+  corner(1,0,'pushbroom','right',14); corner(0,1,'pushbroom','left',-8);
+  // marker
+  var mx=mxOf(state.ru),my=myOf(state.rv);
+  ctx.strokeStyle=RED;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(mx-9,my);ctx.lineTo(mx+9,my);ctx.moveTo(mx,my-9);ctx.lineTo(mx,my+9);ctx.stroke();
+  ctx.fillStyle=RED;ctx.beginPath();ctx.arc(mx,my,5,0,6.2832);ctx.fill();
+  // readout (P2: inside the new height)
+  var cl=classify(state.ru,state.rv);
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('\u25b6 '+NAMES[cl],14,MY+MS+52);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';
+  ctx.fillText('r\u1d64 = '+state.ru.toFixed(2)+'    r\u1d65 = '+state.rv.toFixed(2)+'    element: '+(axes()===2?'SPLIT (two directing axes)':(axes()===1?'single (one directing axis)':'single (directing is a point)')),14,MY+MS+68);
+}
+/* P3: axes() on the shared EPS */
+function axes(){ var iso=Math.abs(state.ru-state.rv)<EPS, u1=state.ru>1-EPS, v1=state.rv>1-EPS;
+  if(iso)return 0; return (u1?0:1)+(v1?0:1); }
+
+// ================= live armature diagram =================
+var DX=855, DY=250, ds=0.92;
+function dx(x){ return DX+x*ds; } function dy(y){ return DY-y*ds; }
+function drawDiagram(ctx){
+  /* P1: clip no longer swallows the headings */
+  ctx.save();ctx.beginPath();ctx.rect(SPLITX+1,0,CW-SPLITX-2,CH);ctx.clip();
+  ctx.fillStyle=INK;ctx.font='bold 13px Helvetica, Arial, sans-serif';ctx.fillText('THE ARMATURE \u2014 the directing structure at this point',SPLITX+14,24);
+  ctx.fillStyle=FAINT;ctx.font='11px Helvetica, Arial, sans-serif';ctx.fillText('picture points \u00b7 vanishing quad \u00b7 the two directing axes',SPLITX+14,40);
+  var pic=[[-110,66],[110,66],[-110,-66],[110,-66]], i,k;
+  // directing axes through the origin
+  ctx.strokeStyle=DU;ctx.lineWidth=1.4;ctx.globalAlpha=0.7;ctx.beginPath();ctx.moveTo(dx(0),dy(-150));ctx.lineTo(dx(0),dy(150));ctx.stroke();
+  ctx.strokeStyle=DV;ctx.beginPath();ctx.moveTo(dx(-230),dy(0));ctx.lineTo(dx(230),dy(0));ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle=DU;ctx.font='10px Helvetica, Arial, sans-serif';ctx.fillText('u-directing axis',dx(4),dy(140));
+  ctx.fillStyle=DV;ctx.fillText('v-directing axis',dx(150),dy(0)-4);
+  // depth planes converging on the vanishing quad
+  for(k=1;k<=4;k++){ var poly=reorder(pic.map(function(p){var m=markImg(p,k);return [dx(m[0]),dy(m[1])];}));
+    ctx.strokeStyle=INK;ctx.lineWidth=0.8;ctx.globalAlpha=0.35;ctx.beginPath();ctx.moveTo(poly[0][0],poly[0][1]);for(i=1;i<poly.length;i++)ctx.lineTo(poly[i][0],poly[i][1]);ctx.closePath();ctx.stroke();ctx.globalAlpha=1; }
+  // vanishing quad
+  var vq=reorder(pic.map(function(p){var v=Vp(p);return [dx(v[0]),dy(v[1])];}));
+  ctx.strokeStyle=VAN;ctx.lineWidth=1.2;ctx.globalAlpha=0.85;ctx.beginPath();ctx.moveTo(vq[0][0],vq[0][1]);for(i=1;i<vq.length;i++)ctx.lineTo(vq[i][0],vq[i][1]);ctx.closePath();ctx.stroke();ctx.globalAlpha=1;
+  // glide lines
+  for(i=0;i<pic.length;i++){ var p=pic[i], fd=farDir(p); ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.globalAlpha=0.8;ctx.beginPath();ctx.moveTo(dx(p[0]),dy(p[1]));ctx.lineTo(dx(fd[0]),dy(fd[1]));ctx.stroke();ctx.globalAlpha=1; }
+  // points
+  for(i=0;i<pic.length;i++){ var p2=pic[i], v=Vp(p2), du=Du(p2), dv=Dv(p2);
+    ctx.fillStyle=DV;ctx.beginPath();ctx.arc(dx(dv[0]),dy(dv[1]),4,0,6.2832);ctx.fill();
+    ctx.fillStyle=DU;ctx.beginPath();ctx.arc(dx(du[0]),dy(du[1]),4,0,6.2832);ctx.fill();
+    ctx.fillStyle=VAN;ctx.beginPath();ctx.arc(dx(v[0]),dy(v[1]),4.5,0,6.2832);ctx.fill();
+    ctx.fillStyle=PIC;ctx.beginPath();ctx.arc(dx(p2[0]),dy(p2[1]),5,0,6.2832);ctx.fill(); }
+  // legend
+  ctx.font='10px Helvetica, Arial, sans-serif';
+  ctx.fillStyle=PIC;ctx.fillText('\u25cf picture',SPLITX+14,CH-30);ctx.fillStyle=VAN;ctx.fillText('\u25cf vanishing',SPLITX+80,CH-30);
+  ctx.fillStyle=DU;ctx.fillText('\u25cf u-directing',SPLITX+164,CH-30);ctx.fillStyle=DV;ctx.fillText('\u25cf v-directing',SPLITX+248,CH-30);
+  ctx.fillStyle=FAINT;ctx.fillText('two directing points per line merge as the marker meets the diagonal or an edge',SPLITX+14,CH-14);
+  ctx.restore();
+}
+
+function draw(){
+  var cv=document.getElementById('scene'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+  if(cv.width!==CW*dpr){cv.width=CW*dpr;cv.height=CH*dpr;}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=PANEL;ctx.fillRect(0,0,CW,CH);
+  drawMap(ctx); drawDiagram(ctx);
+  ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.globalAlpha=0.4;ctx.beginPath();ctx.moveTo(SPLITX,10);ctx.lineTo(SPLITX,CH-10);ctx.stroke();ctx.globalAlpha=1;
+  ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.strokeRect(0.75,0.75,CW-1.5,CH-1.5);
+}
+function highlightRow(){ var cl=classify(state.ru,state.rv), i; var ids=['r_one','r_ortho','r_push','r_iso','r_vax','r_gen'];
+  for(i=0;i<ids.length;i++){ var el=document.getElementById(ids[i]); if(el)el.className=''; }
+  var t=document.getElementById(ROW[cl]); if(t)t.className='hl'; }
+function render(){ draw(); highlightRow(); }
+
+function init(){
+  var cv=document.getElementById('scene'),drag=false;
+  function localXY(e){var rc=cv.getBoundingClientRect();return [(e.clientX-rc.left)*CW/rc.width,(e.clientY-rc.top)*CH/rc.height];}
+  function setFrom(p){ state.ru=Math.max(0,Math.min(1,(p[0]-MX)/MS)); state.rv=Math.max(0,Math.min(1,1-(p[1]-MY)/MS)); render(); }
+  cv.addEventListener('pointerdown',function(e){var p=localXY(e); if(p[0]<SPLITX){drag=true;cv.setPointerCapture(e.pointerId);setFrom(p);} });
+  cv.addEventListener('pointermove',function(e){ if(drag)setFrom(localXY(e)); });
+  cv.addEventListener('pointerup',function(){drag=false;});
+  /* P9: keyboard nudge */
+  cv.tabIndex=0;
+  cv.addEventListener('keydown',function(e){
+    var d=0.01,m={ArrowLeft:[-d,0],ArrowRight:[d,0],ArrowUp:[0,d],ArrowDown:[0,-d]}[e.key];
+    if(m){ state.ru=Math.max(0,Math.min(1,state.ru+m[0])); state.rv=Math.max(0,Math.min(1,state.rv+m[1])); render(); e.preventDefault(); }});
+  function preset(ru,rv){return function(){state.ru=ru;state.rv=rv;render();};}
+  document.getElementById('pOne').addEventListener('click',preset(1,1));
+  document.getElementById('pOrtho').addEventListener('click',preset(0,0));
+  document.getElementById('pPush').addEventListener('click',preset(1,0));
+  document.getElementById('pIso').addEventListener('click',preset(0.5,0.5));
+  document.getElementById('pVax').addEventListener('click',preset(1,0.45));
+  document.getElementById('pGen').addEventListener('click',preset(0.4,0.7));
+  render();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
